@@ -95,7 +95,7 @@ $ git clone https://github.com/ArjaanBuijk/FullstackND-Catalog
 
 2. One time: prepare the python virtual environment
 ```bash
-$ cd FullstackND-Catalog/catalog
+$ cd FullstackND-Catalog
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ pip install --upgrade pip
@@ -104,7 +104,7 @@ $ source venv/bin/activate
 
  Alternatively, instead of installing the required python packages using the file <em>'requirements.txt'</em>, which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package:
 ```bash
-$ cd FullstackND-Catalog/catalog
+$ cd FullstackND-Catalog
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ pip install --upgrade pip
@@ -116,25 +116,27 @@ $ source venv/bin/activate
 (venv) $ pip install flask-httpauth
 (venv) $ pip install flask-login
 (venv) $ pip install Flask-WTF
+(venv) $ pip install flask-testing
+(venv) $ pip install blinker
 ```
 
 3. Activate the python virtual environment and start the application server
 ```bash
-$ cd TOPTAL-jogtrack3/jogtrack
+$ cd FullstackND-Catalog
 $ source venv/bin/activate
-(venv) $ export FLASK_APP=jogtrack.py
+(venv) $ export FLASK_APP=catalog.py
 (venv) $ flask run
 ```
 
  You should see this output printed to the console:
  ```bash
- * Serving Flask app "jogtrack"
+ * Serving Flask app "catalog"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
 4. Test it all works by running the unit tests
 ```bash
-$ cd FLASK-REST-JSONAPI-Quickstart/quickstart3
+$ cd FullstackND-Catalog
 $ source venv/bin/activate
-(venv) $ python test/tests.py
+(venv) $ python tests.py
 ```

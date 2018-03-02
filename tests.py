@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from config import Config
 from flask_testing import TestCase
 
 from fbone import create_app
 from fbone.user import User
-from fbone.config import TestConfig
 from fbone.extensions import db
 
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'  # In memory database
+
+    # turn CSRF off to enable unittesting without sending CSRF tokens
+    CSRF_ENABLED = False
+    WTF_CSRF_ENABLED = False
 
 class BaseTestCase(TestCase):
 
@@ -41,7 +48,7 @@ class BaseTestCase(TestCase):
             'password': password,
         }
         response = self.client.post('/login', data=data, follow_redirects=True)
-        assert "Logged in" in response.data
+        assert "Logged in" in response.data.decode()
         return response
 
     def _logout(self):
@@ -71,7 +78,7 @@ class TestFrontend(BaseTestCase):
             'agree': True,
         }
         response = self.client.post('/signup', data=data, follow_redirects=True)
-        assert "Signed up" in response.data
+        assert "Signed up" in response.data.decode()
         new_user = User.query.filter_by(email=data['email']).first()
         assert new_user.name == "new_user"
 
@@ -81,7 +88,7 @@ class TestFrontend(BaseTestCase):
         response = self.client.post('/login', data={
             'login': "demo@example.com",
             'password': "123456"}, follow_redirects=True)
-        assert "Logged in" in response.data
+        assert "Logged in" in response.data.decode()
 
     def test_logout(self):
         self.login("demo@example.com", "123456")
@@ -89,4 +96,4 @@ class TestFrontend(BaseTestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)

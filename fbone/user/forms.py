@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask_wtf import Form
-from flask_wtf.html5 import URLField, EmailField, TelField
+from flask_wtf import FlaskForm
+#AB from flask_wtf.html5 import URLField, EmailField, TelField
+from wtforms.fields.html5 import URLField, EmailField, TelField
 
 from wtforms import ValidationError, StringField, PasswordField, SubmitField, \
     TextAreaField, FileField, DateField, SelectField
@@ -15,7 +16,7 @@ from fbone.constants import PASSWORD_LEN_MIN, PASSWORD_LEN_MAX, SEX_TYPES, \
 from fbone.utils import allowed_file
 
 
-class ProfileForm(Form):
+class ProfileForm(FlaskForm):
     email = EmailField('Email', [DataRequired(), Email()])
     # Don't use the same name as model because we are going to use populate_obj().
     # avatar_file = FileField("Avatar", [Optional()])
@@ -38,7 +39,7 @@ class ProfileForm(Form):
                                   "/".join(ALLOWED_AVATAR_EXTENSIONS))
 
 
-class PasswordForm(Form):
+class PasswordForm(FlaskForm):
     password = PasswordField('Current password', [DataRequired()])
     new_password = PasswordField('New password',
                                  [DataRequired(),

@@ -9,7 +9,7 @@ from flask_login import login_required, login_user, current_user, logout_user, \
 
 from fbone.user import User
 from fbone.extensions import db, login_manager
-from forms import SignupForm, LoginForm, RecoverPasswordForm, ReauthForm, \
+from .forms import SignupForm, LoginForm, RecoverPasswordForm, ReauthForm, \
     ChangePasswordForm
 
 
@@ -31,6 +31,9 @@ def login():
     form = LoginForm(login=request.args.get('login', None),
                      next=request.args.get('next', None))
 
+    # TESTING
+    form.validate()
+    #
     if form.validate_on_submit():
         user, authenticated = User.authenticate(form.login.data,
                                     form.password.data)

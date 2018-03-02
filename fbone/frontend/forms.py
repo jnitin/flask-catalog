@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import ValidationError, HiddenField, BooleanField, StringField, \
                 PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
-from flask_wtf.html5 import EmailField
+#ABfrom flask_wtf.html5 import EmailField
+from wtforms.fields.html5 import EmailField
 
 from fbone.user import User
 from fbone.constants import USERNAME_LEN_MIN, USERNAME_LEN_MAX, USERNAME_TIP, \
@@ -13,7 +14,7 @@ from fbone.constants import USERNAME_LEN_MIN, USERNAME_LEN_MAX, USERNAME_TIP, \
                     AGREE_TIP
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     next = HiddenField()
     login = StringField('Username or email',
                         [DataRequired(),
@@ -27,7 +28,7 @@ class LoginForm(Form):
                          render_kw={"class": "btn btn-success btn-block"})
 
 
-class SignupForm(Form):
+class SignupForm(FlaskForm):
     next = HiddenField()
     email = EmailField(u'Email',
                        [DataRequired(), Email(),
@@ -54,7 +55,7 @@ class SignupForm(Form):
             raise ValidationError(u'This email is taken')
 
 
-class RecoverPasswordForm(Form):
+class RecoverPasswordForm(FlaskForm):
     email = EmailField(u'Your email',
                        [DataRequired(),
                         Email(),
@@ -62,7 +63,7 @@ class RecoverPasswordForm(Form):
     submit = SubmitField('Send instructions')
 
 
-class ChangePasswordForm(Form):
+class ChangePasswordForm(FlaskForm):
     activation_key = HiddenField()
     password = PasswordField(u'Password', [DataRequired()])
     password_again = PasswordField(u'Password again',
@@ -71,7 +72,7 @@ class ChangePasswordForm(Form):
     submit = SubmitField('Save')
 
 
-class ReauthForm(Form):
+class ReauthForm(FlaskForm):
     next = HiddenField()
     password = PasswordField(u'Password',
                              [DataRequired(),
