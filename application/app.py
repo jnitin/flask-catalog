@@ -49,7 +49,6 @@ def configure_extensions(app):
 
     # flask-login
     login_manager.login_view = 'auth.login'
-    login_manager.refresh_view = 'auth.reauth'
 
     @login_manager.user_loader
     def load_user(id):

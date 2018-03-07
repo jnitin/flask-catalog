@@ -20,5 +20,3 @@ def make_dir(dir_path):
     except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
-    #AB except Exception, e:
-        #AB raise e

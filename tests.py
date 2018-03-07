@@ -41,13 +41,14 @@ class BaseTestCase(TestCase):
         db.session.remove()
         db.drop_all()
 
-    def login(self, username, password):
+    def login(self, email, password, name):
         data = {
-            'email': username,
+            'email': email,
             'password': password,
+            'name': name
         }
         response = self.client.post('/login', data=data, follow_redirects=True)
-        assert "Succesfully logged in" in response.data.decode()
+        assert name in response.data.decode()
         return response
 
     def _logout(self):
@@ -87,10 +88,10 @@ class TestFrontend(BaseTestCase):
         response = self.client.post('/login', data={
             'email': "ab1@c.com",
             'password': "ab1"}, follow_redirects=True)
-        assert "Succesfully logged in" in response.data.decode()
+        assert "a1 b1" in response.data.decode()
 
     def test_4_logout(self):
-        self.login("ab1@c.com", "ab1")
+        self.login("ab1@c.com", "ab1", "a1 b1")
         self._logout()
 
 

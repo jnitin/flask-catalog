@@ -36,13 +36,6 @@ class RegisterForm(FlaskForm):
             raise ValidationError('This email is already registered')
 
 
-class RecoverPasswordForm(FlaskForm):
-    email = EmailField('Your email',
-                       [DataRequired(),
-                        Email()])
-    submit = SubmitField('Send instructions')
-
-
 class ChangePasswordForm(FlaskForm):
     activation_key = HiddenField()
     password = PasswordField('Password', [DataRequired()])
@@ -50,10 +43,3 @@ class ChangePasswordForm(FlaskForm):
                                    [EqualTo('password',
                                             message="Passwords don't match")])
     submit = SubmitField('Save')
-
-
-class ReauthForm(FlaskForm):
-    next = HiddenField()
-    password = PasswordField('Password',
-                             [DataRequired()])
-    submit = SubmitField('Reauthenticate')
