@@ -83,5 +83,6 @@ def password():
         db.session.commit()
 
         flash('Password updated.', 'success')
+        return redirect(url_for('user.profile'))
 
     return render_template('auth/password.html', form=form)
