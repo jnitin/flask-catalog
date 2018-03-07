@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from sqlalchemy import Column, desc
 from sqlalchemy.orm import backref
 from flask import current_app, g

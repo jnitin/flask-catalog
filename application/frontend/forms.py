@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
-
 from flask_wtf import FlaskForm
 from wtforms import ValidationError, HiddenField, BooleanField, StringField, \
                 PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
-#ABfrom flask_wtf.html5 import EmailField
 from wtforms.fields.html5 import EmailField
 
 from application.user import User
-from application.constants import AGREE_TIP
 
 
 class LoginForm(FlaskForm):
@@ -32,7 +28,6 @@ class RegisterForm(FlaskForm):
                              [DataRequired()])
     name = StringField('Your Name',
                        [DataRequired()])
-    # agree = BooleanField(AGREE_TIP, [DataRequired()])
     submit = SubmitField('Register',
                          render_kw={"class": "btn btn-success btn-block"})
 

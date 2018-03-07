@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Initialize SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()

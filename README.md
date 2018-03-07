@@ -84,7 +84,9 @@ The project structure is based on [fbone](https://github.com/imwilsonxu/fbone), 
 
 ## Usage
 
-Development and testing was done on Ubuntu 16.04.
+The project is written for Python 3
+
+Development and testing was done on Ubuntu 16.04, using Python 3.5
 
 The steps described here show how to run <b>catalog</b> within a python virtual environment.
 

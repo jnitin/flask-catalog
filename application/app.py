@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from flask import Flask, render_template
 
 from config import Config
@@ -7,7 +5,6 @@ from .user import User
 
 from .extensions import db, login_manager
 from .filters import format_date, pretty_date, nl2br
-#AB from utils import INSTANCE_FOLDER_PATH
 
 
 # For import *
@@ -20,7 +17,6 @@ def create_app(config=Config, app_name=None):
     if app_name is None:
         app_name = config.PROJECT_NAME
 
-    #AB app = Flask(app_name, instance_path=INSTANCE_FOLDER_PATH, instance_relative_config=True)
     app = Flask(app_name, instance_relative_config=True)
     configure_app(app, config)
     configure_hook(app)
