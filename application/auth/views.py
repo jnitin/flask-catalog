@@ -7,7 +7,7 @@ from flask_login import login_required, login_user, current_user, logout_user, \
 
 from ..user import User
 from ..extensions import db, login_manager
-from .forms import RegisterForm, LoginForm, ChangePasswordForm
+from .forms import RegisterForm, LoginForm, PasswordForm
 
 
 auth = Blueprint('auth', __name__)
@@ -71,3 +71,17 @@ def register():
             return redirect(form.next.data or url_for('user.profile'))
 
     return render_template('auth/register.html', form=form)
+
+@auth.route('/password', methods=['GET', 'POST'])
+@login_required
+def password():
+    form = PasswordForm()
+
+    if form.validate_on_submit():
+        current_user.password = form.new_password.data
+
+        db.session.commit()
+
+        flash('Password updated.', 'success')
+
+    return render_template('auth/password.html', form=form)

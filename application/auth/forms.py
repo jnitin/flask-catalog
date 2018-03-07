@@ -3,6 +3,7 @@ from wtforms import ValidationError, HiddenField, BooleanField, StringField, \
                 PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms.fields.html5 import EmailField
+from flask_login import current_user
 
 from ..user import User
 
@@ -36,10 +37,17 @@ class RegisterForm(FlaskForm):
             raise ValidationError('This email is already registered')
 
 
-class ChangePasswordForm(FlaskForm):
-    activation_key = HiddenField()
-    password = PasswordField('Password', [DataRequired()])
-    password_again = PasswordField('Password again',
-                                   [EqualTo('password',
-                                            message="Passwords don't match")])
-    submit = SubmitField('Save')
+class PasswordForm(FlaskForm):
+    password = PasswordField('Current password', [DataRequired()])
+    new_password = PasswordField('New password',
+                                 [DataRequired()])
+    password_again = PasswordField('Repeat new password',
+                                   [DataRequired(),
+                                    EqualTo('new_password')])
+    submit = SubmitField('Update password',
+                         render_kw={"class": "btn btn-success"})
+
+    def validate_password(form, field):
+        user = User.query.filter_by(id=current_user.id).first()
+        if not user.verify_password(field.data):
+            raise ValidationError("Current password is wrong.")

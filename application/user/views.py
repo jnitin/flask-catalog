@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, send_from_directory, request, \
     current_app, flash
 from flask_login import login_required, current_user
 
-from .forms import ProfileForm, PasswordForm
+from .forms import ProfileForm
 
 from ..extensions import db
 from ..utils import get_current_time
@@ -26,19 +26,3 @@ def profile():
         flash('Public profile updated.', 'success')
 
     return render_template('user/profile.html', form=form)
-
-
-@user.route('/password', methods=['GET', 'POST'])
-@login_required
-def password():
-    form = PasswordForm()
-
-    if form.validate_on_submit():
-        form.populate_obj(user)
-        user.password = form.new_password.data
-
-        db.session.commit()
-
-        flash('Password updated.', 'success')
-
-    return render_template('user/password.html', form=form)

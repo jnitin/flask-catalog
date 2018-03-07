@@ -12,8 +12,8 @@
 					<li role="presentation" class="{% if request.endpoint == 'user.profile' %}active{% endif %}">
 						<a href="{{ url_for('user.profile') }}">Profile</a>
 					</li>
-                    <li role="presentation" class="{% if request.endpoint == 'user.password' %}active{% endif %}">
-						<a href="{{ url_for('user.password') }}">Password</a>
+                    <li role="presentation" class="{% if request.endpoint == 'auth.password' %}active{% endif %}">
+						<a href="{{ url_for('auth.password') }}">Password</a>
 					</li>
 				</ul>
 			</div>

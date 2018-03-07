@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, URL, \
     AnyOf, Optional
 from flask_login import current_user
 
-from ..user import User
+from . import User
 
 
 class ProfileForm(FlaskForm):
@@ -26,17 +26,3 @@ class ProfileForm(FlaskForm):
                 raise ValidationError('This email is already registered')
 
 
-class PasswordForm(FlaskForm):
-    password = PasswordField('Current password', [DataRequired()])
-    new_password = PasswordField('New password',
-                                 [DataRequired()])
-    password_again = PasswordField('Repeat new password',
-                                   [DataRequired(),
-                                    EqualTo('new_password')])
-    submit = SubmitField('Update password',
-                         render_kw={"class": "btn btn-success"})
-
-    def validate_password(form, field):
-        user = User.query.filter_by(id=current_user.id).first()
-        if not user.verify_password(field.data):
-            raise ValidationError("Current password is wrong.")

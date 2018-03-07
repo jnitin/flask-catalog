@@ -48,7 +48,7 @@
 										{{ current_user.name }} <span class="caret"></span></a>
 								<ul class="dropdown-menu">
 									<li><a href="{{ url_for('user.profile') }}">Profile</a></li>
-									<li><a href="{{ url_for('user.password') }}">Password</a></li>
+									<li><a href="{{ url_for('auth.password') }}">Password</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
 								</ul>
