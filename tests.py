@@ -3,10 +3,12 @@
 import unittest
 from config import Config
 from flask_testing import TestCase
+from application import create_app
+from application.user import User
+from application.extensions import db
+from base64 import b64encode
+import json
 
-from fbone import create_app
-from fbone.user import User
-from fbone.extensions import db
 
 class TestConfig(Config):
     TESTING = True
@@ -65,10 +67,10 @@ class BaseTestCase(TestCase):
 
 class TestFrontend(BaseTestCase):
 
-    def test_show(self):
+    def test_1_show(self):
         self._test_get_request('/', 'index.html')
 
-    def test_signup(self):
+    def test__2_signup(self):
         self._test_get_request('/signup', 'frontend/signup.html')
 
         data = {
@@ -82,7 +84,7 @@ class TestFrontend(BaseTestCase):
         new_user = User.query.filter_by(email=data['email']).first()
         assert new_user.name == "new_user"
 
-    def test_login(self):
+    def test__3_login(self):
         self._test_get_request('/login', 'frontend/login.html')
 
         response = self.client.post('/login', data={
@@ -90,9 +92,29 @@ class TestFrontend(BaseTestCase):
             'password': "123456"}, follow_redirects=True)
         assert "Logged in" in response.data.decode()
 
-    def test_logout(self):
+    def test__4_logout(self):
         self.login("demo@example.com", "123456")
         self._logout()
+
+
+class TestAPI(BaseTestCase):
+
+    def test_1_2_get_token(self):
+        """POST /api/v1/tokens: API must return a token"""
+
+        email = "demo@example.com"
+        password = "123456"
+        url = '/api/v1/tokens'
+        headers = {
+            'Content-Length': 0,
+            'Authorization': 'Basic ' +  b64encode("{0}:{1}".format(
+            email,password).encode('utf-8')).decode(),
+            'Content-Type': 'application/json'
+                }
+        response = self.client.post(url,headers=headers)
+        self.assert200(response)
+        token = json.loads(response.data.decode())['token']
+        self.assertEqual(len(token), 32)
 
 
 if __name__ == '__main__':

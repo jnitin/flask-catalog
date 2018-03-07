@@ -99,3 +99,6 @@ ENV/
 # Wing IDE
 *.wpr
 *.wpu
+
+# application logs
+logs/

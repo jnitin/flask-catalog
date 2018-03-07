@@ -8,7 +8,7 @@ import os
 from fabric.api import env, task, run, local, get, sudo
 from fabric.context_managers import cd, lcd, prefix, shell_env
 
-PROJECT_NAME = "fbone"
+PROJECT_NAME = "application"
 
 # Remote Database Config
 REMOTE_DB_USERNAME = ""
@@ -97,7 +97,7 @@ def deploy():
     local("cd " + os.path.join(os.environ["HOME"], PROJECT_NAME))
     local("git push")
 
-    with cd(os.path.join("/home/wilson", PROJECT_NAME)):
+    with cd(os.path.join("/home/replace-with-your-username", PROJECT_NAME)):
         # Make sure git can be accessed via ssh
         run("git pull")
         # Make sure "WSGIScriptReloading On" in apache conf file

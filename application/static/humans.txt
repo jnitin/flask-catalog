@@ -1,0 +1,14 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Arjaan Buijk -- Dev -- @ArjaanBuijk
+
+# THANKS
+
+    <name>
+
+# TECHNOLOGY COLOPHON
+
+    Python, Flask

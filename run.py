@@ -1,6 +1,6 @@
-from fbone import create_app
-from fbone.user import User
-from fbone.extensions import db
+from application import create_app
+from application.user import User
+from application.extensions import db
 
 # Create an instance of the application
 app = create_app()

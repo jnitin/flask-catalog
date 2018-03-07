@@ -44,11 +44,11 @@ The project structure is based on [fbone](https://github.com/imwilsonxu/fbone), 
     ├── CHANGES                     Change logs
     ├── README.md
     ├── fabfile.py                  Fabric file to automated managament project
-    ├── fbone.conf                  Apache config
+    ├── application.conf            Apache config
     ├── requirements.txt            3rd libraries
     ├── tests.py                    Unittests
     ├── wsgi.py                     Wsgi app
-    ├── fbone
+    ├── application
        ├── __init__.py
        ├── app.py                   Main App
        ├── config.py                Develop / Testing configs
