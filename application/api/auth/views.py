@@ -1,6 +1,6 @@
 from flask import jsonify, g
-from application.extensions import db
-from application.api import api
+from ...extensions import db
+from .. import api
 from .utils import basic_auth
 
 @api.route('/tokens', methods=['POST'])

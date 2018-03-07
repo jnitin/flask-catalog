@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, URL, \
     AnyOf, Optional
 from flask_login import current_user
 
-from application.user import User
+from ..user import User
 
 
 class ProfileForm(FlaskForm):

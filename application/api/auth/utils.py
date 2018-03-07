@@ -1,6 +1,6 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
-from application.user.models import User
+from ...user import User
 from .errors import error_response
 from flask_rest_jsonapi.exceptions import JsonApiException
 from werkzeug.http import HTTP_STATUS_CODES

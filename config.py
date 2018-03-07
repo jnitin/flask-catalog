@@ -6,7 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
     # do NOT define secret information here.
     # Define those in ./instance/config.py
-    PROJECT_NAME = "application"
+    APP_NAME = "application"
 
     # During development, use sqlite database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')

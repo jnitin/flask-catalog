@@ -5,8 +5,8 @@ from flask import Blueprint, render_template, current_app, request, flash, \
 from flask_login import login_required, login_user, current_user, logout_user, \
     confirm_login, login_fresh
 
-from application.user import User
-from application.extensions import db, login_manager
+from ..user import User
+from ..extensions import db, login_manager
 from .forms import RegisterForm, LoginForm, RecoverPasswordForm, ReauthForm, \
     ChangePasswordForm
 

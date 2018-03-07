@@ -4,7 +4,7 @@ from wtforms import ValidationError, HiddenField, BooleanField, StringField, \
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms.fields.html5 import EmailField
 
-from application.user import User
+from ..user import User
 
 
 class LoginForm(FlaskForm):

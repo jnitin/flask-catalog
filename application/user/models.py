@@ -2,7 +2,7 @@ from sqlalchemy import Column, desc
 from sqlalchemy.orm import backref
 from flask import current_app, g
 from flask_login import UserMixin, AnonymousUserMixin
-from application.extensions import db, login_manager, bcrypt
+from ..extensions import db, login_manager, bcrypt
 import os
 import base64
 from datetime import datetime, date, timedelta

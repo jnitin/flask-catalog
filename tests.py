@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 from config import Config
 from flask_testing import TestCase
@@ -25,11 +23,10 @@ class BaseTestCase(TestCase):
         return app
 
     def init_data(self):
-        demo = User(
-                name=u'demo',
-                email=u'demo@example.com',
-                password=u'123456')
-        db.session.add(demo)
+        u = User(email='ab1@c.com',
+                 password='ab1',
+                 name='a1 b1',)
+        db.session.add(u)
         db.session.commit()
 
     def setUp(self):
@@ -67,11 +64,11 @@ class BaseTestCase(TestCase):
 
 class TestFrontend(BaseTestCase):
 
-    def test_1_show(self):
+    def test_1_index(self):
         self._test_get_request('/', 'index.html')
 
-    def test__2_signup(self):
-        self._test_get_request('/signup', 'frontend/signup.html')
+    def test_2_register(self):
+        self._test_get_request('/register', 'frontend/register.html')
 
         data = {
             'email': 'new_user@example.com',
@@ -84,7 +81,7 @@ class TestFrontend(BaseTestCase):
         new_user = User.query.filter_by(email=data['email']).first()
         assert new_user.name == "new_user"
 
-    def test__3_login(self):
+    def test_3_login(self):
         self._test_get_request('/login', 'frontend/login.html')
 
         response = self.client.post('/login', data={
@@ -92,7 +89,7 @@ class TestFrontend(BaseTestCase):
             'password': "123456"}, follow_redirects=True)
         assert "Logged in" in response.data.decode()
 
-    def test__4_logout(self):
+    def test_4_logout(self):
         self.login("demo@example.com", "123456")
         self._logout()
 

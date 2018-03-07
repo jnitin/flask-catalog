@@ -15,7 +15,7 @@ def create_app(config=Config, app_name=None):
     """Create a Flask app."""
 
     if app_name is None:
-        app_name = config.PROJECT_NAME
+        app_name = config.APP_NAME
 
     app = Flask(app_name, instance_relative_config=True)
     configure_app(app, config)

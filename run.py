@@ -1,5 +1,5 @@
 from application import create_app
-from application.user import User
+from application.user import User, Role
 from application.extensions import db
 
 # Create an instance of the application
@@ -9,7 +9,7 @@ app = create_app()
 # NOTE: this can be done outside the application, using Flask-Migrate
 with app.app_context():
     db.create_all()
-    #TODO Role.insert_roles()
+    Role.insert_roles()
 
 if __name__ == '__main__':
     # USE THIS WHEN RUNNING IN THE UDACITY VAGRANT ENVIRONMENT
