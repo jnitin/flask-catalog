@@ -2,7 +2,7 @@
 
 {% extends "layouts/base.html" %}
 
-{% set page_title = 'Log in' %}
+{% set page_title = 'Register' %}
 
 {% block body %}
 <div class="row">
@@ -10,10 +10,10 @@
 
         <div class="panel panel-default panel-borderless">
             <div class="panel-body">
-                {{ render_form(url_for('frontend.login'), form) }}
+                {{ render_form(url_for('auth.register'), form) }}
 
                 <p class="text-muted">
-                    Don't have an account? <a href="{{ url_for('frontend.register') }}">Register</a>
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
                 </p>
             </div>
         </div>

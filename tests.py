@@ -43,11 +43,11 @@ class BaseTestCase(TestCase):
 
     def login(self, username, password):
         data = {
-            'login': username,
+            'email': username,
             'password': password,
         }
         response = self.client.post('/login', data=data, follow_redirects=True)
-        assert "Logged in" in response.data.decode()
+        assert "Succesfully logged in" in response.data.decode()
         return response
 
     def _logout(self):
@@ -68,29 +68,29 @@ class TestFrontend(BaseTestCase):
         self._test_get_request('/', 'index.html')
 
     def test_2_register(self):
-        self._test_get_request('/register', 'frontend/register.html')
+        self._test_get_request('/register', 'auth/register.html')
 
         data = {
-            'email': 'new_user@example.com',
-            'password': '123456',
-            'name': 'new_user',
+            'email': 'ab2@c.com',
+            'password': 'ab2',
+            'name': 'a2 b2',
             'agree': True,
         }
-        response = self.client.post('/signup', data=data, follow_redirects=True)
-        assert "Signed up" in response.data.decode()
+        response = self.client.post('/register', data=data, follow_redirects=True)
+        assert "Registration successful" in response.data.decode()
         new_user = User.query.filter_by(email=data['email']).first()
-        assert new_user.name == "new_user"
+        assert new_user.name == "a2 b2"
 
     def test_3_login(self):
-        self._test_get_request('/login', 'frontend/login.html')
+        self._test_get_request('/login', 'auth/login.html')
 
         response = self.client.post('/login', data={
-            'login': "demo@example.com",
-            'password': "123456"}, follow_redirects=True)
-        assert "Logged in" in response.data.decode()
+            'email': "ab1@c.com",
+            'password': "ab1"}, follow_redirects=True)
+        assert "Succesfully logged in" in response.data.decode()
 
     def test_4_logout(self):
-        self.login("demo@example.com", "123456")
+        self.login("ab1@c.com", "ab1")
         self._logout()
 
 
@@ -99,8 +99,8 @@ class TestAPI(BaseTestCase):
     def test_1_2_get_token(self):
         """POST /api/v1/tokens: API must return a token"""
 
-        email = "demo@example.com"
-        password = "123456"
+        email = "ab1@c.com"
+        password = "ab1"
         url = '/api/v1/tokens'
         headers = {
             'Content-Length': 0,

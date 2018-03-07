@@ -11,17 +11,17 @@ from .forms import RegisterForm, LoginForm, RecoverPasswordForm, ReauthForm, \
     ChangePasswordForm
 
 
-frontend = Blueprint('frontend', __name__)
+auth = Blueprint('auth', __name__)
 
 
-@frontend.route('/')
+@auth.route('/')
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('user.profile'))
     return render_template('index.html')
 
 
-@frontend.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('user.profile'))
@@ -42,10 +42,10 @@ def login():
         else:
             flash('Sorry, invalid login', 'danger')
 
-    return render_template('frontend/login.html', form=form)
+    return render_template('auth/login.html', form=form)
 
 
-@frontend.route('/reauth', methods=['GET', 'POST'])
+@auth.route('/reauth', methods=['GET', 'POST'])
 @login_required
 def reauth():
     form = ReauthForm(next=request.args.get('next'))
@@ -60,18 +60,18 @@ def reauth():
             return redirect('/change_password')
 
         flash('Password is wrong.', 'danger')
-    return render_template('frontend/reauth.html', form=form)
+    return render_template('auth/reauth.html', form=form)
 
 
-@frontend.route('/logout')
+@auth.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('Succesfully logged out', 'success')
-    return redirect(url_for('frontend.index'))
+    return redirect(url_for('auth.index'))
 
 
-@frontend.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('user.profile'))
@@ -89,10 +89,10 @@ def register():
             flash('Registration successful!', 'success')
             return redirect(form.next.data or url_for('user.profile'))
 
-    return render_template('frontend/register.html', form=form)
+    return render_template('auth/register.html', form=form)
 
 
-@frontend.route('/change_password', methods=['GET', 'POST'])
+@auth.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     user = None
     if current_user.is_authenticated:
@@ -117,12 +117,12 @@ def change_password():
         db.session.commit()
 
         flash("Your password has been changed, please log in again", "success")
-        return redirect(url_for("frontend.login"))
+        return redirect(url_for("auth.login"))
 
-    return render_template("frontend/change_password.html", form=form)
+    return render_template("auth/change_password.html", form=form)
 
 
-@frontend.route('/reset_password', methods=['GET', 'POST'])
+@auth.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
     form = RecoverPasswordForm()
 
@@ -137,8 +137,8 @@ def reset_password():
             db.session.add(user)
             db.session.commit()
 
-            return render_template('frontend/reset_password.html', form=form)
+            return render_template('auth/reset_password.html', form=form)
         else:
             flash('Sorry, no user found for that email address', 'error')
 
-    return render_template('frontend/reset_password.html', form=form)
+    return render_template('auth/reset_password.html', form=form)

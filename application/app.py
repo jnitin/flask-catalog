@@ -47,18 +47,14 @@ def configure_extensions(app):
     # flask-sqlalchemy
     db.init_app(app)
 
-    # Sentry
-    #AB if app.config['SENTRY_DSN']:
-    #AB     sentry.init(app, dsn=app.config['SENTRY_DSN'])
-
     # flask-login
-    login_manager.login_view = 'frontend.login'
-    login_manager.refresh_view = 'frontend.reauth'
+    login_manager.login_view = 'auth.login'
+    login_manager.refresh_view = 'auth.reauth'
 
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(id)
-    #AB login_manager.setup_app(app)
+
     login_manager.init_app(app)
 
 
@@ -66,10 +62,10 @@ def configure_blueprints(app):
     """Configure blueprints in views."""
 
     from .user import user
-    from .frontend import frontend
+    from .auth import auth
     from .api import api
 
-    for bp in [user, frontend, api]:
+    for bp in [user, auth, api]:
         app.register_blueprint(bp)
 
 
@@ -108,24 +104,6 @@ def configure_logging(app):
         '[in %(pathname)s:%(lineno)d]')
     )
     app.logger.addHandler(info_file_handler)
-
-    # Testing
-    #app.logger.info("testing info.")
-    #app.logger.warn("testing warn.")
-    #app.logger.error("testing error.")
-
-    #mail_handler = SMTPHandler(app.config['MAIL_SERVER'],
-                               #app.config['MAIL_USERNAME'],
-                               #app.config['ADMINS'],
-                               #'Your Application Failed!',
-                               #(app.config['MAIL_USERNAME'],
-                                #app.config['MAIL_PASSWORD']))
-    #mail_handler.setLevel(logging.ERROR)
-    #mail_handler.setFormatter(logging.Formatter(
-        #'%(asctime)s %(levelname)s: %(message)s '
-        #'[in %(pathname)s:%(lineno)d]')
-    #)
-    #app.logger.addHandler(mail_handler)
 
 
 def configure_hook(app):
