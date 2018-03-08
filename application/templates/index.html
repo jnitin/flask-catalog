@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% set page_title = 'Catalog' %}
+{% set page_title = 'Beers' %}
 
 <!--No topbar on home page-->
 {% block topbar %}
@@ -8,8 +8,9 @@
 
 {% block body %}
 <div class="jumbotron">
-    <h1>Catalog</h1>
-    <p>A catolog of items for you to CRUD via browser or JSON API.</p>
+    <h1>Beers</h1>
+    <p>A catolog of beers for you to CRUD via browser or JSON API.</p>
+    <p>(Database is prepopulated with content from <a href="https://www.beeradvocate.com/beer/style/">beeradvocate</a>)
     <p><a role="button" href="{{ url_for('catalog.items')}}" class="btn btn-lg btn-primary"><strong>Enter »</strong></a>
        {% if current_user.is_authenticated %}
          <a role="button" href="{{ url_for('auth.logout')}}" class="btn btn-lg btn-primary"><strong>Log Out »</strong></a>

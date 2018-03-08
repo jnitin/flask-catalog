@@ -9,7 +9,8 @@ class Config(object):
     APP_NAME = "application"
 
     # During development, use sqlite database
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+    DATABASE_PATH = os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Avoid DeprecationWarning: Request.is_xhr is deprecated.

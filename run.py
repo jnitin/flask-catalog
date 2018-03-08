@@ -1,15 +1,26 @@
+import os, os.path
 from application import create_app
 from application.user import User, Role
+from application.catalog import Category, Item
 from application.extensions import db
 
 # Create an instance of the application
 app = create_app()
 
-# Create the database and tables, if not yet exists
-# NOTE: this can be done outside the application, using Flask-Migrate
-with app.app_context():
-    db.create_all()
-    Role.insert_roles()
+# if the database does not yet exist:
+# - Create the database and tables
+# - Insert the roles
+# - Populate with lots of beers
+path = app.config['DATABASE_PATH']
+if os.path.isfile(path) is False:
+    print("Creating & initializing a new data-base...")
+    with app.app_context():
+        db.create_all()
+        Role.insert_roles()
+        Item.insert_initial_data()
+else:
+    print("Connecting to existing data-base...")
+
 
 if __name__ == '__main__':
     # USE THIS WHEN RUNNING IN THE UDACITY VAGRANT ENVIRONMENT
