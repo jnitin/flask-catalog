@@ -63,8 +63,9 @@ def configure_blueprints(app):
     from .user import user
     from .auth import auth
     from .api import api
+    from .catalog import catalog
 
-    for bp in [user, auth, api]:
+    for bp in [user, auth, api, catalog]:
         app.register_blueprint(bp)
 
 

@@ -16,7 +16,7 @@ auth = Blueprint('auth', __name__)
 @auth.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('user.profile'))
+        return redirect(url_for('catalog.items'))
     return render_template('index.html')
 
 
@@ -37,7 +37,7 @@ def login():
             remember = request.form.get('remember') == 'y'
             if login_user(user, remember=remember):
             #    flash("Succesfully logged in", 'success')
-                return redirect(form.next.data or url_for('user.profile'))
+                return redirect(form.next.data or url_for('catalog.items'))
 
         flash('Sorry, invalid login', 'danger')
 
@@ -67,8 +67,8 @@ def register():
         db.session.commit()
 
         if login_user(user):
-            flash('Registration successful!', 'success')
-            return redirect(form.next.data or url_for('user.profile'))
+            # flash('Registration successful!', 'success')
+            return redirect(form.next.data or url_for('catalog.items'))
 
     return render_template('auth/register.html', form=form)
 

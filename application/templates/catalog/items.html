@@ -1,0 +1,23 @@
+{% from "macros/_form.html" import render_input, render_textarea,
+    render_file, render_select, render_datepicker, render_action %}
+
+{% extends 'layouts/catalog.html' %}
+
+{% set page_title = 'Items' %}
+
+{% block panel_right %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <b> Items</b>
+    </div>
+    <div class="panel-body row">
+        <div class="col-md-6">
+            <ol>
+                <li>Balls</li>
+                <li>Shoes</li>
+                <li>Shin Protectors</li>
+          </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,22 @@
 {% extends 'layouts/base.html' %}
 
-{% set page_title = 'Home' %}
+{% set page_title = 'Catalog' %}
+
+<!--No topbar on home page-->
+{% block topbar %}
+{% endblock %}
 
 {% block body %}
 <div class="jumbotron">
-    <h1>Flask Application</h1>
-    <p>Application is a Flask template/bootstrap/boilerplate application.</p>
-    <p><a role="button" href="{{ url_for('auth.register')}}" class="btn btn-lg btn-primary"><strong>Register »</strong></a>
-       <a role="button" href="{{ url_for('auth.login')}}" class="btn btn-lg btn-primary"><strong>Log in »</strong></a>
+    <h1>Catalog</h1>
+    <p>A catolog of items for you to CRUD via browser or JSON API.</p>
+    <p><a role="button" href="{{ url_for('catalog.items')}}" class="btn btn-lg btn-primary"><strong>Enter »</strong></a>
+       {% if current_user.is_authenticated %}
+         <a role="button" href="{{ url_for('auth.logout')}}" class="btn btn-lg btn-primary"><strong>Log Out »</strong></a>
+       {% else%}
+         <a role="button" href="{{ url_for('auth.register')}}" class="btn btn-lg btn-primary"><strong>Register »</strong></a>
+         <a role="button" href="{{ url_for('auth.login')}}" class="btn btn-lg btn-primary"><strong>Log in »</strong></a>
+       {% endif %}
     </p>
 </div>
 {% endblock %}
