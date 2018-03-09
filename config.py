@@ -7,6 +7,7 @@ class Config(object):
     # do NOT define secret information here.
     # Define those in ./instance/config.py
     APP_NAME = "application"
+    COPYRIGHT = "Arjaan Buijk 2018"
 
     # During development, use sqlite database
     DATABASE_PATH = os.path.join(basedir, 'app.db')

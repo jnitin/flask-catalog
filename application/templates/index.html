@@ -2,16 +2,16 @@
 
 {% set page_title = 'Beers' %}
 
-<!--No topbar on home page-->
+<!--no topbar on home page-->
 {% block topbar %}
 {% endblock %}
+
 
 {% block body %}
 <div class="jumbotron">
     <h1>Beers</h1>
     <p>A catolog of beers for you to CRUD via browser or JSON API.</p>
-    <p>(Database is prepopulated with content from <a href="https://www.beeradvocate.com/beer/style/">beeradvocate</a>)
-    <p><a role="button" href="{{ url_for('catalog.items')}}" class="btn btn-lg btn-primary"><strong>Enter »</strong></a>
+    <p><a role="button" href="{{ url_for('catalog.items')}}" class="btn btn-lg btn-primary"><strong>Visit »</strong></a>
        {% if current_user.is_authenticated %}
          <a role="button" href="{{ url_for('auth.logout')}}" class="btn btn-lg btn-primary"><strong>Log Out »</strong></a>
        {% else%}
@@ -19,5 +19,9 @@
          <a role="button" href="{{ url_for('auth.login')}}" class="btn btn-lg btn-primary"><strong>Log in »</strong></a>
        {% endif %}
     </p>
+    <p><small><small>
+      Database is prepopulated with content from <a href="https://www.beeradvocate.com/beer/style/">beeradvocate</a>,
+      Icons made by <a href="https://www.flaticon.com/free-icon/beer-stein_66387" title="Freepik">Freepik</a>
+    </small></small></p>
 </div>
 {% endblock %}

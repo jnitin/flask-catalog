@@ -25,8 +25,9 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('user.profile'))
 
-    form = LoginForm(login=request.args.get('login', None),
-                     next=request.args.get('next', None))
+    form = LoginForm()
+    #form = LoginForm(login=request.args.get('login', None),
+    #                 next=request.args.get('next', None))
 
     #
     if form.validate_on_submit():
@@ -36,7 +37,7 @@ def login():
         if user and user.verify_password(password):
             remember = request.form.get('remember') == 'y'
             if login_user(user, remember=remember):
-            #    flash("Succesfully logged in", 'success')
+                # flash("Succesfully logged in", 'success')
                 return redirect(form.next.data or url_for('catalog.items'))
 
         flash('Sorry, invalid login', 'danger')
