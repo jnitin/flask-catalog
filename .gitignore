@@ -105,3 +105,6 @@ logs/
 
 # application uploads
 uploads/
+
+# development only
+TODO
