@@ -9,18 +9,33 @@ venv
 
 models
 ======
-( ) Register catalog blueprint
-(-) update user-model
-     (-) update tests/tests_user_model.py
-          (-) remove application specific columns
-          (-) remove application specific methods
-          (-) define application specific columns
-          (-) define application specific methods
-          (-) update tests_user_model.py
+(-) user blueprint
+     ( ) remove application specific columns
+     ( ) remove application specific methods
+     ( ) define application specific columns
+     ( ) define application specific methods
+     ( ) update tests_user_model.py
+
      (-) Delete owned entries of a user when Deleting a user
-(-) add catalog model to database
-     (-) create tests/tests_catalog_model.py
-     (-) MAYBE: at startup, populate with default items
+
+(-) catalog blueprint
+     ( ) Register the blueprint
+     (-) models.py
+          ( ) Define ORM classes
+          ( ) Define method: insert_default_items
+          ( ) Call this method from catalog.py, if app.db not there.
+          ( ) Remove app.db, then startup web server, and verify that app.db contains correct tables & default entries
+     ( ) create tests/tests_catalog_model.py
+
+permissions
+===========
+(-) Only admin can create categoriies
+     (-) via web-page
+     (-) via API
+
+(-) Only logged in users can create items
+     (-) via web-page
+     (-) via API
 
 branding
 ========
@@ -75,6 +90,10 @@ api
      (-) model_schemas.py
      (-) views.py
      (-) __init__.py
+
+
+(-) In user/models.py, update to_json() methods
+     (-) In tests_items_modelpy, update to_json tests
 
 (-) All responses must return JSON API 1.0 specification
 

@@ -39,38 +39,34 @@ class User(db.Model, UserMixin):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
 
-        # if default admin, initialize fully
-        if self.email == current_app.config['ADMIN_EMAIL']:
-            self.role = Role.query.filter_by(name='Administrator').first()
-            self.password = current_app.config['ADMIN_PW']
-            self.confirmed = True
-
-        # if default usermanager, initialize fully
-        if self.email == current_app.config['USERMANAGER_EMAIL']:
-            self.role = Role.query.filter_by(name='Usermanager').first()
-            self.password = current_app.config['USERMANAGER_PW']
-            self.confirmed = True
-
-        # if default user, initialize fully
-        if self.email == current_app.config['USER_EMAIL']:
-            self.role = Role.query.filter_by(name='User').first()
-            self.password = current_app.config['USER_PW']
-            self.confirmed = True
-
         # Set default role for a regular new User
-        if self.role is None:
-            self.role = Role.query.filter_by(default=True).first()
+        self.role = Role.query.filter_by(default=True).first()
 
     @staticmethod
     def insert_default_users():
         """Inserts a default admin, usermanager and user into the database"""
-        u1 = User(email=current_app.config['ADMIN_EMAIL'])
+        u1 = User(email=current_app.config['ADMIN_EMAIL'],
+                  password=current_app.config['ADMIN_PW'],
+                  first_name=current_app.config['ADMIN_FIRST_NAME'],
+                  last_name=current_app.config['ADMIN_LAST_NAME'],
+                  confirmed=True)
+        u1.role = Role.query.filter_by(name='Administrator').first()
         db.session.add(u1)
 
-        u2 = User(email=current_app.config['USERMANAGER_EMAIL'])
+        u2 = User(email=current_app.config['USERMANAGER_EMAIL'],
+                  password=current_app.config['USERMANAGER_PW'],
+                  first_name=current_app.config['USERMANAGER_FIRST_NAME'],
+                  last_name=current_app.config['USERMANAGER_LAST_NAME'],
+                  confirmed=True)
+        u2.role = Role.query.filter_by(name='Usermanager').first()
         db.session.add(u2)
 
-        u3 = User(email=current_app.config['USER_EMAIL'])
+        u3 = User(email=current_app.config['USER_EMAIL'],
+                  password=current_app.config['USER_PW'],
+                  first_name=current_app.config['USER_FIRST_NAME'],
+                  last_name=current_app.config['USER_LAST_NAME'],
+                  confirmed=True)
+        u3.role = Role.query.filter_by(name='User').first()
         db.session.add(u3)
 
         db.session.commit()

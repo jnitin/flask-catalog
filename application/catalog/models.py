@@ -1,12 +1,7 @@
-from sqlalchemy import Column, desc
-from sqlalchemy.orm import backref
-from flask import current_app, g
-from flask_login import UserMixin, AnonymousUserMixin
-from ..extensions import db, login_manager, bcrypt
+from datetime import datetime
+from flask import current_app, url_for
+from ..extensions import db
 from ..user import User
-import os
-import base64
-from datetime import datetime, date, timedelta
 
 
 class Category(db.Model):
@@ -16,6 +11,12 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     name = db.Column(db.String(96), unique=True)
+
+    def to_json(self):
+        json_category = {
+                'url': url_for('api.category_detail', id=self.id)
+            }
+        return json_category
 
 
 class Item(db.Model):
@@ -34,13 +35,7 @@ class Item(db.Model):
     category = db.relationship('Category', backref=db.backref('items'))
 
     @staticmethod
-    def insert_initial_data():
-        # Create dummy user
-        u = User(email="BigBelly@demo-beers.com",password="fyeo",
-                     name="Big Belly")
-        db.session.add(u)
-        db.session.commit()
-
+    def insert_default_items():
         beers = [
             {
                 "category": "American Amber / Red Ale",
@@ -134,19 +129,22 @@ class Item(db.Model):
             }
         ]
 
+        usr = User.query.filter_by(email=current_app.config['USER_EMAIL']).one()
         for beer in beers:
             category_name = beer['category']
-            c = Category(name=category_name)
-            db.session.add(c)
+            new_category = Category(name=category_name)
+            db.session.add(new_category)
             db.session.commit()
             for item in beer['items']:
-                i = Item(name=item['name'],
-                         description=item['description'],
-                         user_id=u.id,
-                         category_id=c.id)
-                db.session.add(i)
+                new_item = Item(name=item['name'],
+                                description=item['description'],
+                                user_id=usr.id,
+                                category_id=new_category.id)
+                db.session.add(new_item)
             db.session.commit()
 
-
-
-
+    def to_json(self):
+        json_item = {
+                'url': url_for('api.item_detail', id=self.id)
+            }
+        return json_item

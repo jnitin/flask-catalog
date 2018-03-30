@@ -55,5 +55,5 @@ def send_invitation_email(user_email):
         'email/email_invitation.html',
         invitation_url=invitation_url)
 
-    send_email('You are invited to join Calories', [user_email], email_html_body)
+    send_email('You are invited to join Catalog', [user_email], email_html_body)
 

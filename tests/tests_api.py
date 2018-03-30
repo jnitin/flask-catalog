@@ -639,7 +639,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(u.failed_logins, 0)
 
 
-    def test_2_0_create_user_and_add_meal(self):
+    def test_2_0_create_user_and_add_item(self):
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {
@@ -678,16 +678,16 @@ class APITestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         token = json_response['token']
 
-        # Create a meal for this user
-        url = '/api/v1/meals/'
+        # Create an item for this user
+        url = '/api/v1/itemss/'
         headers = self.get_api_headers(token,'')
         data = {
             "data": {
-                "type": "meal",
+                "type": "item",
                 "attributes": {
                     "date": '{}'.format(date(2018,1,5)),
                     "time": '{}'.format(time(18,5,15)),
-                    "description": "Potatoes, a Veggie Patty and a Milk"
+                    "description": "TODO !!!"
                 }
             }
         }
@@ -696,41 +696,41 @@ class APITestCase(unittest.TestCase):
                                       data=json.dumps(data))
         self.verify_response_is_201_CREATED(response)
         response_data = json.loads(response.data.decode())
-        meal_id = response_data['data']['id']
+        item_id = response_data['data']['id']
 
     #def test_2_1_verify_relationships(self):
-        #"""POST /api/v1/meals/: verify relationships"""
+        #"""POST /api/v1/items/: verify relationships"""
         #self.populate_database_with_users(num_users=4,
                                             #direct_to_db=False)
 
         ## get a token for the third user (a regular user)
         #user = self.user_data_list[2]
         #token = self.get_token(user)
-        ## Create a meal for the 3rd user, while sending Bearer token
-        #url = '/api/v1/meals/'
+        ## Create a item for the 3rd user, while sending Bearer token
+        #url = '/api/v1/items/'
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
                 #'Accept': 'application/vnd.api+json',
                 #'Authorization': 'Bearer {}'.format(token)
                 #}
-        #data = self.meal_data_list[0]  # use list without history & weather
+        #data = self.item_data_list[0]  # use list without history & weather
         #response = self.client().post(url,
                                       #headers=headers,
                                       #data=json.dumps(data))
         #self.verify_response_is_201_CREATED(response)
         #response_data = json.loads(response.data.decode())
-        #meal_id = response_data['data']['id']
+        #item_id = response_data['data']['id']
 
         #######################################################################
         ## Make sure the relationship to the user is correct
         ## - using links: 'related'
-        #url = '/api/v1/meals/{}/user'.format(meal_id)
+        #url = '/api/v1/items/{}/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #response_data = json.loads(response.data.decode())
         #user_id = '3'
         #self.assertEqual(response_data['data']['id'],user_id)
         ## - using links: 'relationships'
-        #url = '/api/v1/meals/{}/relationships/user'.format(meal_id)
+        #url = '/api/v1/items/{}/relationships/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #response_data = json.loads(response.data.decode())
         ##
@@ -753,120 +753,120 @@ class APITestCase(unittest.TestCase):
         #week = response_data['data'][0]['attributes']
         #self.assertEqual(week['year'], 2018)
         #self.assertEqual(week['weeknumber'], 6)
-        #self.assertEqual(week['number_of_meals'], 1)
+        #self.assertEqual(week['number_of_items'], 1)
         #self.assertEqual(week['total_distance'], 1609.34)
         #self.assertEqual(week['total_duration'], 600)
 
-    #def test_3_0_protect_access_to_meals(self):
-        #"""Verify permissions to access meals"""
+    #def test_3_0_protect_access_to_items(self):
+        #"""Verify permissions to access items"""
         #self.populate_database_with_users(num_users=4,
                                             #direct_to_db=False)
 
         ## get a token for the third user (a regular user)
         #user = self.user_data_list[2]
         #token = self.get_token(user)
-        ## Create a meal for the 3rd user, while sending Bearer token
-        #url = '/api/v1/meals/'
+        ## Create a item for the 3rd user, while sending Bearer token
+        #url = '/api/v1/items/'
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
                 #'Accept': 'application/vnd.api+json',
                 #'Authorization': 'Bearer {}'.format(token)
                 #}
-        #data = self.meal_data_list[0]  # use list without history & weather
+        #data = self.item_data_list[0]  # use list without history & weather
         #response = self.client().post(url,
                                       #headers=headers,
                                       #data=json.dumps(data))
         #self.verify_response_is_201_CREATED(response)
         #response_data = json.loads(response.data.decode())
-        #meal_id = response_data['data']['id']
+        #item_id = response_data['data']['id']
 
         #######################################################################
-        ## Verify that another cannot access the meals of the 3rd user
+        ## Verify that another cannot access the items of the 3rd user
         ## get a token for the 4th user (a regular user)
         #user = self.user_data_list[3]
         #token = self.get_token(user)
-        ## get the meal of the 3rd user, while sending Bearer token
-        #url = '/api/v1/meals/'
+        ## get the item of the 3rd user, while sending Bearer token
+        #url = '/api/v1/items/'
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
                     #'Accept': 'application/vnd.api+json',
                     #'Authorization': 'Bearer {}'.format(token)
             #}
         ## - directly
-        #url = '/api/v1/meals/{}'.format(meal_id)
+        #url = '/api/v1/items/{}'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
         ## - using links: 'related'
-        #url = '/api/v1/meals/{}/user'.format(meal_id)
+        #url = '/api/v1/items/{}/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
         ## - using links: 'relationships'
-        #url = '/api/v1/meals/{}/relationships/user'.format(meal_id)
+        #url = '/api/v1/items/{}/relationships/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
 
         #######################################################################
-        ## Verify that a usermanager cannot access the meals of the 3rd user
+        ## Verify that a usermanager cannot access the items of the 3rd user
         ## get a token for the 2nd user (a user manager)
         #user = self.user_data_list[1]
         #token = self.get_token(user)
-        ## get the meal of the 3rd user, while sending Bearer token
-        #url = '/api/v1/meals/'
+        ## get the item of the 3rd user, while sending Bearer token
+        #url = '/api/v1/items/'
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
                     #'Accept': 'application/vnd.api+json',
                         #'Authorization': 'Bearer {}'.format(token)
             #}
         ## - directly
-        #url = '/api/v1/meals/{}'.format(meal_id)
+        #url = '/api/v1/items/{}'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
         ## - using links: 'related'
-        #url = '/api/v1/meals/{}/user'.format(meal_id)
+        #url = '/api/v1/items/{}/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
         ## - using links: 'relationships'
-        #url = '/api/v1/meals/{}/relationships/user'.format(meal_id)
+        #url = '/api/v1/items/{}/relationships/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
 
         #######################################################################
-        ## Verify that an admin can access the meals of the 3rd user
+        ## Verify that an admin can access the items of the 3rd user
         ## get a token for the 1st user (an admin)
         #user = self.user_data_list[0]
         #token = self.get_token(user)
-        ## get the meal of the 3rd user, while sending Bearer token
-        #url = '/api/v1/meals/'
+        ## get the item of the 3rd user, while sending Bearer token
+        #url = '/api/v1/items/'
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
                     #'Accept': 'application/vnd.api+json',
                         #'Authorization': 'Bearer {}'.format(token)
             #}
         ## - directly
-        #url = '/api/v1/meals/{}'.format(meal_id)
+        #url = '/api/v1/items/{}'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_200_OK(response)
         ## - using links: 'related'
-        #url = '/api/v1/meals/{}/user'.format(meal_id)
+        #url = '/api/v1/items/{}/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_200_OK(response)
         ## - using links: 'relationships'
-        #url = '/api/v1/meals/{}/relationships/user'.format(meal_id)
+        #url = '/api/v1/items/{}/relationships/user'.format(item_id)
         #response = self.client().get(url, headers=headers)
         #self.verify_response_is_200_OK(response)
 
-    #def test_3_1_protect_access_to_users_meals_weeks(self):
+    #def test_3_1_protect_access_to_users_items_weeks(self):
         #"""More extensive permission testing"""
         #self.populate_database_with_users(direct_to_db=True)
-        #self.populate_database_with_meals(direct_to_db=True)
+        #self.populate_database_with_items(direct_to_db=True)
 
         ## Check all is ok in the database
         #db_users = User.query.all()
-        #db_meals = Meal.query.all()
+        #db_items = Item.query.all()
         #db_weeks = Week.query.all()
         #self.assertEqual(len(db_users),len(self.user_data_list))
-        #self.assertEqual(len(db_meals),
-                         #len(self.user_data_list)*len(self.meal_data_list_history))  # NOQA
+        #self.assertEqual(len(db_items),
+                         #len(self.user_data_list)*len(self.item_data_list_history))  # NOQA
 
         ## get a token for the third user (a regular user)
         #user = self.user_data_list[2]
@@ -896,15 +896,15 @@ class APITestCase(unittest.TestCase):
         #self.assertListEqual(ordered(response_data['data']),
                              #ordered(expected_data_list))
 
-        ## get list of this user's meals
-        #url='/api/v1/users/3/meals'
+        ## get list of this user's items
+        #url='/api/v1/users/3/items'
         #response = self.client().get(url,headers=headers)
         #self.verify_response_is_200_OK(response)
         #response_data = json.loads(response.data.decode())
 
-        ## get list of this user's meals relying on internal permissions
+        ## get list of this user's items relying on internal permissions
         #expected_data = response_data.copy()
-        #url='/api/v1/meals/'
+        #url='/api/v1/items/'
         #response = self.client().get(url,headers=headers)
         #self.verify_response_is_200_OK(response)
         #response_data = json.loads(response.data.decode())
@@ -930,7 +930,7 @@ class APITestCase(unittest.TestCase):
         #url='/api/v1/users/4'
         #response = self.client().get(url,headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
-        #url='/api/v1/users/4/meals'
+        #url='/api/v1/users/4/items'
         #response = self.client().get(url,headers=headers)
         #self.verify_response_is_403_FORBIDDEN(response)
         #url='/api/v1/users/4/weeks'
@@ -948,7 +948,7 @@ class APITestCase(unittest.TestCase):
     #def test_3_2_protect_endpoints_if_not_logged_in(self):
         #"""/api/v1/--: protect endpoints if not logged in"""
         #self.populate_database_with_users(num_users=3)
-        #self.populate_database_with_meals(num_users=3, num_meals=1)
+        #self.populate_database_with_items(num_users=3, num_items=1)
 
         #headers = {
                 #'Content-Type': 'application/vnd.api+json',
@@ -964,16 +964,16 @@ class APITestCase(unittest.TestCase):
         ## Test all endpoints of api_bp/endpoints.py
         ##
         #urls_users = []
-        #urls_meals = []
+        #urls_items = []
         #urls_weeks = []
         #urls_users.append('/api/v1/users/')  # UserList
         #urls_users.append('/api/v1/users/3')  # UserDetail
-        #urls_users.append('/api/v1/meals/1/user')  # UserDetail
-        ##urls_meals.append('/api/v1/users/1/relationships/meals')  # UserRelationship
-        #urls_meals.append('/api/v1/meals/')  # MealList
-        #urls_meals.append('/api/v1/users/3/meals')  # MealList
-        #urls_meals.append('/api/v1/meals/1')  # MealDetail
-        ##urls_users.append('/api/v1/meals/1/relationships/user')  # MealRelationship
+        #urls_users.append('/api/v1/items/1/user')  # UserDetail
+        ##urls_items.append('/api/v1/users/1/relationships/items')  # UserRelationship
+        #urls_items.append('/api/v1/items/')  # ItemList
+        #urls_items.append('/api/v1/users/3/items')  # ItemList
+        #urls_items.append('/api/v1/items/1')  # ItemDetail
+        ##urls_users.append('/api/v1/items/1/relationships/user')  # ItemRelationship
         #urls_weeks.append('/api/v1/weeks')  # WeekList
         #urls_weeks.append('/api/v1/users/3/weeks')  # WeekList
         #urls_weeks.append('/api/v1/weeks/1')  # WeekDetail
@@ -1001,8 +1001,8 @@ class APITestCase(unittest.TestCase):
             #self.verify_response_is_401_or_405(response)
 
 
-        #data = self.meal_data_list[0]
-        #for url in urls_meals:
+        #data = self.item_data_list[0]
+        #for url in urls_items:
             #response = self.client().get(url,
                                          #headers=headers)
             #self.verify_response_is_401_UNAUTHORIZED(response)
@@ -1072,16 +1072,16 @@ class APITestCase(unittest.TestCase):
         #num_users = 3
         #self.populate_database_with_users(num_users=num_users,
                                             #direct_to_db=True)
-        #self.populate_database_with_meals(num_users=num_users,
+        #self.populate_database_with_items(num_users=num_users,
                                          #direct_to_db=True)
 
         ## Check all is ok in the database
         #db_users = User.query.all()
-        #db_meals = Meal.query.all()
+        #db_items = Item.query.all()
         #db_weeks = Week.query.all()
         #self.assertEqual(len(db_users),num_users)
-        #self.assertEqual(len(db_meals),
-                         #num_users*len(self.meal_data_list_history))  # NOQA
+        #self.assertEqual(len(db_items),
+                         #num_users*len(self.item_data_list_history))  # NOQA
 
         ## get a token for the third user (a regular user)
         #user = self.user_data_list[2]
@@ -1093,8 +1093,8 @@ class APITestCase(unittest.TestCase):
                 #'Authorization': 'Bearer {}'.format(token)
                 #}
 
-        ## get list of this user's meals
-        #url='/api/v1/users/3/meals'
+        ## get list of this user's items
+        #url='/api/v1/users/3/items'
         #response = self.client().get(url,headers=headers)
         #self.verify_response_is_200_OK(response)
         #response_data = json.loads(response.data.decode())
@@ -1111,15 +1111,15 @@ class APITestCase(unittest.TestCase):
         #http://flask-rest-jsonapi.readthedocs.io/en/latest/filtering.html
         #"""
         #self.populate_database_with_users(direct_to_db=True)
-        #self.populate_database_with_meals(direct_to_db=True)
+        #self.populate_database_with_items(direct_to_db=True)
 
         ## Check all is ok in the database
         #db_users = User.query.all()
-        #db_meals = Meal.query.all()
+        #db_items = Item.query.all()
         #db_weeks = Week.query.all()
         #self.assertEqual(len(db_users),len(self.user_data_list))
-        #self.assertEqual(len(db_meals),
-                         #len(self.user_data_list)*len(self.meal_data_list_history))  # NOQA
+        #self.assertEqual(len(db_items),
+                         #len(self.user_data_list)*len(self.item_data_list_history))  # NOQA
 
         ## get a token for the first user (an admin)
         #admin = self.user_data_list[0]

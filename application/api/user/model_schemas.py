@@ -35,7 +35,7 @@ class UserSchema(Schema):
                          related_view='api.meal_list',
                          related_view_kwargs={'id': '<id>'},
                          many=True,
-                         schema='MealSchema',
+                         schema='ItemSchema',
                          type_='meal')
 
     days = Relationship(self_view='api.user_days',

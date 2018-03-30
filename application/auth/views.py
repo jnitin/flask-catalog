@@ -32,7 +32,7 @@ def unconfirmed():
 def index():
     if current_user.is_authenticated and current_user.is_active and \
        not current_user.blocked:
-        return redirect(url_for('meal.meals'))
+        return redirect(url_for('catalog.category_items'))
     return render_template('index.html')
 
 
@@ -40,7 +40,7 @@ def index():
 def login():
     #if current_user.is_authenticated and current_user.is_active and \
        #not current_user.blocked:
-        #return redirect(url_for('meal.meals'))
+        #return redirect(url_for('catalog.category_items'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -56,7 +56,7 @@ def login():
             login_user(user, form.remember.data)
             nxt = request.args.get('next')
             if nxt is None or not nxt.startswith('/'):
-                nxt = url_for('meal.meals')
+                nxt = url_for('catalog.category_items')
             return redirect(nxt)
 
         flash('Sorry, invalid login', 'danger')
@@ -82,7 +82,7 @@ def register():
         return redirect(url_for('auth.blocked_account'))
 
     if current_user.is_authenticated and current_user.is_active:
-        return redirect(url_for('meal.meals'))
+        return redirect(url_for('catalog.category_items'))
 
     form = RegisterForm(next=request.args.get('next'))
 
@@ -159,7 +159,7 @@ def password():
         db.session.commit()
 
         flash('Password updated.', 'success')
-        return redirect(url_for('meal.meals'))
+        return redirect(url_for('catalog.category_items'))
 
     return render_template('auth/password.html', form=form)
 

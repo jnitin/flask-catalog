@@ -37,7 +37,7 @@
 						{% else %}
 							{% if current_user.is_authenticated and current_user.is_active %}
 								<li class="nav-item">
-								  <a class="nav-link"  href="{{ url_for('meal.meals') }}">Calories</a>
+								  <a class="nav-link"  href="{{ url_for('catalog.category_items') }}">Catalog</a>
 								</li>
 								<!--
 								<li class="nav-item">

@@ -1,2 +1,2 @@
 from .model_schemas import UserSchema
-from .views import UserList, UserDetail, UserMealRelationship, UserDayRelationship
+from .views import UserList, UserDetail

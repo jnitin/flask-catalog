@@ -1,7 +1,7 @@
 from . import UserSchema
 from .. import api as api_blueprint
 from ...user import User, Role, Permission
-from ...meal import Meal, Day
+#from ...meal import Meal, Day
 from ...decorators import admin_required, usermanager_required
 from ...email import send_confirmation_email, send_invitation_email
 from ...extensions import db, login_manager, images
@@ -16,41 +16,41 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app, g, request, send_from_directory, jsonify, url_for
 
 
-def find_user_by_meal_id(meal_id):
-    try:
-        meal = Meal.query.filter_by(id=meal_id).one()
-    except NoResultFound:
-        raise ObjectNotFound({'parameter': 'meal_id'},
-                             "Meal: {} not found".format(meal_id))
-    else:
-        if meal.user is not None:
-            if (g.current_user.is_administrator() or
-                meal.user == g.current_user):
-                return meal.user
-            else:
-                # Unauthorized
-                raise JsonApiException(' ',
-                                       title = HTTP_STATUS_CODES[403],
-                                       status = '403')
-        return None
+#def find_user_by_meal_id(meal_id):
+    #try:
+        #meal = Meal.query.filter_by(id=meal_id).one()
+    #except NoResultFound:
+        #raise ObjectNotFound({'parameter': 'meal_id'},
+                             #"Meal: {} not found".format(meal_id))
+    #else:
+        #if meal.user is not None:
+            #if (g.current_user.is_administrator() or
+                #meal.user == g.current_user):
+                #return meal.user
+            #else:
+                ## Unauthorized
+                #raise JsonApiException(' ',
+                                       #title = HTTP_STATUS_CODES[403],
+                                       #status = '403')
+        #return None
 
-def find_user_by_day_id(day_id):
-    try:
-        day = Day.query.filter_by(id=day_id).one()
-    except NoResultFound:
-        raise ObjectNotFound({'parameter': 'day_id'},
-                             "Day: {} not found".format(day_id))
-    else:
-        if day.user is not None:
-            if (g.current_user.is_administrator() or
-                day.user == g.current_user):
-                return day.user
-            else:
-                # Unauthorized
-                raise JsonApiException(' ',
-                                       title = HTTP_STATUS_CODES[403],
-                                       status = '403')
-        return None
+#def find_user_by_day_id(day_id):
+    #try:
+        #day = Day.query.filter_by(id=day_id).one()
+    #except NoResultFound:
+        #raise ObjectNotFound({'parameter': 'day_id'},
+                             #"Day: {} not found".format(day_id))
+    #else:
+        #if day.user is not None:
+            #if (g.current_user.is_administrator() or
+                #day.user == g.current_user):
+                #return day.user
+            #else:
+                ## Unauthorized
+                #raise JsonApiException(' ',
+                                       #title = HTTP_STATUS_CODES[403],
+                                       #status = '403')
+        #return None
 
 
 ###############################################################################
@@ -179,15 +179,13 @@ rest_jsonapi.route(UserList, 'user_list',
           '/users/')
 
 rest_jsonapi.route(UserDetail, 'user_detail',
-          '/users/<int:id>',
-          '/meals/<int:meal_id>/user',
-          '/days/<int:day_id>/user')
+          '/users/<int:id>')
 
-rest_jsonapi.route(UserMealRelationship, 'user_meals',
-          '/users/<int:id>/relationships/meals/')
+#rest_jsonapi.route(UserMealRelationship, 'user_meals',
+          #'/users/<int:id>/relationships/meals/')
 
-rest_jsonapi.route(UserDayRelationship, 'user_days',
-          '/users/<int:id>/relationships/days/')
+#rest_jsonapi.route(UserDayRelationship, 'user_days',
+          #'/users/<int:id>/relationships/days/')
 
 
 
