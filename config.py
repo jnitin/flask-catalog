@@ -1,7 +1,7 @@
 """Contains non-sensitive configurations for application"""
 
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.abspath(os.path.dirname(__file__))  # path to this file
 
 class Config(object):
     # do NOT define secret information here.

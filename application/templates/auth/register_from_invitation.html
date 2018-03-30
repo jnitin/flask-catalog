@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% set page_title = 'Register' %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+
+{% block body_class %}
+    text-center
+{% endblock %}
+
+{% block body %}
+    <form class="form-login" method="POST"}}">
+        {{ form.hidden_tag() }}
+
+        <img class="mb-4" src="{{ url_for('static', filename='img/logo-64x64.png') }}" alt="" width="64" height="64">
+
+        <h1 class="h3 mb-3 font-weight-normal">Hello {{ user_email }}, please complete your registration.</h1>
+
+        <label for="password" class="sr-only">{{ form.password.label }}</label>
+        {{ form.password(class="form-control", placeholder=form.password.label.text,
+            title=form.password.label.text, required=True) }}
+
+        <label for="first_name" class="sr-only">{{ form.first_name.label }}</label>
+        {{ form.first_name(class="form-control", placeholder=form.first_name.label.text,
+            title=form.first_name.label.text, required=True) }}
+
+        <label for="last_name" class="sr-only">{{ form.last_name.label }}</label>
+        {{ form.last_name(class="form-control", placeholder=form.last_name.label.text,
+            title=form.last_name.label.text, required=True) }}
+
+        </br>
+        {{ form.submit(class="btn btn-lg btn-primary btn-block") }}
+
+        <p class="mt-5 mb-3 text-muted">&copy; {{ config['COPYRIGHT'] }}</p>
+    </form>
+{% endblock %}
+
+{% block footer %} {% endblock %}

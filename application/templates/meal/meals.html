@@ -1,0 +1,75 @@
+{% extends 'layouts/catalog.html' %}
+
+{% set page_title = 'Items' %}
+
+{% block card_categories %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"><b>Categories</b></h5>
+            <div class="list-group">
+                <p>No categories...</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block card_items %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><b>Meals</b></h5>
+        <div class="list-group">
+            {% if meal_active %}
+                <a href="{{ url_for('meal.meals', meal_id=meal_active.id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">{{ meal_active.name }}</h4>
+                    </div>
+                    <p class="mb-1">{{ meal_active.description }}</p>
+                </a>
+            {% endif %}
+            {% for meal in meals %}
+                {% if meal != meal_active %}
+                    <a href="{{ url_for('meal.meals', meal_id=meal.id) }}" class="list-group-item list-group-item-action">{{ meal.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block card_edit %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><b>Customize</b></h5>
+        {% if current_user.is_authenticated and current_user.is_active %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"title="Add a new meal">Add meal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if meal_active %}{% else %}disabled{% endif %}"
+                        {% if meal_active %}title="Edit selected meal"{% else %}title="Select a meal first"{% endif %}
+                        href="{% if meal_active %}{{ url_for('meal.edit_meal', meal_id=meal_active.id) }}{% else %}#{% endif %}"
+                        >Edit meal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if meal_active %}{% else %}disabled{% endif %}"
+                    {% if meal_active %}title="Delete selected meal"{% else %}title="Select a meal first"{% endif %}
+                    href="{% if meal_active %}{{ url_for('meal.delete_meal', meal_id=meal_active.id) }}{% else %}#{% endif %}"
+                    >Delete meal</a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.register') }}"title="Register to manage your calories">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}"title="Login to access your entries">Login</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,9 @@
 from sqlalchemy import Column, desc
 from sqlalchemy.orm import backref
-from flask import current_app, g
+from flask import current_app, g, url_for, render_template
 from flask_login import UserMixin, AnonymousUserMixin
-from ..extensions import db, login_manager, bcrypt
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from ..extensions import db, login_manager, bcrypt, images
 import os
 import base64
 from datetime import datetime, date, timedelta
@@ -15,22 +16,56 @@ class User(db.Model, UserMixin):
     id = Column(db.Integer, primary_key=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String(128))  # We store it hashed
-    name = db.Column(db.String)
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
+    confirmed = db.Column(db.Boolean, nullable=True, default=False)
+    failed_logins = db.Column(db.Integer, default=0)
+    blocked = db.Column(db.Boolean, nullable=True, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    profile_pic_filename = db.Column(db.String, default=None, nullable=True)
+    profile_pic_url = db.Column(db.String, default=None, nullable=True)
+    daily_calories_target = db.Column(db.Float, index=True, default=1000.0)
 
-    # for token based authorization by api
-    token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
+    #meals = db.relationship('Meal', backref='user', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        # Set default role for a new User
-        if self.role is None:
-            if self.email == current_app.config['ADMIN_EMAIL']:
-                self.role = Role.query.filter_by(permissions=0xff).first()
-            if self.role is None:
-                self.role = Role.query.filter_by(default=True).first()
 
+        # if default admin, initialize fully
+        if self.email == current_app.config['ADMIN_EMAIL']:
+            self.role = Role.query.filter_by(name='Administrator').first()
+            self.password = current_app.config['ADMIN_PW']
+            self.confirmed = True
+
+        # if default usermanager, initialize fully
+        if self.email == current_app.config['USERMANAGER_EMAIL']:
+            self.role = Role.query.filter_by(name='Usermanager').first()
+            self.password = current_app.config['USERMANAGER_PW']
+            self.confirmed = True
+
+        # if default user, initialize fully
+        if self.email == current_app.config['USER_EMAIL']:
+            self.role = Role.query.filter_by(name='User').first()
+            self.password = current_app.config['USER_PW']
+            self.confirmed = True
+
+        # Set default role for a regular new User
+        if self.role is None:
+            self.role = Role.query.filter_by(default=True).first()
+
+    @staticmethod
+    def insert_default_users():
+        """Inserts a default admin, usermanager and user into the database"""
+        u1 = User(email=current_app.config['ADMIN_EMAIL'])
+        db.session.add(u1)
+
+        u2 = User(email=current_app.config['USERMANAGER_EMAIL'])
+        db.session.add(u2)
+
+        u3 = User(email=current_app.config['USER_EMAIL'])
+        db.session.add(u3)
+
+        db.session.commit()
 
     # Use descriptors to deactivate 'getter' of password
     @property
@@ -45,31 +80,119 @@ class User(db.Model, UserMixin):
 
     def verify_password(self, password):
         """Using bcrypt to check the hashed password"""
-        return bcrypt.check_password_hash(self.password_hash, password)
+        if bcrypt.check_password_hash(self.password_hash, password):
+            self.failed_logins = 0
+            return True
+        else:
+            self.failed_logins += 1
+            if self.failed_logins > 2:
+                self.blocked = True
+            db.session.commit()
+            return False
 
-    def can(self, permissions):
+
+    def unblock(self):
+        self.failed_logins = 0
+        self.blocked = False
+
+    ## implement our own is_active property for flask_login
+    ## inactive accounts may not log in
+    #@property
+    #def is_active(self):
+        #"""Only users that have their email confirmed and are not blocked are
+        #active."""
+        #return self.confirmed and not self.blocked
+
+    def generate_confirmation_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'confirm': self.id}).decode('utf-8')
+
+    def confirm(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        db.session.add(self)
+        return True
+
+    def generate_reset_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'reset': self.id}).decode('utf-8')
+
+    @staticmethod
+    def reset_password(token, new_password):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        user = User.query.get(data.get('reset'))
+        if user is None:
+            return False
+        user.password = new_password
+        db.session.add(user)
+        return True
+
+    def generate_email_change_token(self, new_email, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps(
+            {'change_email': self.id, 'new_email': new_email}).decode('utf-8')
+
+    def change_email(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        if data.get('change_email') != self.id:
+            return False
+        new_email = data.get('new_email')
+        if new_email is None:
+            return False
+        if self.query.filter_by(email=new_email).first() is not None:
+            return False
+        self.email = new_email
+        db.session.add(self)
+        return True
+
+    @staticmethod
+    def generate_invitation_token(user_email, expiration=7*3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps(
+            {'user_email': user_email}).decode('utf-8')
+
+    @staticmethod
+    def get_user_email_from_invitation_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        user_email = data.get('user_email')
+        if user_email is None:
+            return False
+        if User.query.filter_by(email=user_email).first() is not None:
+            return False
+        return user_email
+
+    def can(self, perm):
         """Returns True if User has all the permissions.
 
         Usage:
             u = User.query....
             u.can(Permission.CRUD_OWNED_ITEMS)
         """
-        # perform a bitwise and to verify that all permissions are there
-        return self.role is not None and \
-               (self.role.permissions & permissions) == permissions
+        return self.role is not None and self.role.has_permission(perm)
 
     def is_administrator(self):
-        return self.can(Permission.ADMINISTER)
+        return self.can(Permission.ADMIN)
 
-    def get_token(self, expires_in=3600):
-        """Generates a new token for authorization"""
-        now = datetime.utcnow()
-        if self.token and self.token_expiration > now + timedelta(seconds=60):
-            return self.token
-        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
-        self.token_expiration = now + timedelta(seconds=expires_in)
-        db.session.add(self)
-        return self.token
+    def is_usermanager(self):
+        return self.can(Permission.CRUD_USERS)
 
     def revoke_token(self):
         """Revokes the authorization token"""
@@ -83,6 +206,57 @@ class User(db.Model, UserMixin):
         if user is None or user.token_expiration < datetime.utcnow():
             return None
         return user
+
+    # Use descriptor to deactivate 'getter' of profile_pic
+    @property
+    def profile_pic(self):
+        raise AttributeError('profile_pic is not a readable attribute')
+
+    # Customize 'setter' of profile_pic
+    @profile_pic.setter
+    def profile_pic(self, client_file_storage):
+        """Upload the profile picture to the server and set the url"""
+
+        # If we already have a profile picture, remove it
+        if self.profile_pic_filename:
+            filepath=os.path.join(
+                current_app.config['UPLOADED_IMAGES_DEST'],
+                self.profile_pic_filename)
+            os.remove(filepath)
+            self.profile_pic_filename = None
+            self.profile_pic_url = None
+
+        # This uploads & saves the file on the server
+        # NOTE: It uses the secure_filename function...
+        server_filename = images.save(client_file_storage)
+
+        # Generate the URL to this file
+        url = images.url(server_filename)
+
+        # Store information with the user
+        self.profile_pic_filename = server_filename
+        self.profile_pic_url = url
+
+    def to_json(self):
+        json_user = {
+                'url': url_for('api.user_detail', id=self.id)
+            }
+        return json_user
+
+    def generate_auth_token(self, expiration):
+        s = Serializer(current_app.config['SECRET_KEY'],
+                       expires_in=expiration)
+        return s.dumps({'id': self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['id'])
+
 
 # For consistency, create a custom AnonymousUser class that implements the
 # can() and is_administrator() methods. This object inherits from Flask-Login’s
@@ -98,24 +272,37 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+    def is_usermanager(self):
+        return False
+
 login_manager.anonymous_user = AnonymousUser
 
+class Permission:
+    """Defines the list of permissions"""
+    # implementation based on "Flask Web Development - Chapter 9. User Roles"
+    CRUD_OWNED = 1
+    CRUD_USERS = 2
+    ADMIN = 4
 
 class Role(db.Model):
     """Defines the list of roles with their permissions:
 
-    User role      | Bit value  | Description
-    ---------------|------------|---------------------------------------------
-    Anonymous      | 0b00000000 | User who is not logged in.
-                   | (0x00)     | Can only register or login.
-                   |            |
-    User           | 0b00000001 | Basic permissions to CRUD owned items.
-                   | (0x07)     | This is the default for new users.
-                   |            |
-    Administrator  | 0b11111111 | Full access
-                   | (0xff)     |
+    User role      | Permission value  | Description
+    ---------------|-------------------|---------------------------------------------
+    Anonymous      | 0                 | User who is not logged in.
+                   |                   | Can only register or login.
+                   |                   |
+    User           | 1                 | Basic permissions to CRUD owned entries.
+                   |                   | This is the default for new users.
+                   |                   |
+    Usermanager    | 2                 | Adds permission to CRUD other users
+                   |                   |
+                   |                   |
+    Administrator  | 4                 | Full access, which includes permission to
+                   |                   | change the roles of other users.
 
     """
+    # implementation based on "Flask Web Development - Chapter 9. User Roles"
 
     __tablename__ = 'roles'
 
@@ -126,32 +313,44 @@ class Role(db.Model):
 
     users = db.relationship('User', backref='role', lazy='dynamic')
 
+    def __init__(self, **kwargs):
+        super(Role, self).__init__(**kwargs)
+        if self.permissions is None:
+            self.permissions = 0
+
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.CRUD_OWNED_ITEMS, True),
-            'Administrator': (0xff, False)
-            }
+            'User': [Permission.CRUD_OWNED],
+            'Usermanager': [Permission.CRUD_OWNED, Permission.CRUD_USERS],
+            'Administrator': [Permission.CRUD_OWNED, Permission.CRUD_USERS,
+                              Permission.ADMIN],
+        }
+        default_role = 'User'
         for r in roles:
             role = Role.query.filter_by(name=r).first()
             if role is None:
                 role = Role(name=r)
-                role.permissions = roles[r][0]
-                role.default = roles[r][1]
-                db.session.add(role)
+            role.reset_permissions()
+            for perm in roles[r]:
+                role.add_permission(perm)
+            role.default = (role.name == default_role)
+            db.session.add(role)
         db.session.commit()
 
-class Permission:
-    """Defines the list of permissions:
+    def add_permission(self, perm):
+        if not self.has_permission(perm):
+            self.permissions += perm
 
-    Task Name        | Bit value  | Description
-    -----------------|------------|---------------------------------------------
-    CRUD owned items | 0b00000001 | CRUD owned items
-                     | (0x01)     |
-                     |            |
-    Administer       | 0b10000000 | Administrative access to the site.
-                     | (0x80)     |
+    def remove_permission(self, perm):
+        if self.has_permission(perm):
+            self.permissions -= perm
 
-    """
-    CRUD_OWNED_ITEMS = 0x01
-    ADMINISTER = 0x80
+    def reset_permissions(self):
+        self.permissions = 0
+
+    def has_permission(self, perm):
+        return self.permissions & perm == perm
+
+    def __repr__(self):
+        return '<Role %r>' % self.name

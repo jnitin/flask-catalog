@@ -1,2 +1,5 @@
 from .views import api
-from .auth import views, errors
+from .auth import views as api_auth_views
+from .user import views as api_user_views
+from .meal import views as api_meal_views
+from .help import views as api_help_views

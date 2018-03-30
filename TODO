@@ -1,0 +1,13 @@
+(-) Push project to personal git and use as project example in Toptal profile
+     (-) Update README to end customer perspective.
+     
+(-) Export Jupyter notebook to HTML and use as awesome example in Toptal profile
+
+
+(-) Get rid of RelationShips. Don't need them... (I think)
+(-) Finish front-end HTML pages
+(-) Explanation why "type": "user"  in the POST request to register a user
+(-) Delete Meals of a user when Deleting a user
+(-) Create multiple configs, as in Flask Web Development book
+(-) All responses should use JSON API 1.0 specification
+(-) User setting of target  calories can be changed with a PATCH command.

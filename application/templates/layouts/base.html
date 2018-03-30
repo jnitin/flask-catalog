@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<meta name="description" content="Catalog of Beers">
+		<meta name="description" content="Calories">
 		<meta name="author" content="Arjaan Buijk">
 		<title>{% block title %}{{ page_title }}{% endblock %}</title>
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -33,15 +33,21 @@
 						<li class="nav-item">
 						  <a class="nav-link" href="{{ url_for('auth.index') }}"><img src="{{ url_for('static', filename='img/logo-inverse.png') }}"/> <span class="sr-only">(current)</span></a>
 						</li>
-						<li class="nav-item">
-						  <a class="nav-link" href="{{ url_for('catalog.items') }}">Catalog</a>
-						</li>
-						<!--
-						<li class="nav-item">
-						  <a class="nav-link disabled" href="#">Disabled</a>
-						</li>
-						-->
+						{% if current_user.blocked %}
+						{% else %}
+							{% if current_user.is_authenticated and current_user.is_active %}
+								<li class="nav-item">
+								  <a class="nav-link"  href="{{ url_for('meal.meals') }}">Calories</a>
+								</li>
+								<!--
+								<li class="nav-item">
+								  <a class="nav-link disabled" href="#">Disabled</a>
+								</li>
+								-->
+							{% endif %}
+						{% endif %}
 					</ul>
+
 
 					<!--TODO: Implement search
 					<form class="form-inline my-2 my-lg-0">
@@ -50,13 +56,13 @@
 					</form>
 					-->
 
-
 					<ul class="navbar-nav navbar-right">
 						<li class="nav-item  dropdown">
-							{% if current_user.is_authenticated %}
+							{% if current_user.is_authenticated and current_user.is_active %}
 								<a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ current_user.name }}</a>
 								<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown01">
 									<a class="dropdown-item" href="{{ url_for('user.profile') }}">Profile</a>
+									<a class="dropdown-item" href="{{ url_for('user.profile_pic') }}">Profile Picture</a>
 									<a class="dropdown-item" href="{{ url_for('auth.password') }}">Password</a>
 									<div class="dropdown-divider"></div>
 									<a class="dropdown-item" a href="{{ url_for('auth.logout') }}">Log out</a>
@@ -70,10 +76,15 @@
 							{% endif %}
 						</li>
 					</ul>
-
 				</div>
 			  </nav>
 	    {% endblock %}
+
+		<!-- Put a little gap below the navbar -->
+		{% block navgap %}
+		</br>
+	    {% endblock %}
+
 
 	    {% block container %}
 	    <div class="container">

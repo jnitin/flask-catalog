@@ -102,3 +102,6 @@ ENV/
 
 # application logs
 logs/
+
+# application uploads
+uploads/

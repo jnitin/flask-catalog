@@ -1,7 +1,7 @@
 import os, os.path
 from application import create_app
 from application.user import User, Role
-from application.catalog import Category, Item
+from application.meal import Meal
 from application.extensions import db
 
 # Create an instance of the application
@@ -17,7 +17,7 @@ if os.path.isfile(path) is False:
     with app.app_context():
         db.create_all()
         Role.insert_roles()
-        Item.insert_initial_data()
+        User.insert_default_users()
 else:
     print("Connecting to existing data-base...")
 
