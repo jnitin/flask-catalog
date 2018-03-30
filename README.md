@@ -1,41 +1,56 @@
-# Calories
+# Catalog
 
-Flask application with a REST API to track calories, following JSON API 1.0 specification
+Flask application with a front-end and a REST API of an item catalog.
+
+- The items in our demonstration catalog are beers.
+- The REST API follows the [JSON API 1.0](http://jsonapi.org/)  specification
 
 
 ### Features
-1. API users can create an account and log in.
+1. Without authentication, only the main page can be visited which displays the catalog content.
 
-2. All API calls are authenticated. 
+2. Users can create an account and login, in several ways:
 
-3. New users need to verify their account by email. Users are not able to log in until this verification is complete.
+   1. At the home page, by providing email & password.
 
-4. There are three roles with different permission levels: 
- (-) a regular user, who is only able to CRUD their own records
- (-) a user manager, who is able to CRUD only users
- (-) an admin, who is able to CRUD all records and users
+   2. At the home page, with a Google account.
 
-5. When a user fails to log in three times in a row, his or her account will be blocked automatically, and only admins and managers are able to unblock it.
+   3. With an API request, by providing email & password
 
-6. An admin is able to invite someone to the application by specifying an email address; the system will send an invitation message automatically, prompting the user to complete the registration by setting first name, last name, and password.
+      *(NOTE: The API does not yet support authentication with a Google account)*
 
-7. Users are able to upload and change their profile picture.
+   ​
 
-8. Users can post 'meals', and each meal has a date, time, text, and number of calories.
+3. All API calls are authenticated. 
 
-9. If the number of calories is not provided, the API will connect to [Nutritionix](https://www.nutritionix.com) and try to get the number of calories for the entered meal.
+4. New users need to verify their account by email. Users are not able to log in until this verification is complete.
 
-10. In a user setting, a target number of calories per day is defined.
+5. There are three roles with different permission levels: 
+   (-) a regular user, who is only able to CRUD their own records
+    (-) a user manager, who is able to CRUD only users
+    (-) an admin, who is able to CRUD all records and users
 
-11. When retrieving the details for a meal an extra boolean field is set to true if the total for that day is less than expected number of calories per day, otherwise it will be false.
+6. When a user fails to log in three times in a row, his or her account will be blocked automatically, and only admins and managers are able to unblock it.
 
-12. The API return data according to the [JSON API 1.0](http://jsonapi.org/) specification
+7. An admin is able to invite someone to the application by specifying an email address; the system will send an invitation message automatically, prompting the user to complete the registration by setting first name, last name, and password.
 
-13. The API provides filter capabilities for all endpoints that return a list of elements, and supports pagination.
+8. Users are able to upload and change their profile picture.
 
-14. The API filtering allows definition of operations precedence and use any combination of the available fields.
+9. Users can post 'meals', and each meal has a date, time, text, and number of catalog.
 
-15. The application includes rigorous unit tests.
+10. If the number of catalog is not provided, the API will connect to [Nutritionix](https://www.nutritionix.com) and try to get the number of catalog for the entered meal.
+
+11. In a user setting, a target number of catalog per day is defined.
+
+12. When retrieving the details for a meal an extra boolean field is set to true if the total for that day is less than expected number of catalog per day, otherwise it will be false.
+
+13. The API return data according to the [JSON API 1.0](http://jsonapi.org/) specification
+
+14. The API provides filter capabilities for all endpoints that return a list of elements, and supports pagination.
+
+15. The API filtering allows definition of operations precedence and use any combination of the available fields.
+
+16. The application includes rigorous unit tests.
 
 16. End 2 end scenarios are tested via a python client written in a [Jupyter notebook](http://jupyter.org/)
 
@@ -78,15 +93,15 @@ The API is demonstrated in this [end-2-end test scenario](link-to-HTML).
 
 Development and testing was done on Ubuntu 16.04, using Python 3.5
 
-The steps described here show how to run <b>calories</b> within a python virtual environment.
+The steps described here show how to run <b>catalog</b> within a python virtual environment.
 
 **Step 1. Clone the project repository**
 ```bash
-$ git clone https://github.com/ArjaanBuijk/Calories.git
+$ git clone https://github.com/ArjaanBuijk/Catalog.git
 ```
 
 **Step 2. Configure project**
-Install the secret configuration file into: Calories/instance/config.py
+Install the secret configuration file into: Catalog/instance/config.py
 Note that for security reasons this configuration file is not included in the github repository.
 
 **Step 3. One time: make sure python3-pip and python3-env are installed**
@@ -97,7 +112,7 @@ $ sudo apt-get install python3-venv
 
 **Step 4. One time: prepare the python3 virtual environment**
 ```bash
-$ cd Calories
+$ cd Catalog
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv)
@@ -107,7 +122,7 @@ $ source venv/bin/activate
 
  Alternatively, instead of installing the required python packages using the file 'requirements.txt', which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package:
 ```bash
-$ cd Calories
+$ cd Catalog
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ pip install --upgrade pip
@@ -126,16 +141,16 @@ $ source venv/bin/activate
 
 **Step 5. Activate the python virtual environment and start the application server**
 ```bash
-$ cd Calories
+$ cd Catalog
 $ source venv/bin/activate
-(venv) $ export FLASK_APP=calories.py
+(venv) $ export FLASK_APP=catalog.py
 (venv) $ flask run
 ```
 
  You will see this output printed to the console:
  ```bash
  Connecting to existing data-base...
- * Serving Flask app "calories"
+ * Serving Flask app "catalog"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
  ```
 
@@ -146,10 +161,10 @@ $ source venv/bin/activate
 To start with a clean and fresh database, just remove the existing database before starting the application:
 
 ```bash
-$ cd Calories
+$ cd Catalog
 $ source venv/bin/activate
 (venv) $ rm app.db
-(venv) $ export FLASK_APP=calories.py
+(venv) $ export FLASK_APP=catalog.py
 (venv) $ flask run
 ```
 
@@ -157,7 +172,7 @@ You will see this output printed to the console:
 
 ```bash
  Creating & initializing a new data-base...
- * Serving Flask app "calories"
+ * Serving Flask app "catalog"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 

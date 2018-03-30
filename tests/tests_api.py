@@ -653,8 +653,7 @@ class APITestCase(unittest.TestCase):
                     "email": 'arjaan.buijk@gmail.com',
                     "password": "a_real_password",
                     "first_name": "Arjaan",
-                    "last_name": "Buijk",
-                    "daily_calories_target": "2000"
+                    "last_name": "Buijk"
                 }
             }
         }
@@ -698,117 +697,6 @@ class APITestCase(unittest.TestCase):
         self.verify_response_is_201_CREATED(response)
         response_data = json.loads(response.data.decode())
         meal_id = response_data['data']['id']
-
-
-    def test_0_0_0_2_1_daily_calories_target(self):
-        # Register a new user via POST command
-        url = '/api/v1/users/'
-        headers = {
-            'Content-Type': 'application/vnd.api+json',
-            'Accept': 'application/vnd.api+json'
-            }
-        data = {
-            "data": {
-                "type": "user",
-                "attributes": {
-                    "email": 'arjaan.buijk@gmail.com',
-                    "password": "a_real_password",
-                    "first_name": "Arjaan",
-                    "last_name": "Buijk",
-                    "daily_calories_target": "800.0"
-                }
-            }
-        }
-        response = self.client().post(url,
-                                      headers=headers,
-                                      data=json.dumps(data))
-        self.verify_response_is_201_CREATED(response)
-        response_data = json.loads(response.data.decode())
-
-        # activate the account
-        # we activate it by going into the database directly...
-        u = User.query.filter_by(email='arjaan.buijk@gmail.com').one()
-        u.confirmed = True
-
-        # get a token
-        url = '/api/v1/token'
-        headers = self.get_api_headers('arjaan.buijk@gmail.com',
-                                       'a_real_password')
-        response = self.client().post(url,headers=headers)
-        self.verify_response_is_200_OK(response)
-        json_response = json.loads(response.get_data(as_text=True))
-        self.assertIsNotNone(json_response.get('token'))
-        token = json_response['token']
-
-        # Create a meal for this user
-        url = '/api/v1/meals/'
-        headers = self.get_api_headers(token,'')
-        data = {
-            "data": {
-                "type": "meal",
-                "attributes": {
-                    "date": '{}'.format(date(2018,1,5)),
-                    "time": '{}'.format(time(18,5,15)),
-                    "description": "Potatoes, a Veggie Patty and a Milk"
-                }
-            }
-        }
-        response = self.client().post(url,
-                                      headers=headers,
-                                      data=json.dumps(data))
-        self.verify_response_is_201_CREATED(response)
-        response_data = json.loads(response.data.decode())
-        meal_id = response_data['data']['id']
-        meal_url = response_data['data']['links']['self']
-
-        ## Get all information for this meal, so we can check daily target
-        ## TODO: include=day option does not work yet
-        ##url = meal_url+'?include=day'
-        #url = meal_url
-        #headers = self.get_api_headers(token,'')
-        #response = self.client().get(url,
-                                     #headers=headers)
-        #self.verify_response_is_200_OK(response)
-        #response_data = json.loads(response.data.decode())
-        #day_url = response_data['data']['relationships']['day']['links']['related']
-
-        #url = day_url
-        #headers = self.get_api_headers(token,'')
-        #response = self.client().get(url,
-                                     #headers=headers)
-        #self.verify_response_is_200_OK(response)
-        #response_data = json.loads(response.data.decode())
-        #below_daily_max = response_data['data']['attributes']['below_daily_max']
-        #self.assertTrue(below_daily_max)
-
-        # Add meal for the same day again, and then the max is exceeded
-        url = '/api/v1/meals/'
-        headers = self.get_api_headers(token,'')
-        data = {
-            "data": {
-                "type": "meal",
-                "attributes": {
-                    "date": '{}'.format(date(2018,1,5)),
-                    "time": '{}'.format(time(23,5,15)),
-                    "description": "Potatoes, a Veggie Patty and a Milk"
-                }
-            }
-        }
-        response = self.client().post(url,
-                                      headers=headers,
-                                      data=json.dumps(data))
-        self.verify_response_is_201_CREATED(response)
-
-        #url = day_url
-        #headers = self.get_api_headers(token,'')
-        #response = self.client().get(url,
-                                     #headers=headers)
-        #self.verify_response_is_200_OK(response)
-        #response_data = json.loads(response.data.decode())
-        #below_daily_max = response_data['data']['attributes']['below_daily_max']
-        #self.assertFalse(below_daily_max)
-
-
 
     #def test_2_1_verify_relationships(self):
         #"""POST /api/v1/meals/: verify relationships"""

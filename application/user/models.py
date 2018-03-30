@@ -13,6 +13,9 @@ class User(db.Model, UserMixin):
 
     __tablename__ = 'users'
 
+    ############################################
+    ## Columns typical for every application  ##
+    ############################################
     id = Column(db.Integer, primary_key=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String(128))  # We store it hashed
@@ -24,10 +27,15 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     profile_pic_filename = db.Column(db.String, default=None, nullable=True)
     profile_pic_url = db.Column(db.String, default=None, nullable=True)
-    daily_calories_target = db.Column(db.Float, index=True, default=1000.0)
 
-    #meals = db.relationship('Meal', backref='user', lazy='dynamic')
+    ##################################
+    ## Application specific columns ##
+    ##################################
 
+
+    ###########################################
+    ## Methds typical for every application  ##
+    ###########################################
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
 
@@ -95,13 +103,6 @@ class User(db.Model, UserMixin):
         self.failed_logins = 0
         self.blocked = False
 
-    ## implement our own is_active property for flask_login
-    ## inactive accounts may not log in
-    #@property
-    #def is_active(self):
-        #"""Only users that have their email confirmed and are not blocked are
-        #active."""
-        #return self.confirmed and not self.blocked
 
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
@@ -256,6 +257,10 @@ class User(db.Model, UserMixin):
         except:
             return None
         return User.query.get(data['id'])
+
+    ##################################
+    ## Application specific methods ##
+    ##################################
 
 
 # For consistency, create a custom AnonymousUser class that implements the

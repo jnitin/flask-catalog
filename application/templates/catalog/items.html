@@ -1,0 +1,77 @@
+{% extends 'layouts/catalog.html' %}
+
+{% set page_title = 'Items' %}
+
+{% block card_categories %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"><b>Categories</b></h5>
+            <div class="list-group">
+                {% for category in categories %}
+                    <a href="{{ url_for('catalog.category_items', category_id=category.id) }}" class="list-group-item list-group-item-action {% if category.id == category_id %}active{% endif %}">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block card_items %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><b>{{ category_active.name }} Items</b></h5>
+        <div class="list-group">
+            {% if item_active %}
+                <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item_active.id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h4 class="mb-1">{{ item_active.name }}</h4>
+                    </div>
+                    <p class="mb-1">{{ item_active.description }}</p>
+                </a>
+            {% endif %}
+            {% for item in items %}
+                {% if item != item_active %}
+                    <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item.id) }}" class="list-group-item list-group-item-action">{{ item.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block card_edit %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title"><b>Customize</b></h5>
+        {% if current_user.is_authenticated %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"title="Add a new beer to the catalog">Add beer</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
+                        {% if item_active %}title="Edit selected beer"{% else %}title="Select a beer first"{% endif %}
+                        href="{{ url_for('catalog.edit_category_item', category_id=category_id, item_id=item_active.id) }}"
+                        >Edit beer
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
+                    {% if item_active %}title="Delete selected beer"{% else %}title="Select a beer first"{% endif %}
+                    href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_active.id) }}"
+                    >Delete beer</a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.register') }}"title="Register to build your own catalog">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}"title="Login to access your own catalog">Login</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -79,12 +79,13 @@ def configure_blueprints(app):
     from .user import user
     from .auth import auth
     from .email import email
+    from .catalog import catalog
     from .meal import meal
     # Note: api blueprint already initialzed above in api.init_app(---)
     # from .api import api
 
     # Register all blueprints with the application
-    for blueprint in [user, auth, email, meal]:
+    for blueprint in [user, auth, email,  catalog, meal]:
         app.register_blueprint(blueprint)
 
 

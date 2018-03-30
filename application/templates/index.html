@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% set page_title = 'Calories' %}
+{% set page_title = 'Catalog' %}
 
 <!--no topbar on home page-->
 {% block topbar %}
@@ -9,19 +9,22 @@
 
 {% block body %}
 <div class="jumbotron">
-    <h1>Calories</h1>
-    <p>Manage your calories intake via browser or JSON API.</p>
+    <h1>Catalog</h1>
+    <p>CRUD a catalog via browser or REST JSON API 1.0.</p>
     <p>
+      <p>
        {% if current_user.is_authenticated and current_user.is_active %}
+         <a role="button" href="{{ url_for('catalog.categories')}}" class="btn btn-lg btn-primary"><strong>Enter »</strong></a>
          <a role="button" href="{{ url_for('auth.logout')}}" class="btn btn-lg btn-primary"><strong>Log Out »</strong></a>
        {% else%}
+         <a role="button" href="{{ url_for('catalog.categories')}}" class="btn btn-lg btn-primary"><strong>Visit »</strong></a>
          <a role="button" href="{{ url_for('auth.register')}}" class="btn btn-lg btn-primary"><strong>Register »</strong></a>
          <a role="button" href="{{ url_for('auth.login')}}" class="btn btn-lg btn-primary"><strong>Log in »</strong></a>
        {% endif %}
     </p>
     <p><small><small>
-      Calorie count deliverd by <a href="https://www.nutritionix.com/">Nutritionix</a>,
-      <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+      Database is prepopulated with content from <a href="https://www.beeradvocate.com/beer/style/">beeradvocate</a>,
+      Icons made by <a href="https://www.flaticon.com/free-icon/beer-stein_66387" title="Freepik">Freepik</a>
     </small></small></p>
 </div>
 {% endblock %}
