@@ -53,17 +53,16 @@
             // and then redirect back to the main page
             $.ajax({
                 type: 'POST',
-                url: '/gconnect?state={{state}}',
+                url: '/gconnect?state={{state}}&next={{nxt}}',
                 processData: false,
                 data: authResult['code'],
                 contentType: 'application/octet-stream; charset=utf-8',
                 success: function(result) {
-                    // Redirect to main page after 4 seconds
                     if (result) {
-                        //$('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                        // we returned next safe URL or home page to go to after succesfull login
                         setTimeout(function() {
-                            window.location.href = "{{url_for('catalog.categories')}}";
-                            }, 4000);
+                            window.location.href = result;
+                            }, 1000);
                     }
                 }
             });

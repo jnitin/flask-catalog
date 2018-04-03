@@ -58,6 +58,11 @@ def login():
                     for x in range(32))
     session['state'] = state
 
+    # Extract next URL, and pass to template to be passed to gconnect
+    nxt = request.args.get('next')
+    if nxt is None or not nxt.startswith('/'):
+        nxt = url_for('catalog.categories')
+
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
@@ -86,11 +91,11 @@ def login():
 
     return render_template('auth/login.html', form=form,
                            google_oauth2_client_id=client_id,
-                           state=state)
+                           state=state,
+                           nxt=nxt)
 
 
 @auth.route('/logout')
-@login_required
 def logout():
     logout_user()
     flash('Succesfully logged out', 'success')
@@ -109,6 +114,11 @@ def register():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     session['state'] = state
+
+    # Extract next URL, and pass to template to be passed to gconnect
+    nxt = request.args.get('next')
+    if nxt is None or not nxt.startswith('/'):
+        nxt = url_for('catalog.categories')
 
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
@@ -140,7 +150,8 @@ def register():
 
     return render_template('auth/register.html', form=form,
                            google_oauth2_client_id=client_id,
-                           state=state)
+                           state=state,
+                           nxt=nxt)
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
@@ -303,7 +314,7 @@ def gconnect():
     nxt = request.args.get('next')
     if nxt is None or not nxt.startswith('/'):
         nxt = url_for('catalog.categories')
-    return redirect(nxt)
+    return nxt
 
 
 ################################################################################

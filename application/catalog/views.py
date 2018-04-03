@@ -53,6 +53,26 @@ def category_item(category_id, item_id):
                                    item_active=item_active)
     abort(404)
 
+@catalog.route('/add',
+               methods=['GET', 'POST'])
+@login_required
+def add(category_id=0):
+    return 'TODO: IMPLEMENT add'
+    # Details of an item
+    categories = Category.query.all()
+    category_active = Category.query.filter_by(id=category_id).first()
+    if category_active:
+        items = Item.query.filter_by(category_id=category_id).all()
+        item_active = Item.query.filter_by(id=item_id).first()
+        if item_active:
+            return render_template('catalog/items.html',
+                                   categories=categories,
+                                   category_id=category_id,
+                                   category_active = category_active,
+                                   items=items,
+                                   item_id=item_id,
+                                   item_active=item_active)
+    abort(404)
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/edit',
                methods=['GET', 'POST'])
