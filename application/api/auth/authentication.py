@@ -33,7 +33,7 @@ def verify_password(email_or_token, password):
     g.token_used = False
 
     if user.verify_password(password):
-        # Also login to flask_login
+        # Also login to Flask_Login
         login_user(user, remember=False)
         return True
 

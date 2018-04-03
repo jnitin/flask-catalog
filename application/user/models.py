@@ -22,11 +22,14 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     confirmed = db.Column(db.Boolean, nullable=True, default=False)
+    password_set = db.Column(db.Boolean, nullable=True, default=False)
+    registered_with_google = db.Column(db.Boolean, nullable=True, default=False)
     failed_logins = db.Column(db.Integer, default=0)
     blocked = db.Column(db.Boolean, nullable=True, default=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     profile_pic_filename = db.Column(db.String, default=None, nullable=True)
     profile_pic_url = db.Column(db.String, default=None, nullable=True)
+
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     ##################################
     ## Application specific columns ##
@@ -41,6 +44,33 @@ class User(db.Model, UserMixin):
 
         # Set default role for a regular new User
         self.role = Role.query.filter_by(default=True).first()
+
+    @staticmethod
+    def create_user(email, password, first_name, last_name,
+                    confirmed=False,
+                    role=None,
+                    with_google=False,
+                    profile_pic_url=None):
+
+        user = User(email=email,
+                    first_name=first_name,
+                    last_name=last_name
+                    )
+        if password:
+            user.password = password
+        if confirmed:
+            user.confirmed=True
+        if role:
+            user.role = Role.query.filter_by(name=role).first()
+        if with_google:
+            user.registered_with_google = True
+        if profile_pic_url:
+            user.profile_pic_url=profile_pic_url
+
+        db.session.add(user)
+        db.session.commit()
+
+        return user
 
     @staticmethod
     def insert_default_users():
@@ -81,10 +111,13 @@ class User(db.Model, UserMixin):
     def password(self, password):
         """Using bcrypt to hash the password"""
         self.password_hash = bcrypt.generate_password_hash(password)
+        self.password_set = True
 
     def verify_password(self, password):
         """Using bcrypt to check the hashed password"""
-        if bcrypt.check_password_hash(self.password_hash, password):
+
+        if (self.password_set and
+            bcrypt.check_password_hash(self.password_hash, password)):
             self.failed_logins = 0
             return True
         else:

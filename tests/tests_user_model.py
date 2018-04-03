@@ -153,14 +153,16 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_usermanager_role(self):
         r = Role.query.filter_by(name='Usermanager').first()
-        u = User(email='john@example.com', password='cat', role=r)
+        u = User(email='john@example.com', password='cat')
+        u.role = r
         self.assertTrue(u.can(Permission.CRUD_OWNED))
         self.assertTrue(u.can(Permission.CRUD_USERS))
         self.assertFalse(u.can(Permission.ADMIN))
 
     def test_administrator_role(self):
         r = Role.query.filter_by(name='Administrator').first()
-        u = User(email='john@example.com', password='cat', role=r)
+        u = User(email='john@example.com', password='cat')
+        u.role = r
         self.assertTrue(u.can(Permission.CRUD_OWNED))
         self.assertTrue(u.can(Permission.CRUD_USERS))
         self.assertTrue(u.can(Permission.ADMIN))

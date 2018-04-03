@@ -30,7 +30,7 @@ def category_items(category_id):
                                category_id=category_id,
                                category_active = category_active,
                                items=items,
-                               item_id=None,
+                               item_id=0,
                                item_active=None)
     abort(404)
 

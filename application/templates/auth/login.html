@@ -1,18 +1,8 @@
-{% extends "layouts/base.html" %}
+{% extends "auth/login_oauth.html" %}
 
 {% set page_title = 'Log in' %}
 
-
-{% block css %}
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-{% endblock %}
-
-
-{% block body_class %}
-	text-center
-{% endblock %}
-
-{% block body %}
+{% block body_1 %}
 	<form class="form-login" method="POST" >
         <!--Tell Flask-WTF to include CSRF protection in a FlaskForm-->
         {{ form.hidden_tag() }}
@@ -23,49 +13,31 @@
 		<!--Email & Password & 'Rembember me' fields-->
         <h1 class="h3 mb-3 font-weight-normal">Please log in</h1>
 
-        <label for="email" class="sr-only">{{ form.email.label }}</label>
-        {{ form.email(class="form-control", placeholder=form.email.label.text,
-			title=form.email.label.text, required=True, autofocus=True) }}
-        <!--Renders this HTML:
-        <input type="email" id="email" title="Email address"class="form-control" placeholder="Email address" required autofocus>
+		<!--
 		Notes:
 		 - sr-only class hides the label, but ensures it is there for screen-readers
 		 - no need to put curlies around form.email.label.text inside curlies, because everything
-		    inside curlies is already a python expression!
+			inside curlies is already a python expression!
 		 - placeholder is shown inside the box.
 		 - title is a popup tooltip
-        -->
+		-->
+        <label for="email" class="sr-only">{{ form.email.label }}</label>
+        {{ form.email(class="form-control", placeholder=form.email.label.text,
+			title=form.email.label.text, required=True, autofocus=True) }}
 
         <label for="password" class="sr-only">{{ form.password.label }}</label>
         {{ form.password(class="form-control", placeholder=form.password.label.text,
 			title=form.password.label.text, required=True) }}
-
 
         <p>{{ form.remember() }} {{ form.remember.label }}</p>
 
         {{ form.submit(class="btn btn-lg btn-primary btn-block") }}
 
 
-
-		<!--
-		<h1 class="h3 mb-3 font-weight-normal">Please log in</h1>
-		<label for="email" class="sr-only">Email address</label>
-		<input type="email" id="email" class="form-control" placeholder="Email address" required autofocus>
-		<label for="password" class="sr-only">Password</label>
-		<input type="password" id="password" class="form-control" placeholder="Password" required>
-		<div class="checkbox mb-3 text-left">
-			<label>
-				<input type="checkbox" value="remember"> Remember me
-			</label>
-		</div>
-		<button class="btn btn-lg btn-primary btn-block" type="submit">Log in</button>
-        -->
-
-
 		<p class="text-muted">
-			Don't have an account? <a href="{{ url_for('auth.register') }}">Register</a>
+			No account? <a href="{{ url_for('auth.register') }}">Register</a>
 		</p>
-		<p class="mt-5 mb-3 text-muted">&copy; {{ config['COPYRIGHT'] }}</p>
+
 	</form>
 {% endblock %}
 

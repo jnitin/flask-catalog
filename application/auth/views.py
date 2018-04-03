@@ -1,7 +1,17 @@
 from flask import Blueprint, render_template, current_app, request, flash, \
-    url_for, redirect, session, abort
+    url_for, redirect, session, abort, make_response
 from flask_login import login_required, login_user, current_user, logout_user, \
     confirm_login, login_fresh
+import random, string
+
+########################################################################
+# IMPORTS FOR 3.11-9: GCONNECT
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+import requests
+########################################################################
 
 from ..email import send_confirmation_email
 from ..user import User
@@ -32,15 +42,24 @@ def unconfirmed():
 def index():
     if current_user.is_authenticated and current_user.is_active and \
        not current_user.blocked:
-        return redirect(url_for('catalog.category_items'))
+        return redirect(url_for('catalog.categories'))
     return render_template('index.html')
 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    #if current_user.is_authenticated and current_user.is_active and \
-       #not current_user.blocked:
-        #return redirect(url_for('catalog.category_items'))
+    if current_user.is_authenticated and current_user.is_active and \
+       not current_user.blocked:
+        return redirect(url_for('catalog.categories'))
+
+
+    # Create anti-forgery state token for google oauth logic with Ajax request
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in range(32))
+    session['state'] = state
+
+    # Pass client_id of google oauth2 to template
+    client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -56,7 +75,7 @@ def login():
             login_user(user, form.remember.data)
             nxt = request.args.get('next')
             if nxt is None or not nxt.startswith('/'):
-                nxt = url_for('catalog.category_items')
+                nxt = url_for('catalog.categories')
             return redirect(nxt)
 
         flash('Sorry, invalid login', 'danger')
@@ -65,7 +84,9 @@ def login():
         if user and user.blocked:
             return redirect(url_for('auth.blocked_account'))
 
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html', form=form,
+                           google_oauth2_client_id=client_id,
+                           state=state)
 
 
 @auth.route('/logout')
@@ -82,35 +103,44 @@ def register():
         return redirect(url_for('auth.blocked_account'))
 
     if current_user.is_authenticated and current_user.is_active:
-        return redirect(url_for('catalog.category_items'))
+        return redirect(url_for('catalog.categories'))
+
+    # Create anti-forgery state token for google oauth logic with Ajax request
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in range(32))
+    session['state'] = state
+
+    # Pass client_id of google oauth2 to template
+    client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
     form = RegisterForm(next=request.args.get('next'))
 
     # check if user is blocked
     if form.is_submitted():
-        email = form.email.data
-        u = User.query.filter_by(email=email).first()
+        u = User.query.filter_by(email=form.email.data).first()
         if u and u.blocked:
             return redirect(url_for('auth.blocked_account'))
 
     if form.validate_on_submit():
-        email = form.email.data
-        if User.query.filter_by(email=email).first():
+        if User.query.filter_by(email=form.email.data).first():
             flash('email already registerd by other user', 'danger')
             return render_template('auth/register.html', form=form)
 
-        user = User()
-        form.populate_obj(user)
-
-        db.session.add(user)
-        db.session.commit()
+        user = User.create_user(email=form.email.data,
+                                password=form.password.data,
+                                first_name=form.first_name.data,
+                                last_name=form.last_name.data,
+                                confirmed=False
+                                )
 
         # send user a confirmatin link via email
         send_confirmation_email(user)
         flash('Thanks for registering! ', 'success')
         return redirect(url_for('email.check_your_email'))
 
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form,
+                           google_oauth2_client_id=client_id,
+                           state=state)
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
@@ -120,28 +150,23 @@ def register_from_invitation(token):
         flash('The invitation link is invalid or has expired.')
         return redirect(url_for('auth.index'))
 
+    if User.query.filter_by(email=user_email).first():
+        flash('Registration was already completed before', 'success')
+        return redirect(url_for('auth.index'))
+
     form = RegisterInvitationForm(next=request.args.get('next'))
 
     if form.validate_on_submit():
-        email = user_email
-        password = form.password.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
+        user = User.create_user(email=user_email,
+                                password=form.password.data,
+                                first_name=form.first_name.data,
+                                last_name=form.last_name.data,
+                                confirmed=True  # auto-confirm invited users
+                                )
 
-        user = User(email=email,
-                    password=password,
-                    first_name=first_name,
-                    last_name=last_name
-                    )
-        user.confirm(token)  # auto-confirm invited users
-
-        db.session.add(user)
-        db.session.commit()
-
-        # no need to send user a confirmatin link via email
+        # no need to send user a confirmation link via email
         # send_confirmation_email(user)
         flash('Thanks for registering! ', 'success')
-        #return redirect(url_for('email.check_your_email'))
         return redirect(url_for('auth.index'))
 
     return render_template('auth/register_from_invitation.html',
@@ -159,7 +184,7 @@ def password():
         db.session.commit()
 
         flash('Password updated.', 'success')
-        return redirect(url_for('catalog.category_items'))
+        return redirect(url_for('catalog.categories'))
 
     return render_template('auth/password.html', form=form)
 
@@ -169,3 +194,148 @@ def blocked_account():
     flash('Your account has been blocked.', 'danger')
     flash('Contact the site administrator.', 'danger')
     return render_template('auth/blocked_account.html')
+
+
+################################################################################
+# Handle the AJAX request that the client sends to the server after succesful
+# authentication with the Google+ API server.
+#
+@auth.route('/gconnect', methods=['POST'])
+def gconnect():
+    # Validate state token to protect against cross-site reference forgery attacks
+    if request.args.get('state') != session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Obtain authorization code
+    # This is the one-time code that Google+ API had sent to the client
+    code = request.data
+
+    try:
+        # Upgrade the authorization code into a credentials object:
+        # ask google+ api server for a credentials object, using the one-time
+        # code that was provided to the client and passed on via the AJAX
+        # request to this gconnect function.
+        file = current_app.config['GOOGLE_OAUTH2_FILE']
+        oauth_flow = flow_from_clientsecrets(file, scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    h = httplib2.Http()
+    #python2 returns a string:
+    #result = json.loads(h.request(url, 'GET')[1])
+    #python3 returns a byte object:
+    result = json.loads(h.request(url, 'GET')[1].decode())
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is used for the intended user.
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this current_app
+    client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
+    if result['issued_to'] != client_id:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        print("Token's client ID does not match app's.")
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    stored_access_token = session.get('access_token')
+    stored_gplus_id = session.get('gplus_id')
+    if stored_access_token is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Store the access token in the session for later use.
+    # For now, we don't stay connected to google, so not needed to store this
+    #session['access_token'] = credentials.access_token
+    #session['gplus_id'] = gplus_id
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+
+    data = answer.json()
+
+    #session['username'] = data['name']
+    #session['picture'] = data['picture']
+    #session['email'] = data['email']
+
+    user = User.query.filter_by(email=data['email']).first()
+    if user:
+        # check if account is blocked
+        if user.blocked:
+            return redirect(url_for('auth.blocked_account'))
+    else:
+        user = User.create_user(email=data['email'],
+                                password=None,
+                                first_name=data['given_name'],
+                                last_name=data['family_name'],
+                                confirmed=True,  # email is confirmed
+                                with_google=True,
+                                profile_pic_url=data['picture']
+                                )
+
+    # when we get here, all is kosher
+    # login with Flask_Login
+    login_user(user, remember=True)
+    nxt = request.args.get('next')
+    if nxt is None or not nxt.startswith('/'):
+        nxt = url_for('catalog.categories')
+    return redirect(nxt)
+
+
+################################################################################
+# DISCONNECT - Revoke a current user's token and reset their session
+# We did not stay connected to Google, so we do not need this function at this
+# this time...
+#@auth.route('/gdisconnect')
+#def gdisconnect():
+    #access_token = session.get('access_token')
+    #if access_token is None:
+        #print ('Access Token is None')
+        #response = make_response(json.dumps('Current user not connected.'), 401)
+        #response.headers['Content-Type'] = 'application/json'
+        #return response
+    #print('In gdisconnect access token is {}'.format(access_token))
+    #print('User name is: ')
+    #print(session['username'])
+    #url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
+    #h = httplib2.Http()
+    #result = h.request(url, 'GET')[0]
+    #print('result is ')
+    #print(result)
+    #if result['status'] == '200':
+        #del session['access_token']
+        #del session['gplus_id']
+        #del session['username']
+        #del session['email']
+        #del session['picture']
+        #response = make_response(json.dumps('Successfully disconnected.'), 200)
+        #response.headers['Content-Type'] = 'application/json'
+        #return response
+    #else:
+        #response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        #response.headers['Content-Type'] = 'application/json'
+        #return response

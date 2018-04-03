@@ -1,18 +1,8 @@
-{% extends "layouts/base.html" %}
+{% extends "auth/login_oauth.html" %}
 
 {% set page_title = 'Register' %}
 
-
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-{% endblock %}
-
-
-{% block body_class %}
-    text-center
-{% endblock %}
-
-{% block body %}
+{% block body_1 %}
     <form class="form-login" method="POST" }}">
         {{ form.hidden_tag() }}
 
@@ -42,7 +32,6 @@
         <p class="text-muted">
             Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
         </p>
-        <p class="mt-5 mb-3 text-muted">&copy; {{ config['COPYRIGHT'] }}</p>
     </form>
 {% endblock %}
 

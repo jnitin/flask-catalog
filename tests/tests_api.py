@@ -678,25 +678,25 @@ class APITestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         token = json_response['token']
 
-        # Create an item for this user
-        url = '/api/v1/itemss/'
-        headers = self.get_api_headers(token,'')
-        data = {
-            "data": {
-                "type": "item",
-                "attributes": {
-                    "date": '{}'.format(date(2018,1,5)),
-                    "time": '{}'.format(time(18,5,15)),
-                    "description": "TODO !!!"
-                }
-            }
-        }
-        response = self.client().post(url,
-                                      headers=headers,
-                                      data=json.dumps(data))
-        self.verify_response_is_201_CREATED(response)
-        response_data = json.loads(response.data.decode())
-        item_id = response_data['data']['id']
+        ## Create an item for this user
+        #url = '/api/v1/itemss/'
+        #headers = self.get_api_headers(token,'')
+        #data = {
+            #"data": {
+                #"type": "item",
+                #"attributes": {
+                    #"date": '{}'.format(date(2018,1,5)),
+                    #"time": '{}'.format(time(18,5,15)),
+                    #"description": "TODO !!!"
+                #}
+            #}
+        #}
+        #response = self.client().post(url,
+                                      #headers=headers,
+                                      #data=json.dumps(data))
+        #self.verify_response_is_201_CREATED(response)
+        #response_data = json.loads(response.data.decode())
+        #item_id = response_data['data']['id']
 
     #def test_2_1_verify_relationships(self):
         #"""POST /api/v1/items/: verify relationships"""

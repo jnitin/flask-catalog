@@ -22,7 +22,7 @@
         <h5 class="card-title"><b>{{ category_active.name }} Items</b></h5>
         <div class="list-group">
             {% if item_active %}
-                <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item_active.id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">
+                <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item_id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">
                     <div class="d-flex w-100 justify-content-between">
                         <h4 class="mb-1">{{ item_active.name }}</h4>
                     </div>
@@ -51,14 +51,14 @@
                 <li class="nav-item">
                     <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
                         {% if item_active %}title="Edit selected beer"{% else %}title="Select a beer first"{% endif %}
-                        href="{{ url_for('catalog.edit_category_item', category_id=category_id, item_id=item_active.id) }}"
+                        href="{{ url_for('catalog.edit_category_item', category_id=category_id, item_id=item_id) }}"
                         >Edit beer
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
                     {% if item_active %}title="Delete selected beer"{% else %}title="Select a beer first"{% endif %}
-                    href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_active.id) }}"
+                    href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_id) }}"
                     >Delete beer</a>
                 </li>
             </ul>

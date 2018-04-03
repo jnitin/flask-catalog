@@ -137,6 +137,7 @@ $ source venv/bin/activate
 (venv) $ pip install Flask-WTF
 (venv) $ pip install requests
 (venv) $ pip install Pillow
+(venv) $ pip install oauth2client
 ```
 
 **Step 5. Activate the python virtual environment and start the application server**
