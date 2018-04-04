@@ -66,7 +66,7 @@
             </div>
         {% endif %}
     <div class="card-body">
-        <h5 class="card-title"><b>{{ category_active.name }} Items</b></h5>
+        <h5 class="card-title"><b>{% if category_active %}{{ category_active.name }}{% endif %} Items</b></h5>
         <div class="list-group">
             {% if item_active %}
                 <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item_id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">

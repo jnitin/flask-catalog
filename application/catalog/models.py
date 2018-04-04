@@ -12,6 +12,10 @@ class Category(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     name = db.Column(db.String(96), unique=True)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    user = db.relationship('User', backref=db.backref('categories'))
+
     def to_json(self):
         json_category = {
                 'url': url_for('api.category_detail', id=self.id)
@@ -132,7 +136,8 @@ class Item(db.Model):
         usr = User.query.filter_by(email=current_app.config['USER_EMAIL']).one()
         for beer in beers:
             category_name = beer['category']
-            new_category = Category(name=category_name)
+            new_category = Category(name=category_name,
+                                    user_id=usr.id,)
             db.session.add(new_category)
             db.session.commit()
             for item in beer['items']:
