@@ -4,7 +4,8 @@ from flask import Blueprint, render_template, current_app, request, flash, \
     url_for, redirect, session, abort
 from flask_login import login_required, current_user
 
-from .forms import add_category_form, add_item_form
+from .forms import add_category_form, edit_category_form, \
+                   add_item_form
 from ..extensions import db
 from ..catalog import Category, Item
 
@@ -102,7 +103,39 @@ def add_category():
                methods=['GET', 'POST'])
 @login_required
 def edit_category(category_id):
-    return 'TODO: IMPLEMENT edit_category'
+    form = edit_category_form()
+
+    category_active = Category.query.filter_by(id=category_id).first()
+
+    if category_active is None:
+        abort(404)
+
+    if category_active.user != current_user:
+        message = 'You are not authorized to edit this category.'
+        return render_template('catalog/403.html', message=message)
+
+    if form.validate_on_submit():
+        if Category.query.filter_by(name=form.name.data).first():
+            flash('Category {} Already Exists'.format(form.name.data),
+                  'danger')
+        else:
+            category_active.name=form.name.data
+            db.session.commit()
+
+            flash('Category renamed to {}'.format(form.name.data),
+                  'success')
+
+            categories = Category.query.all()
+            return render_template('catalog/items.html',
+                                   categories=categories,
+                                   category_id=category_active.id,
+                                   category_active = category_active,
+                                   items=[],
+                                   item_id=0,
+                                   item_active=None)
+
+    return render_template('catalog/edit_category.html', form=form,
+                           category_active = category_active)
 
 @catalog.route('/categories/<int:category_id>/delete',
                methods=['GET', 'POST'])

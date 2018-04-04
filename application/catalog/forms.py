@@ -13,6 +13,10 @@ class add_category_form(FlaskForm):
     name = StringField('Name', [DataRequired()])
     submit = SubmitField('Create')
 
+class edit_category_form(FlaskForm):
+    name = StringField('Name', [DataRequired()])
+    submit = SubmitField('Update')
+
 
 class add_item_form(FlaskForm):
     name = StringField('Name', [DataRequired()])

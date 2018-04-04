@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+
+{% set page_title = 'Edit Category' %}
+
+{% block body %}
+    <div class="row banner menu">
+        <div class="col-md-11 col-md-offset-1 padding-none">
+            <h1>Edit Category</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-1 padding-top">
+            <form class="form" method = "post">
+                {{ form.hidden_tag() }}
+
+                <label for="name" class="sr-only">{{ form.name.label }}</label>
+                {{ form.name(class="form-control", placeholder=category_active.name,
+                    title="Enter new name", required=True) }}
+
+                </br>
+
+                {{ form.submit(class="btn btn-lg btn-primary btn-block") }}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
