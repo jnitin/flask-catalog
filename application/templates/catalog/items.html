@@ -4,6 +4,29 @@
 
 {% block card_categories %}
     <div class="card">
+        {% if current_user.is_authenticated %}
+            <div class="card-header">
+                <ul class="nav nav-pills card-header-pills">
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="{{ url_for('catalog.add_category') }}"
+                           title="Add a category to the catalog">Add</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if category_active %}{% else %}disabled{% endif %}"
+                           href="{{ url_for('catalog.edit_category', category_id=category_id) }}"
+                           {% if category_active %}title="Edit selected category"{% else %}title="Select a category first"{% endif %}
+                           >Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if category_active %}{% else %}disabled{% endif %}"
+                           href="{{ url_for('catalog.delete_category', category_id=category_id) }}"
+                           {% if category_active %}title="Delete selected category and all it's beers"{% else %}title="Select a category first"{% endif %}
+                           >Delete</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
         <div class="card-body">
             <h5 class="card-title"><b>Categories</b></h5>
             <div class="list-group">
@@ -18,6 +41,30 @@
 
 {% block card_items %}
 <div class="card">
+    {% if current_user.is_authenticated %}
+            <div class="card-header">
+                <ul class="nav nav-pills card-header-pills">
+                    <li class="nav-item">
+                        <a class="nav-link {% if category_active %}{% else %}disabled{% endif %}"
+                           href="{{ url_for('catalog.add_category_item', category_id=category_id) }}"
+                           {% if category_active %}title="Add an item to selected category"{% else %}title="Select a category first"{% endif %}
+                           >Add</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
+                           href="{{ url_for('catalog.edit_category_item', category_id=category_id, item_id=item_id) }}"
+                           {% if item_active %}title="Edit selected item"{% else %}title="Select an item first"{% endif %}
+                           >Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
+                           href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_id) }}"
+                           {% if item_active %}title="Delete selected item"{% else %}title="Select an item first"{% endif %}
+                           >Delete</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
     <div class="card-body">
         <h5 class="card-title"><b>{{ category_active.name }} Items</b></h5>
         <div class="list-group">
@@ -35,43 +82,6 @@
                 {% endif %}
             {% endfor %}
         </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block card_edit %}
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>Customize</b></h5>
-        {% if current_user.is_authenticated %}
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link" href="#"title="Add a new beer to the catalog">Add beer</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
-                        {% if item_active %}title="Edit selected beer"{% else %}title="Select a beer first"{% endif %}
-                        href="{{ url_for('catalog.edit_category_item', category_id=category_id, item_id=item_id) }}"
-                        >Edit beer
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
-                    {% if item_active %}title="Delete selected beer"{% else %}title="Select a beer first"{% endif %}
-                    href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_id) }}"
-                    >Delete beer</a>
-                </li>
-            </ul>
-        {% else %}
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.register') }}"title="Register to build your own catalog">Register</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.login') }}"title="Login to access your own catalog">Login</a>
-                </li>
-            </ul>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
