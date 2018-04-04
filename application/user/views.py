@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, send_from_directory, request, \
     current_app, flash
 from flask_login import login_required, current_user
 
-from .forms import ProfileForm, ProfilePicForm
+from .forms import profile_form, profile_pic_form
 
 from ..extensions import db
 from ..utils import get_current_time
@@ -16,7 +16,7 @@ user = Blueprint('user', __name__, url_prefix='/user')
 @user.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    form = ProfileForm(obj=current_user)
+    form = profile_form(obj=current_user)
 
     if form.validate_on_submit():
         email = form.email.data
@@ -42,7 +42,7 @@ def profile():
 @user.route('/profile_pic', methods=['GET', 'POST'])
 @login_required
 def profile_pic():
-    form = ProfilePicForm(obj=current_user)
+    form = profile_pic_form(obj=current_user)
 
     if form.validate_on_submit():
         client_file_storage = form.profile_pic.data

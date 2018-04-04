@@ -16,7 +16,7 @@ import requests
 from ..email import send_confirmation_email
 from ..user import User
 from ..extensions import db, login_manager
-from .forms import RegisterForm, RegisterInvitationForm, LoginForm, PasswordForm
+from .forms import register_form, register_invitation_form, login_form, password_form
 
 auth = Blueprint('auth', __name__)
 
@@ -66,7 +66,7 @@ def login():
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
-    form = LoginForm()
+    form = login_form()
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
@@ -123,7 +123,7 @@ def register():
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
-    form = RegisterForm(next=request.args.get('next'))
+    form = register_form(next=request.args.get('next'))
 
     # check if user is blocked
     if form.is_submitted():
@@ -165,7 +165,7 @@ def register_from_invitation(token):
         flash('Registration was already completed before', 'success')
         return redirect(url_for('auth.index'))
 
-    form = RegisterInvitationForm(next=request.args.get('next'))
+    form = register_invitation_form(next=request.args.get('next'))
 
     if form.validate_on_submit():
         user = User.create_user(email=user_email,
@@ -187,7 +187,7 @@ def register_from_invitation(token):
 @auth.route('/password', methods=['GET', 'POST'])
 @login_required
 def password():
-    form = PasswordForm()
+    form = password_form()
 
     if form.validate_on_submit():
         current_user.password = form.new_password.data

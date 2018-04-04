@@ -8,7 +8,7 @@ from flask_login import current_user
 from ..user import User
 
 
-class LoginForm(FlaskForm):
+class login_form(FlaskForm):
     next = HiddenField()
     email = EmailField('Email',
                        [DataRequired(), Email()])
@@ -21,7 +21,7 @@ class LoginForm(FlaskForm):
     #                     render_kw={"class": "btn btn-success btn-block"})
 
 
-class RegisterForm(FlaskForm):
+class register_form(FlaskForm):
     next = HiddenField()
 
     email = EmailField('Email',
@@ -39,7 +39,7 @@ class RegisterForm(FlaskForm):
             raise ValidationError('This email is already registered')
 
 
-class RegisterInvitationForm(FlaskForm):
+class register_invitation_form(FlaskForm):
     next = HiddenField()
 
     password = PasswordField('Password',
@@ -50,7 +50,7 @@ class RegisterInvitationForm(FlaskForm):
                        [DataRequired()])
     submit = SubmitField('Register')
 
-class PasswordForm(FlaskForm):
+class password_form(FlaskForm):
     password = PasswordField('Current password', [DataRequired()])
     new_password = PasswordField('New password',
                                  [DataRequired()])

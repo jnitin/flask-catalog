@@ -9,12 +9,12 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, URL, \
 from flask_login import current_user
 
 
-class AddCategoryForm(FlaskForm):
+class add_category_form(FlaskForm):
     name = StringField('Name', [DataRequired()])
     submit = SubmitField('Create')
 
 
-class AddItemForm(FlaskForm):
+class add_item_form(FlaskForm):
     name = StringField('Name', [DataRequired()])
     description = TextAreaField('Description', [DataRequired()])
     submit = SubmitField('Create')

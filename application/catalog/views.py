@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, current_app, request, flash, \
     url_for, redirect, session, abort
 from flask_login import login_required, current_user
 
-from .forms import AddCategoryForm
+from .forms import add_category_form, add_item_form
 from ..extensions import db
 from ..catalog import Category, Item
 
@@ -72,7 +72,7 @@ def category_item(category_id, item_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category():
-    form = AddCategoryForm()
+    form = add_category_form()
 
     if form.validate_on_submit():
         if Category.query.filter_by(name=form.name.data).first():
@@ -114,7 +114,40 @@ def delete_category(category_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category_item(category_id):
-    return 'TODO: IMPLEMENT add_category_item'
+    form = add_item_form()
+
+    category_active = Category.query.filter_by(id=category_id).first()
+
+    if category_active is None:
+        abort(404)
+
+    if form.validate_on_submit():
+        if Item.query.filter_by(name=form.name.data).first():
+            flash('Item {} Already Exists'.format(form.name.data),
+                  'danger')
+        else:
+            new_item = Item(name=form.name.data,
+                            description=form.description.data,
+                            user_id=current_user.id,
+                            category_id=category_id)
+            db.session.add(new_item)
+            db.session.commit()
+
+            flash('New Item {} Created'.format(form.name.data),
+                  'success')
+
+            categories = Category.query.all()
+            items = Item.query.filter_by(category_id=category_id).all()
+            return render_template('catalog/items.html',
+                                   categories=categories,
+                                   category_id=category_id,
+                                   category_active = category_active,
+                                   items=items,
+                                   item_id=new_item.id,
+                                   item_active=new_item)
+
+    return render_template('catalog/add_category_item.html', form=form,
+                           category_active = category_active)
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/edit',
                methods=['GET', 'POST'])

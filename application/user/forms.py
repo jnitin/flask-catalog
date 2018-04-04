@@ -14,7 +14,7 @@ from ..extensions import images
 from . import User
 
 
-class ProfileForm(FlaskForm):
+class profile_form(FlaskForm):
     email = EmailField('Email', [DataRequired(), Email()])
     first_name = StringField('First Name', [DataRequired()])
     last_name = StringField('Last Name', [DataRequired()])
@@ -28,7 +28,7 @@ class ProfileForm(FlaskForm):
                 raise ValidationError('This email is already registered')
 
 
-class ProfilePicForm(FlaskForm):
+class profile_pic_form(FlaskForm):
     profile_pic = FileField('Profile Picture',
                             validators=[FileRequired(),
                                         FileAllowed(images, 'Images only!')])
