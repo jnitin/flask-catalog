@@ -204,4 +204,26 @@ def edit_category_item(category_id, item_id):
                methods=['GET', 'POST'])
 @login_required
 def delete_category_item(category_id, item_id):
-    return 'TODO: IMPLEMENT delete_category_item'
+    #
+    # NOTES:
+    # Confirmation if user really wants to delete is done on client side
+    # so, we do not use a form asking for confirmation, just go & delete it
+    #
+    category_active = Category.query.filter_by(id=category_id).first()
+    item_active = Item.query.filter_by(id=item_id).first()
+
+    if category_active is None or item_active is None:
+        abort(404)
+
+    if item_active.user != current_user:
+        message = 'You are not authorized to delete this item, because'+\
+            ' you are not the owner.'
+        return render_template('catalog/403.html', message=message)
+
+    db.session.delete(item_active)
+    db.session.commit()
+
+    flash("Deleted Item",
+          'success')
+
+    return redirect(url_for('catalog.categories'))
