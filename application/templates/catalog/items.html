@@ -1,8 +1,60 @@
 {% extends 'layouts/catalog.html' %}
 
-{% set page_title = 'Items' %}
+{% block jshead2 %}
+
+    <!--jQuery-ui modal confirmation dialog that asks confirmation to delete
+        see: https://jqueryui.com/dialog/#modal-confirmation
+             http://jsfiddle.net/Raitono/jcxv8qom/1/ -->
+
+    <script type="text/javascript">
+
+        // set properties of dialog
+        $(document).ready(function() {
+            $("#div_confirm_delete").dialog({
+                autoOpen: false,
+                resizable: false,
+                height: "auto",
+                width: 400,
+                modal: true
+            });
+        });
+
+        // define function that handles the dialog
+        // - directs to target url if confirmed
+        // - does nothing if canceled or closed
+        function confirmDeleteFn( jQuery ) {
+            $('.confirm-delete').click(function(e) {
+                e.preventDefault();
+                var targetUrl = $(this).attr("href");
+                $( "#div_confirm_delete" ).dialog({
+                    buttons : {
+                        "Delete" : function() {
+                            window.location.href = targetUrl;
+                        },
+                        "Cancel" : function() {
+                            $(this).dialog("close");
+                        }
+                      }
+                  });
+
+                $("#div_confirm_delete").dialog("open");
+            });
+        }
+
+        // define the function once document is fully loaded
+        $( document ).ready( confirmDeleteFn );
+    </script>
+
+{% endblock %}
+
+{% set page_title = 'Catalog' %}
 
 {% block card_categories %}
+    <!--jQuery-ui script above turns this into a modal confirmation dialog-->
+    <div id="div_confirm_delete" title="Delete?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Deletion is permanent and cannot be recovered. Are you sure?</p>
+    </div>
+
     <div class="card">
         {% if current_user.is_authenticated %}
             <div class="card-header">
@@ -18,12 +70,14 @@
                            {% if category_active %}title="Edit selected category"{% else %}title="Select a category first"{% endif %}
                            >Edit</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link {% if category_active %}{% else %}disabled{% endif %}"
+                        <a class="nav-link confirm-delete {% if category_active %}{% else %}disabled{% endif %}"
                            href="{{ url_for('catalog.delete_category', category_id=category_id) }}"
                            {% if category_active %}title="Delete selected category and all it's beers"{% else %}title="Select a category first"{% endif %}
                            >Delete</a>
                     </li>
+
                 </ul>
             </div>
         {% endif %}
@@ -57,7 +111,7 @@
                            >Edit</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if item_active %}{% else %}disabled{% endif %}"
+                        <a class="nav-link confirm-delete {% if item_active %}{% else %}disabled{% endif %}"
                            href="{{ url_for('catalog.delete_category_item', category_id=category_id, item_id=item_id) }}"
                            {% if item_active %}title="Delete selected item"{% else %}title="Select an item first"{% endif %}
                            >Delete</a>
@@ -66,7 +120,7 @@
             </div>
         {% endif %}
     <div class="card-body">
-        <h5 class="card-title"><b>{% if category_active %}{{ category_active.name }}{% endif %} Items</b></h5>
+        <h5 class="card-title"><b>{% if category_active %}{{ category_active.name }}{% else %}Items{% endif %}</b></h5>
         <div class="list-group">
             {% if item_active %}
                 <a href="{{ url_for('catalog.category_item', category_id=category_id, item_id=item_id) }}" class="list-group-item list-group-item-action flex-column align-items-start active">

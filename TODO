@@ -127,9 +127,16 @@ cleanup
 ( ) Get rid of RelationShips. Don't need them... (I think)
 (-) Explanation why "type": "user"  in the POST request to register a user
 
-coding standards
-================
-(-) Fix all Pylint Errors/Warnings/Info messages
+code review
+===========
+(-) Do all POST requests return a redirect instead of render_template?
+     --> This is important to avoid resubmission of forms
+          (see: https://en.wikipedia.org/wiki/Post/Redirect/Get )
+
+(-) Fix all Pylint Errors
+(-) Fix all Pylint Warnings
+(-) Fix all Pylint Info messages
+
 
 deployment
 ==========
@@ -139,6 +146,7 @@ deployment
      (-) Is SECRET_KEY updated?
 
 (-) Deploy to heroku
+     (-) Put all secret configurations into environment variables
 
 promotion
 =========
