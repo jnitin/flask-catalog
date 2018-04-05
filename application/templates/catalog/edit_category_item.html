@@ -1,11 +1,11 @@
 {% extends 'layouts/base.html' %}
 
-{% set page_title = 'Add Item' %}
+{% set page_title = 'Edit Item' %}
 
 {% block body %}
     <div class="row banner menu">
         <div class="col-md-11 col-md-offset-1 padding-none">
-            <h1>New Item</h1>
+            <h1>Edit Item</h1>
             <h2>Category: {{ category_active.name }}</h2>
         </div>
     </div>
@@ -15,12 +15,12 @@
                 {{ form.hidden_tag() }}
 
                 <label for="name" class="sr-only">{{ form.name.label }}</label>
-                {{ form.name(class="form-control", placeholder=form.name.label.text,
-                    title=form.name.label.text, required=True) }}
+                {{ form.name(class="form-control",
+                    title="Edit name", required=True) }}
 
                 <label for="description" class="sr-only">{{ form.description.label }}</label>
-                {{ form.description(class="form-control", placeholder=form.description.label.text,
-                    title=form.description.label.text, required=True) }}
+                {{ form.description(class="form-control",
+                    title="Edit description", required=True) }}
 
                 </br>
 

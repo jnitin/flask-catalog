@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, current_app, request, flash, \
 from flask_login import login_required, current_user
 
 from .forms import add_category_form, edit_category_form, \
-     add_item_form
+     add_item_form, edit_item_form
 from ..extensions import db
 from ..catalog import Category, Item
 
@@ -75,7 +75,7 @@ def add_category():
 
     if form.validate_on_submit():
         if Category.query.filter_by(name=form.name.data).first():
-            flash('Category {} Already Exists'.format(form.name.data),
+            flash("Category '<b>{}</b>' already exists".format(form.name.data),
                   'danger')
         else:
             new_category = Category(name=form.name.data,
@@ -83,7 +83,7 @@ def add_category():
             db.session.add(new_category)
             db.session.commit()
 
-            flash('New Category {} Created'.format(form.name.data),
+            flash("Category '<b>{}</b>' created".format(form.name.data),
                   'success')
 
             return redirect(url_for('catalog.category_items',
@@ -95,7 +95,6 @@ def add_category():
                methods=['GET', 'POST'])
 @login_required
 def edit_category(category_id):
-    form = edit_category_form()
 
     category_active = Category.query.filter_by(id=category_id).first()
 
@@ -107,15 +106,18 @@ def edit_category(category_id):
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
+    # pass category_active to initialize the values of the fields
+    form = edit_category_form(obj=category_active)
+
     if form.validate_on_submit():
         if Category.query.filter_by(name=form.name.data).first():
-            flash('Category {} Already Exists'.format(form.name.data),
+            flash("Category '<b>{}</b>' already exists".format(form.name.data),
                   'danger')
         else:
             category_active.name=form.name.data
             db.session.commit()
 
-            flash('Category renamed to {}'.format(form.name.data),
+            flash("Category renamed to '<b>{}</b>'".format(form.name.data),
                   'success')
 
             return redirect(url_for('catalog.category_items',
@@ -151,10 +153,11 @@ def delete_category(category_id):
         db.session.delete(item)
 
     # now delete the category
+    cat_name = category_active.name  # save name for flash message
     db.session.delete(category_active)
     db.session.commit()
 
-    flash("Deleted Category and all it's Items",
+    flash("Deleted category '<b>{}</b>' and all it's Items".format(cat_name),
           'success')
 
     return redirect(url_for('catalog.categories'))
@@ -164,16 +167,16 @@ def delete_category(category_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category_item(category_id):
-    form = add_item_form()
-
     category_active = Category.query.filter_by(id=category_id).first()
 
     if category_active is None:
         abort(404)
 
+    form = add_item_form()
+
     if form.validate_on_submit():
         if Item.query.filter_by(name=form.name.data).first():
-            flash('Item {} Already Exists'.format(form.name.data),
+            flash("Item '<b>{}</b>' already exists".format(form.name.data),
                   'danger')
         else:
             new_item = Item(name=form.name.data,
@@ -183,7 +186,7 @@ def add_category_item(category_id):
             db.session.add(new_item)
             db.session.commit()
 
-            flash('New Item {} Created'.format(form.name.data),
+            flash("Item '<b>{}</b>' Created".format(form.name.data),
                   'success')
 
             return redirect(url_for('catalog.category_item',
@@ -197,7 +200,43 @@ def add_category_item(category_id):
                methods=['GET', 'POST'])
 @login_required
 def edit_category_item(category_id, item_id):
-    return 'TODO: IMPLEMENT edit_category_item'
+    category_active = Category.query.filter_by(id=category_id).first()
+    item_active = Item.query.filter_by(id=item_id).first()
+
+    if category_active is None or item_active is None:
+        abort(404)
+
+    # pass item_active to initialize the values of the fields
+    form = edit_item_form(obj=item_active)
+
+    if form.validate_on_submit():
+        # update description
+        item_active.description=form.description.data
+        db.session.commit()
+        flash('Successfully updated Item description',
+              'success')
+
+        # check if name of item was modified, and if so, if new name is unique
+        if form.name.data != item_active.name:
+            if Item.query.filter_by(name=form.name.data).first():
+                flash('Cannot update Item name because it already exists'.format(form.name.data),
+                      'danger')
+            else:
+                item_active.name=form.name.data
+                db.session.commit()
+
+                flash('Successfully updated Item name',
+                      'success')
+
+        return redirect(url_for('catalog.category_item',
+                                category_id=category_id,
+                                item_id=item_id))
+
+
+    return render_template('catalog/edit_category_item.html', form=form,
+                           category_active=category_active,
+                           item_active=item_active)
+
 
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/delete',
@@ -220,10 +259,11 @@ def delete_category_item(category_id, item_id):
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
+    item_name = item_active.name  # save name for flash message
     db.session.delete(item_active)
     db.session.commit()
 
-    flash("Deleted Item",
+    flash("Deleted Item '<b>{}</b>'".format(item_name),
           'success')
 
     return redirect(url_for('catalog.categories'))

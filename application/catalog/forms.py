@@ -21,3 +21,8 @@ class add_item_form(FlaskForm):
     name = StringField('Name', [DataRequired()])
     description = TextAreaField('Description', [DataRequired()])
     submit = SubmitField('Create')
+
+class edit_item_form(FlaskForm):
+    name = StringField('Name', [DataRequired()])
+    description = TextAreaField('Description', [DataRequired()])
+    submit = SubmitField('Update')
