@@ -15,9 +15,14 @@ from . import User
 
 
 class profile_form(FlaskForm):
-    email = EmailField('Email', [DataRequired(), Email()])
-    first_name = StringField('First Name', [DataRequired()])
-    last_name = StringField('Last Name', [DataRequired()])
+    profile_pic = FileField('Profile Picture',
+                            validators=[FileAllowed(images, 'Images only!')])
+    email = EmailField('Email',
+                       [DataRequired(), Email()])
+    first_name = StringField('First Name',
+                       [DataRequired()])
+    last_name = StringField('Last Name',
+                       [DataRequired()])
     submit = SubmitField('Update profile')
 
     def validate_email(self, field):
@@ -26,11 +31,4 @@ class profile_form(FlaskForm):
         if email_new != email_current:
             if User.query.filter_by(email=email_new).first() is not None:
                 raise ValidationError('This email is already registered')
-
-
-class profile_pic_form(FlaskForm):
-    profile_pic = FileField('Profile Picture',
-                            validators=[FileRequired(),
-                                        FileAllowed(images, 'Images only!')])
-    submit = SubmitField('Update profile picture')
 

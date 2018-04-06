@@ -115,9 +115,12 @@ api
 e2e testing
 ===========
 (-) Update e2e_tests.ipynb
+(-) Test register_from_invitation route
+(-) Test display of profile pic when it comes from Google
 
 configuration
 =============
+(-) Put production configurations into environments, enabling heroku deployment
 (-) Create multiple configs, as in Flask Web Development book
 
 cleanup
@@ -132,7 +135,7 @@ code review
 (-) Do all POST requests return a redirect instead of render_template?
      --> This is important to avoid resubmission of forms
           (see: https://en.wikipedia.org/wiki/Post/Redirect/Get )
-
+(-) Do all entries in HTML for forms have error printing (See login as example)
 (-) Fix all Pylint Errors
 (-) Fix all Pylint Warnings
 (-) Fix all Pylint Info messages
@@ -145,8 +148,10 @@ deployment
      (-) Is DEBUG mode turned off?
      (-) Is SECRET_KEY updated?
 
-(-) Deploy to heroku
+(-) Deploy to heroku (Follow mega tutorial instructions...)
      (-) Put all secret configurations into environment variables
+     (-) Upgrade to Python 3.6.2
+     (-) Update requirements.txt
 
 promotion
 =========
@@ -155,4 +160,11 @@ promotion
 (-) Export Jupyter notebook to HTML and use as awesome example in Toptal profile
 
 
+###############################
+## TO DO FOR NEXT deployment ##
+###############################
+
+(-) Refactor with Templates moved into each blueprint folder
+(-) Update password
+(-) Reset password
 

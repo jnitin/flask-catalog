@@ -9,21 +9,15 @@ from ..user import User
 
 
 class login_form(FlaskForm):
-    next = HiddenField()
     email = EmailField('Email',
                        [DataRequired(), Email()])
     password = PasswordField('Password',
                              [DataRequired()])
     remember = BooleanField('Remember me')
     submit = SubmitField('Log in')
-    # Use render_kw to set style of submit button
-    #submit = SubmitField('Log in',
-    #                     render_kw={"class": "btn btn-success btn-block"})
 
 
 class register_form(FlaskForm):
-    next = HiddenField()
-
     email = EmailField('Email',
                        [DataRequired(), Email()])
     password = PasswordField('Password',
@@ -40,8 +34,6 @@ class register_form(FlaskForm):
 
 
 class register_invitation_form(FlaskForm):
-    next = HiddenField()
-
     password = PasswordField('Password',
                              [DataRequired()])
     first_name = StringField('First Name',
@@ -49,18 +41,3 @@ class register_invitation_form(FlaskForm):
     last_name = StringField('Last Name',
                        [DataRequired()])
     submit = SubmitField('Register')
-
-class password_form(FlaskForm):
-    password = PasswordField('Current password', [DataRequired()])
-    new_password = PasswordField('New password',
-                                 [DataRequired()])
-    password_again = PasswordField('Repeat new password',
-                                   [DataRequired(),
-                                    EqualTo('new_password')])
-    submit = SubmitField('Update password',
-                         render_kw={"class": "btn btn-success"})
-
-    def validate_password(self, field):
-        user = User.query.filter_by(id=current_user.id).first()
-        if not user.verify_password(field.data):
-            raise ValidationError("Current password is wrong.")

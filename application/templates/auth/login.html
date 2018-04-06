@@ -2,36 +2,40 @@
 
 {% set page_title = 'Log in' %}
 
-{% block body_1 %}
-	<form class="form-login" method="POST" >
+{% block header_text %}
+	<h1 class="h3 mb-3 font-weight-normal">Log in</h1>
+{% endblock %}
+
+{% block row2_center %}
+	<form class="form-login" action="" method="POST" >
         <!--Tell Flask-WTF to include CSRF protection in a FlaskForm-->
         {{ form.hidden_tag() }}
 
-        <!--Logo-->
-		<img class="mb-4" src="{{ url_for('static', filename='img/logo-64x64.png') }}" alt="" width="64" height="64">
 
-		<!--Email & Password & 'Rembember me' fields-->
-        <h1 class="h3 mb-3 font-weight-normal">Please log in</h1>
+        <p>
+			{{ form.email.label }}
+			{{ form.email(class="form-control", required=True, title=form.email.label.text, autofocus=True) }}
+			{% for error in form.email.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
+		<p>
+			{{ form.password.label }}
+			{{ form.password(class="form-control", title=form.password.label.text, required=True) }}
+			{% for error in form.password.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
 
-		<!--
-		Notes:
-		 - sr-only class hides the label, but ensures it is there for screen-readers
-		 - no need to put curlies around form.email.label.text inside curlies, because everything
-			inside curlies is already a python expression!
-		 - placeholder is shown inside the box.
-		 - title is a popup tooltip
-		-->
-        <label for="email" class="sr-only">{{ form.email.label }}</label>
-        {{ form.email(class="form-control", placeholder=form.email.label.text,
-			title=form.email.label.text, required=True, autofocus=True) }}
+        <p>
+			{{ form.remember() }} {{ form.remember.label }}
+			{% for error in form.remember.errors %}
+				<span style="color: red;">[{{ error }}]</span>
+			{% endfor %}
+		</p>
 
-        <label for="password" class="sr-only">{{ form.password.label }}</label>
-        {{ form.password(class="form-control", placeholder=form.password.label.text,
-			title=form.password.label.text, required=True) }}
-
-        <p>{{ form.remember() }} {{ form.remember.label }}</p>
-
-        {{ form.submit(class="btn btn-lg btn-primary btn-block") }}
+		<br>
+        <p>{{ form.submit(class="btn btn-lg btn-primary btn-block") }}</p>
 
 
 		<p class="text-muted">

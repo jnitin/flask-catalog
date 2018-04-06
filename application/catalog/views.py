@@ -219,7 +219,7 @@ def edit_category_item(category_id, item_id):
         # check if name of item was modified, and if so, if new name is unique
         if form.name.data != item_active.name:
             if Item.query.filter_by(name=form.name.data).first():
-                flash('Cannot update Item name because it already exists'.format(form.name.data),
+                flash("Cannot rename Item to '<b>{}</b>', because that name already exists".format(form.name.data),
                       'danger')
             else:
                 item_active.name=form.name.data

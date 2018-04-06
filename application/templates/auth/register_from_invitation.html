@@ -1,22 +1,15 @@
-{% extends "layouts/base.html" %}
+{% extends "layouts/auth.html" %}
 
 {% set page_title = 'Register' %}
 
-
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% block header_text %}
+    <h1 class="h3 mb-3 font-weight-normal">Register</h1>
 {% endblock %}
 
 
-{% block body_class %}
-    text-center
-{% endblock %}
-
-{% block body %}
-    <form class="form-login" method="POST"}}">
+{% block row2_center %}
+    <form class="form-login" action="" method="POST"}}">
         {{ form.hidden_tag() }}
-
-        <img class="mb-4" src="{{ url_for('static', filename='img/logo-64x64.png') }}" alt="" width="64" height="64">
 
         <h1 class="h3 mb-3 font-weight-normal">Hello {{ user_email }}, please complete your registration.</h1>
 

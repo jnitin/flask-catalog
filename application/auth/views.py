@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, current_app, request, flash, \
     url_for, redirect, session, abort, make_response
 from flask_login import login_required, login_user, current_user, logout_user, \
     confirm_login, login_fresh
+from werkzeug.urls import url_parse
 import random, string
 
 ########################################################################
@@ -16,7 +17,7 @@ import requests
 from ..email import send_confirmation_email
 from ..user import User
 from ..extensions import db, login_manager
-from .forms import register_form, register_invitation_form, login_form, password_form
+from .forms import register_form, register_invitation_form, login_form
 
 auth = Blueprint('auth', __name__)
 
@@ -58,11 +59,6 @@ def login():
                     for x in range(32))
     session['state'] = state
 
-    # Extract next URL, and pass to template to be passed to gconnect
-    nxt = request.args.get('next')
-    if nxt is None or not nxt.startswith('/'):
-        nxt = url_for('catalog.categories')
-
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
@@ -78,10 +74,14 @@ def login():
 
         if user and user.verify_password(password):
             login_user(user, form.remember.data)
-            nxt = request.args.get('next')
-            if nxt is None or not nxt.startswith('/'):
-                nxt = url_for('catalog.categories')
-            return redirect(nxt)
+
+            # check if flask-login has redirected us via login_required
+            # if so, it appended a next query string to the request
+            # verify we have a URL that stays within our domain
+            next_page = request.args.get('next')
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('catalog.categories')
+            return redirect(next_page)
 
         flash('Sorry, invalid login', 'danger')
 
@@ -89,10 +89,18 @@ def login():
         if user and user.blocked:
             return redirect(url_for('auth.blocked_account'))
 
+
+    # Extract next URL to go to after a successfull login, and pass to
+    # to template to be passed on to gconnect
+    # TODO: do we really need to do this or is it already available?
+    next_page = request.args.get('next')
+    if not next_page or url_parse(next_page).netloc != '':
+        next_page = url_for('catalog.categories')
+
     return render_template('auth/login.html', form=form,
                            google_oauth2_client_id=client_id,
                            state=state,
-                           nxt=nxt)
+                           nxt=next_page)
 
 
 @auth.route('/logout')
@@ -115,15 +123,11 @@ def register():
                     for x in range(32))
     session['state'] = state
 
-    # Extract next URL, and pass to template to be passed to gconnect
-    nxt = request.args.get('next')
-    if nxt is None or not nxt.startswith('/'):
-        nxt = url_for('catalog.categories')
 
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
-    form = register_form(next=request.args.get('next'))
+    form = register_form()
 
     # check if user is blocked
     if form.is_submitted():
@@ -148,10 +152,14 @@ def register():
         flash('Thanks for registering! ', 'success')
         return redirect(url_for('email.check_your_email'))
 
+
+    # Set next page to go go after registration via google, which also logs in
+    next_page = url_for('catalog.categories')
+
     return render_template('auth/register.html', form=form,
                            google_oauth2_client_id=client_id,
                            state=state,
-                           nxt=nxt)
+                           nxt=next_page)
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
@@ -183,21 +191,6 @@ def register_from_invitation(token):
     return render_template('auth/register_from_invitation.html',
                            form=form,
                            user_email = user_email)
-
-@auth.route('/password', methods=['GET', 'POST'])
-@login_required
-def password():
-    form = password_form()
-
-    if form.validate_on_submit():
-        current_user.password = form.new_password.data
-
-        db.session.commit()
-
-        flash('Password updated.', 'success')
-        return redirect(url_for('catalog.categories'))
-
-    return render_template('auth/password.html', form=form)
 
 
 @auth.route('/blocked_account')
@@ -308,13 +301,14 @@ def gconnect():
                                 profile_pic_url=data['picture']
                                 )
 
-    # when we get here, all is kosher
+    # when we get here, all is kosher with google login
     # login with Flask_Login
     login_user(user, remember=True)
-    nxt = request.args.get('next')
-    if nxt is None or not nxt.startswith('/'):
-        nxt = url_for('catalog.categories')
-    return nxt
+    next_page = request.args.get('next')
+    if not next_page or url_parse(next_page).netloc != '':
+        next_page = url_for('catalog.categories')
+
+    return next_page
 
 
 ################################################################################

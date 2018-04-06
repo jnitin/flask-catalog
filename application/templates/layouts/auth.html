@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% block body %}
+    {% block row1 %}
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+
+        <div class="col-md-8" id='wrapper' style='text-align: center;'>
+            <div style='display: inline-block; vertical-align: center;'>
+                <!--Logo-->
+                <img class="mb-4" src="{{ url_for('static', filename='img/logo-64x64.png') }}" alt="" width="64" height="64">
+            </div>
+
+            <div style='display: inline-block; vertical-align: center;'>
+                <!--Header text next to logo-->
+                {% block header_text %}{% endblock %}
+            </div>
+        </div>
+
+        <div class="col-md-2">
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block row2 %}
+    <div class="row">
+        <div class="col-md-2">
+        </div>
+
+        <div class="col-md-8">
+            {% block row2_center %}
+            {% endblock %}
+        </div>
+
+        <div class="col-md-2">
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block row_for_oauth %} {% endblock %}
+{% endblock %}

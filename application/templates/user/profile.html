@@ -2,33 +2,74 @@
 
 {% set page_title = 'Profile' %}
 
-{% block card_right %}
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title"><b>Update Profile</b></h5>
-        <div class="col-md-6">
-            <form class="form" method="post" enctype="multipart/form-data">
-                {{ form.hidden_tag() }}
+{% block header_text %}
+    <h1 class="h3 mb-3 font-weight-normal">Profile</h1>
+{% endblock %}
 
-                <label for="email" class="sr-only">{{ form.email.label }}</label>
-                {{ form.email(class="form-control", placeholder=form.email.label.text,
-                    title=form.email.label.text, required=True, autofocus=True) }}
+{% block row2_center %}
+<form class="form-login" action="" method="POST" enctype="multipart/form-data"}}">
+        <!--Tell Flask-WTF to include CSRF protection in a FlaskForm-->
+        {{ form.hidden_tag() }}
 
-                <label for="first_name" class="sr-only">{{ form.first_name.label }}</label>
-                {{ form.first_name(class="form-control", placeholder=form.first_name.label.text,
-                    title=form.first_name.label.text, required=True) }}
+        <p>
+            <div class="card">
+                <div class="card-header">
+                    {{ form.profile_pic.label }}
+                </div>
+                <div class="card-body">
+                    {% if current_user.profile_pic_url %}
+                        <img src="{{ current_user.profile_pic_url }}" alt="{{ current_user.profile_pic_filename }}" style="width:128px;height:128px;">
+                    {% endif %}
+                    {{ form.profile_pic(class="form-control", title=form.profile_pic.label.text, required=False) }}
+                    {% for error in form.profile_pic.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </p>
 
-                <label for="last_name" class="sr-only">{{ form.last_name.label }}</label>
-                {{ form.last_name(class="form-control", placeholder=form.last_name.label.text,
-                    title=form.last_name.label.text, required=True) }}
+        <p>
+            <div class="card">
+                <div class="card-header">
+                    {{ form.email.label }}
+                </div>
+                <div class="card-body">
+                    {{ form.email(class="form-control", title=form.email.label.text, required=False) }}
+                    {% for error in form.email.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </p>
+        <p>
+            <div class="card">
+                <div class="card-header">
+                    {{ form.first_name.label }}
+                </div>
+                <div class="card-body">
+                    {{ form.first_name(class="form-control", title=form.first_name.label.text, required=False) }}
+                    {% for error in form.first_name.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </p>
+        <p>
+            <div class="card">
+                <div class="card-header">
+                    {{ form.last_name.label }}
+                </div>
+                <div class="card-body">
+                    {{ form.last_name(class="form-control", title=form.last_name.label.text, required=False) }}
+                    {% for error in form.last_name.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </p>
 
-                </br>
+        <br>
+        <p>{{ form.submit(class="btn btn-lg btn-primary btn-block") }}</p>
 
-                </br></br>
-                {{ form.submit(class="btn btn-lg btn-primary btn-block") }}
-
-            </form>
-        </div>
-    </div>
-</div>
+    </form>
 {% endblock %}
