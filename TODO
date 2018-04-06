@@ -167,4 +167,5 @@ promotion
 (-) Refactor with Templates moved into each blueprint folder
 (-) Update password
 (-) Reset password
+(-) Activate link in /unconfirmed : Need another confirmation email?
 

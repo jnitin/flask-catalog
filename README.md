@@ -138,6 +138,7 @@ $ source venv/bin/activate
 (venv) $ pip install requests
 (venv) $ pip install Pillow
 (venv) $ pip install oauth2client
+(venv) $ pip install python-dotenv
 ```
 
 **Step 5. Activate the python virtual environment and start the application server**

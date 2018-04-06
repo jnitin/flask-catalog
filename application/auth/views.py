@@ -221,6 +221,7 @@ def gconnect():
         # code that was provided to the client and passed on via the AJAX
         # request to this gconnect function.
         file = current_app.config['GOOGLE_OAUTH2_FILE']
+
         oauth_flow = flow_from_clientsecrets(file, scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
