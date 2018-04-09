@@ -266,9 +266,62 @@ deployment
                (http://gunicorn.org/)
 
 
-     (-) Create a Procfile
+     ( ) Define all environment variables from .env on heroku as config vars
 
+          Option 1: use the command line:
+               $ heroku config:set ++++++=........     (Set a config variable)
+               $ heroku config:unset ++++++            (Unset a config variable)
+               $ heroku config                         (Lists all config variables)
+               $ heroku config:get ++++++              (Lists a specific config variable)
 
+          Option 2: Edit config vars on the app's settings tab on Dashboard:
+               https://dashboard.heroku.com/apps/flask-catalog/settings
+
+          Note: https://devcenter.heroku.com/articles/config-vars
+                Heroku manifests config vars as environment variables to the
+                application. These environment variables are persistent – they
+                will remain in place across deploys and app restarts – so unless
+                you need to change values, you only need to set them once.
+
+                Whenever you set or remove a config var, your app will be restarted
+
+     ( ) Create a Procfile and put it under source control
+
+          Procfile:
+          ---------
+          web: flask db upgrade; gunicorn catalog:app
+
+          Because the first sub-command is based on the flask command, I need to
+          add the FLASK_APP environment variable:
+
+          $ heroku config:set FLASK_APP=catalog.py
+
+          Also, don't forget to add Procfile under source control
+
+          NOTE: Heroku needs to know how to execute the application, and for
+                that it uses a file named Procfile in the root directory of the
+                application. The format of this file is simple, each line
+                includes a process name, a colon, and then the command that
+                starts the process.
+
+                The most common type of application that runs on Heroku is a web
+                application, and for this type of application the process name
+                should be 'web'.
+
+                Here I defined the command to start the web application as two
+                commands in sequence. First I run a database migration upgrade,
+                then I start the server.
+
+     ( ) Deploy
+
+          ( ) Commit everything
+               $ git add .
+               $ git commit -m "Ready for heroku deployment"
+
+          ( ) Push local repository to heroku, and it will be automatically deployed
+               $ git push heroku master
+
+          NOTE:
 
 promotion
 =========
