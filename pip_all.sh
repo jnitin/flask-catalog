@@ -23,6 +23,7 @@ pip install --upgrade pip
 pip install flask
 pip install Flask-REST-JSONAPI
 pip install flask-sqlalchemy
+pip install flask-migrate
 pip install flask-bcrypt
 pip install flask-httpauth
 pip install flask-login

@@ -41,9 +41,9 @@ class Config(object):
     USER_FIRST_NAME = os.environ.get('USER_FIRST_NAME') or 'Example'
     USER_LAST_NAME = os.environ.get('USER_LAST_NAME') or 'User'
 
-    # During development, use sqlite database
-    DATABASE_PATH = os.path.join(basedir, 'app.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
+    # During development, use sqlite database on disk
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Avoid DeprecationWarning: Request.is_xhr is deprecated.

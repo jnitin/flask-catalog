@@ -11,16 +11,17 @@ app = create_app()
 # - Create the database and tables
 # - Insert the roles
 # - Populate with lots of beers
-path = app.config['DATABASE_PATH']
-if os.path.isfile(path) is False:
-    print("Creating & initializing a new data-base...")
-    with app.app_context():
-        db.create_all()
-        Role.insert_roles()
-        User.insert_default_users()
-        Item.insert_default_items()
-else:
-    print("Connecting to existing data-base...")
+print ('TODO: Remove lines.... in catalog.py')
+#path = app.config['DATABASE_PATH']
+#if os.path.isfile(path) is False:
+#    print("Creating & initializing a new data-base...")
+#    with app.app_context():
+#        db.create_all()
+#        Role.insert_roles()
+#        User.insert_default_users()
+#        Item.insert_default_items()
+#else:
+#    print("Connecting to existing data-base...")
 
 
 if __name__ == '__main__':

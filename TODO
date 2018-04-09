@@ -152,6 +152,24 @@ deployment
      ( ) Put all secret configurations into environment variables
      ( ) Upgrade to Python 3.6.2 (https://docs.google.com/document/d/1hMlS6pfl_bG0vz6ns2bG4NMRgsVdIzpyPQxIkmsOubs/edit)
      ( ) Update requirements.txt
+     ( ) install heroku CLI (https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
+          $ sudo snap install heroku --classic
+          $ heroku --version
+          heroku-cli/6.16.4 (linux-x64) node-v9.9.0
+     (-) Implement database migration
+          (-) Follow section 4.2 of Mega Tutorial
+               (-) Add extension Flask-Migrate
+                    (o) This adds sub-command: flask db
+               (-) Initialize database:
+                    (venv) $ flask db init
+                    (o) creates a folder ./migrations which must be put under source control
+          (-) Update app.py configure_cli:
+          (-) update initdb, so it can be called from flask cli
+     (-) login to heroku CLI
+          $ heroku login
+          NOTE: The heroku CLI saves your email address and an API token to ~/.netrc
+                for future use. For more information, see Heroku CLI Authentication:
+                https://devcenter.heroku.com/articles/authentication
 
 promotion
 =========
@@ -168,4 +186,7 @@ promotion
 (-) Update password
 (-) Reset password
 (-) Activate link in /unconfirmed : Need another confirmation email?
+
+
+
 

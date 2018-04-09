@@ -2,6 +2,10 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+# Add Flask-Migrate extension, for migrating databases
+from flask_migrate import Migrate
+migrate = Migrate()
+
 # Add Flask-Login extension, for keeping track of login status during session
 from flask_login import LoginManager
 login_manager = LoginManager()

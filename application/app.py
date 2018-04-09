@@ -3,7 +3,7 @@ from flask import Flask
 from config import Config
 from .user import User
 
-from .extensions import db, login_manager, api, images, mail
+from .extensions import db, migrate, login_manager, api, images, mail
 from .filters import format_date, pretty_date, nl2br
 
 
@@ -46,6 +46,9 @@ def configure_app(app, config):
 def configure_extensions(app):
     # flask-sqlalchemy
     db.init_app(app)
+
+    # flask-migrate
+    migrate.init_app(app, db)
 
     # flask-login
     login_manager.login_view = 'auth.login'
