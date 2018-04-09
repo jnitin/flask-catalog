@@ -1,7 +1,8 @@
 from flask import Flask
 
 from config import Config
-from .user import User
+from .user import User, Role
+from .catalog import Category, Item
 
 from .extensions import db, migrate, login_manager, api, images, mail
 from .filters import format_date, pretty_date, nl2br
@@ -140,5 +141,9 @@ def configure_cli(app):
 
     @app.cli.command()
     def initdb():
+        """This resets the database to default content"""
         db.drop_all()
         db.create_all()
+        Role.insert_roles()
+        User.insert_default_users()
+        Item.insert_default_items()

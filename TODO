@@ -156,20 +156,42 @@ deployment
           $ sudo snap install heroku --classic
           $ heroku --version
           heroku-cli/6.16.4 (linux-x64) node-v9.9.0
-     (-) Implement database migration
-          (-) Follow section 4.2 of Mega Tutorial
+     ( ) Implement database migration
+          ( ) Follow section 4.2 of Mega Tutorial
                (-) Add extension Flask-Migrate
                     (o) This adds sub-command: flask db
-               (-) Initialize database:
+               (-) Initialize migration repository:
                     (venv) $ flask db init
-                    (o) creates a folder ./migrations which must be put under source control
-          (-) Update app.py configure_cli:
-          (-) update initdb, so it can be called from flask cli
+                    --> creates a folder ./migrations which must be put under source control
+               (-) Do a database migration, with comment
+                    $ flask db migrate -m "initial"    (Creates migration script)
+                    $ flask db upgrade                 (Creates/Upgrades db)
+
+                    NOTE:
+                    (o) When working with database servers such as MySQL and
+                        PostgreSQL, you have to create the database in the
+                        database server before running upgrade.
+                    (o) If you ever need to downgrade the database, use this:
+                         $ flask db downgrade
+                         $ rm <last migration script>
+                    (o) Question: does Flask-Migrate get rid of content???
+
+          ( ) Update initdb in app.py, to reset db and create default content
+              Test it by runnning the initdb command:
+              $ flask initdb
+              $ sqlitebrowser app.db   (VERIFY CONTENT)
+
+              NOTE: initdb is NOT related to Flask-Migrate. It uses the
+                    standard capability of Flask, which comes with cli out of
+                    the box (http://flask.pocoo.org/docs/0.12/cli/)
+
      (-) login to heroku CLI
           $ heroku login
           NOTE: The heroku CLI saves your email address and an API token to ~/.netrc
                 for future use. For more information, see Heroku CLI Authentication:
                 https://devcenter.heroku.com/articles/authentication
+
+     (-) set DATABASE_URL in .env ....!!!!
 
 promotion
 =========

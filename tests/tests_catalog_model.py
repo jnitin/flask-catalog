@@ -33,6 +33,7 @@ class ItemModelTestCase(unittest.TestCase):
         db.create_all()
         Role.insert_roles()
         User.insert_default_users()
+        Item.insert_default_items()
 
     def tearDown(self):
         db.session.remove()

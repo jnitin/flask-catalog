@@ -7,6 +7,7 @@ import unittest
 from config import Config
 from application import create_app
 from application.user import User, AnonymousUser, Role, Permission
+from application.catalog import Category, Item
 from application.extensions import db
 import requests
 import json
@@ -54,6 +55,7 @@ class APITestCase(unittest.TestCase):
         db.create_all()
         Role.insert_roles()
         User.insert_default_users()
+        Item.insert_default_items()
 
         #####################################################################
         # list of users we will use during testing
