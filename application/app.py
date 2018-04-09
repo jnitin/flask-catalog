@@ -112,22 +112,28 @@ def configure_logging(app):
     import os
     from logging.handlers import SMTPHandler
 
-    # Set info level on logger, which might be overwritten by handers.
+    if app.config['LOG_TO_STDOUT']:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.INFO)
+        app.logger.addHandler(stream_handler)
+    else:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+
+        info_file_handler = logging.handlers.RotatingFileHandler('logs/info.log',
+                                                                 maxBytes=10240,
+                                                                 backupCount=10)
+        info_file_handler.setLevel(logging.INFO)
+        info_file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s '
+            '[in %(pathname)s:%(lineno)d]')
+                                      )
+        app.logger.addHandler(info_file_handler)
+
+    # Set info level on logger, which might be overwritten by handlers.
     # Suppress DEBUG messages.
     app.logger.setLevel(logging.INFO)
-
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-
-    info_file_handler = logging.handlers.RotatingFileHandler('logs/info.log',
-                                                             maxBytes=10240,
-                                                             backupCount=10)
-    info_file_handler.setLevel(logging.INFO)
-    info_file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s '
-        '[in %(pathname)s:%(lineno)d]')
-                                  )
-    app.logger.addHandler(info_file_handler)
+    app.logger.info('Application startup')
 
 
 def configure_hook(app):

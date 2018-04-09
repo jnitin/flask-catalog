@@ -148,14 +148,10 @@ deployment
      (-) Is DEBUG mode turned off?
      (-) Is SECRET_KEY updated?
 
-(-) Deploy to heroku (Follow mega tutorial instructions...)
+(-) Prep for deployment to heroku (Follow mega tutorial instructions...)
      ( ) Put all secret configurations into environment variables
      ( ) Upgrade to Python 3.6.2 (https://docs.google.com/document/d/1hMlS6pfl_bG0vz6ns2bG4NMRgsVdIzpyPQxIkmsOubs/edit)
      ( ) Update requirements.txt
-     ( ) install heroku CLI (https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
-          $ sudo snap install heroku --classic
-          $ heroku --version
-          heroku-cli/6.16.4 (linux-x64) node-v9.9.0
      ( ) Implement database migration
           ( ) Follow section 4.2 of Mega Tutorial
                (-) Add extension Flask-Migrate
@@ -175,23 +171,104 @@ deployment
                          $ flask db downgrade
                          $ rm <last migration script>
                     (o) Question: does Flask-Migrate get rid of content???
+     ( ) Refactor database initialization into a cli command: flask initdb
+          Test it by runnning the initdb command:
+          $ flask initdb
+          $ sqlitebrowser app.db   (VERIFY CONTENT)
 
-          ( ) Update initdb in app.py, to reset db and create default content
-              Test it by runnning the initdb command:
-              $ flask initdb
-              $ sqlitebrowser app.db   (VERIFY CONTENT)
+          NOTE: initdb is NOT related to Flask-Migrate. It uses the
+                standard capability of Flask, which comes with cli out of
+                the box (http://flask.pocoo.org/docs/0.12/cli/)
+     ( ) Prep to work with Heroku Postgres database:
+          ( ) Update config.py to use DATABASE_URL environment variable, like this:
+               SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+                    'sqlite:///' + os.path.join(basedir, 'app.db')
+     (-) Option to log to stdout:
+          --> Follow method of mega tutorial, using LOG_TO_STDOUT
 
-              NOTE: initdb is NOT related to Flask-Migrate. It uses the
-                    standard capability of Flask, which comes with cli out of
-                    the box (http://flask.pocoo.org/docs/0.12/cli/)
 
-     (-) login to heroku CLI
+(-) Deploy to heroku (Follow mega tutorial instructions...)
+     ( ) install heroku CLI (https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
+          $ sudo snap install heroku --classic
+          $ heroku --version
+          heroku-cli/6.16.4 (linux-x64) node-v9.9.0
+     ( ) login to heroku CLI
           $ heroku login
           NOTE: The heroku CLI saves your email address and an API token to ~/.netrc
                 for future use. For more information, see Heroku CLI Authentication:
                 https://devcenter.heroku.com/articles/authentication
+     ( ) Create a Heroku application
+          (venv) $ heroku apps:create flask-catalog
+          Creating ⬢ flask-catalog... done
+          https://flask-catalog.herokuapp.com/ | https://git.heroku.com/flask-catalog.git
 
-     (-) set DATABASE_URL in .env ....!!!!
+          NOTE: The local git repository will be configured with an extra
+                remote, called heroku. Verify that it exists with the git remote
+                command:
+
+          (venv) $ git remote -v
+
+     ( ) Create a free postgressql database:
+
+          There is a command line to do this, but it is not clear which one to use:
+          $ heroku addons:add heroku-postgresql:hobby-dev        (Mega Tutorial)
+          or
+          $ heroku addons:create heroku-postgresql:hobby-dev     (https://elements.heroku.com/addons/heroku-postgresql)
+
+          To avoid mistakes, I provisioned the database via the heroku website:
+          --> https://elements.heroku.com/addons/heroku-postgresql
+          Just login, and install it to the flask-catalog app. Then redirected to this:
+          https://dashboard.heroku.com/apps/flask-catalog/resources?justInstalledAddonServiceId=6c67493d-8fc2-4cd4-9161-4f1ec11cbe69
+
+
+          NOTE: The environment variable DATABASE_URL is automatically set
+                     on Heroku when using a Postgres database (see below), so
+                     nothing else needs to be done to prep for deployment.
+                Read: https://elements.heroku.com/addons/heroku-postgresql
+                      --> hobby-dev is free
+                      https://www.heroku.com/postgres
+                      https://www.postgresql.org/
+
+     ( ) Add psycopg2 as a new dependency to requirements.txt
+
+          $ pip install psycopg2
+          $ pip freeze > requirements.txt
+
+          NOTE: The application will be connecting to a Postgres database, and
+                for that to work SQLAlchemy requires the psycopg2 package to be
+                installed.
+
+     ( ) Logging to stdout
+          Set the LOG_TO_STDOUT environment variable
+
+          $ heroku config:set LOG_TO_STDOUT=1
+          Setting LOG_TO_STDOUT and restarting ⬢ flask-catalog... done, v4
+          LOG_TO_STDOUT: 1
+
+          (o) to view all logs of application:
+          $ heroku logs
+
+          NOTE: Heroku expects applications to log directly to stdout. Anything
+                the application prints to the standard output is saved and
+                returned when you use the '$ heroku logs' command.
+
+     ( ) Add gunicorn webserver as a new dependencies to requirements.txt
+
+          $ pip install gunicorn
+          $ pip freeze > requirements.txt
+
+          NOTE: Heroku does not provide a web server of its own. Instead, it
+                expects the application to start its own web server on the port
+                number given in the environment variable $PORT . Since the Flask
+                development web server is not robust enough to use for production,
+                I’m going to use gunicorn, the server recommended by Heroku for
+                Python applications.
+               (http://gunicorn.org/)
+
+
+     (-) Create a Procfile
+
+
 
 promotion
 =========

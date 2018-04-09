@@ -55,3 +55,13 @@ python3 -m ipykernel install --user
 ## Install Pylint ##
 ####################
 pip install pylint
+
+################################
+## Install gunicorn webserver ##
+################################
+pip install gunicorn
+
+############################################################################
+## Install package that allows SQLAlchemy to connect to Postgres database ##
+############################################################################
+pip install psycopg2

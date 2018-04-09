@@ -16,6 +16,9 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'not-so-secret-key'
     BCRYPT_LOG_ROUNDS = int(os.environ.get('BCRYPT_LOG_ROUNDS') or 2)
 
+    # Option to log directly to stdout
+    LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
+
     # We use gmail as our mail server
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
