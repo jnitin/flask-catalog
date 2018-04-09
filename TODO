@@ -149,9 +149,9 @@ deployment
      (-) Is SECRET_KEY updated?
 
 (-) Deploy to heroku (Follow mega tutorial instructions...)
-     (-) Put all secret configurations into environment variables
-     (-) Upgrade to Python 3.6.2
-     (-) Update requirements.txt
+     ( ) Put all secret configurations into environment variables
+     ( ) Upgrade to Python 3.6.2 (https://docs.google.com/document/d/1hMlS6pfl_bG0vz6ns2bG4NMRgsVdIzpyPQxIkmsOubs/edit)
+     ( ) Update requirements.txt
 
 promotion
 =========

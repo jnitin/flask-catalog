@@ -91,7 +91,7 @@ The API is demonstrated in this [end-2-end test scenario](link-to-HTML).
 
 ### Installation
 
-Development and testing was done on Ubuntu 16.04, using Python 3.5
+Development and testing was done on Ubuntu 16.04, using Python 3.6.2, to be compatible with environment deployed on heroku.
 
 The steps described here show how to run <b>catalog</b> within a python virtual environment.
 
@@ -113,7 +113,7 @@ $ sudo apt-get install python3-venv
 **Step 4. One time: prepare the python3 virtual environment**
 ```bash
 $ cd Catalog
-$ python3 -m venv venv
+$ python3.6 -m venv venv
 $ source venv/bin/activate
 (venv)
 (venv) $ pip install --upgrade pip
@@ -123,8 +123,12 @@ $ source venv/bin/activate
  Alternatively, instead of installing the required python packages using the file 'requirements.txt', which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package:
 ```bash
 $ cd Catalog
-$ python3 -m venv venv
+$ python3.6 -m venv venv
 $ source venv/bin/activate
+(venv) $ ./pip_all.sh
+
+NOTE: this installs:
+--------------------
 (venv) $ pip install --upgrade pip
 (venv) $ pip install flask
 (venv) $ pip install Flask-REST-JSONAPI

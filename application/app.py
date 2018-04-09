@@ -37,9 +37,10 @@ def configure_app(app, config):
     # Note: Potentially overwritten by TestConfig class during unit testing
     app.config.from_object(config)
 
+    # We now use environment variables, for heroku deployment
     # Load the configuration from ./instance/config.py (secret information)
     # http://flask.pocoo.org/docs/config/#instance-folders
-    app.config.from_pyfile('config.py')
+    #app.config.from_pyfile('config.py')
 
 
 def configure_extensions(app):

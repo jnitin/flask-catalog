@@ -4,7 +4,7 @@
 ## Instructions ##
 ##################
 # first do this:
-#  $ python3 -m venv venv
+#  $ python3.6 -m venv venv
 #  $ source venv/bin/activate
 #
 # then run this:
@@ -29,6 +29,12 @@ pip install flask-login
 pip install flask-mail
 pip install flask-uploads
 pip install Flask-WTF
+
+############################################################
+## Install additional python packages used by application ##
+############################################################
+pip install oauth2client
+pip install python-dotenv
 
 ##########################################
 ## Install python packages for e2e test ##
