@@ -18,8 +18,8 @@ class User(db.Model, UserMixin):
     ############################################
     id = Column(db.Integer, primary_key=True)
     email = db.Column(db.String, index=True, unique=True)
-    #password_hash = db.Column(db.String(128))  # We store it hashed
-    password_hash = db.Column(db.Binary(128))  # We store it hashed
+    password_hash = db.Column(db.String(128))  # We store it hashed
+    #password_hash = db.Column(db.Binary(128))  # We store it hashed
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     confirmed = db.Column(db.Boolean, nullable=True, default=False)
@@ -111,7 +111,7 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         """Using bcrypt to hash the password"""
-        self.password_hash = bcrypt.generate_password_hash(password)
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         self.password_set = True
 
     def verify_password(self, password):
