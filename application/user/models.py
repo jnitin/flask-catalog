@@ -3,6 +3,7 @@ from sqlalchemy.orm import backref
 from flask import current_app, g, url_for, render_template
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from werkzeug.security import generate_password_hash, check_password_hash
 from ..extensions import db, login_manager, bcrypt, images
 import os
 import base64
@@ -111,14 +112,17 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         """Using bcrypt to hash the password"""
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        #self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = generate_password_hash(password)
         self.password_set = True
 
     def verify_password(self, password):
         """Using bcrypt to check the hashed password"""
 
+        #if (self.password_set and
+        #    bcrypt.check_password_hash(self.password_hash, password)):
         if (self.password_set and
-            bcrypt.check_password_hash(self.password_hash, password)):
+            check_password_hash(self.password_hash, password)):
             self.failed_logins = 0
             return True
         else:
