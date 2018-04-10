@@ -127,22 +127,62 @@ $ python3.6 -m venv venv
 $ source venv/bin/activate
 (venv) $ ./pip_all.sh
 
-NOTE: this installs:
---------------------
-(venv) $ pip install --upgrade pip
-(venv) $ pip install flask
-(venv) $ pip install Flask-REST-JSONAPI
-(venv) $ pip install flask-sqlalchemy
-(venv) $ pip install flask-bcrypt
-(venv) $ pip install flask-httpauth
-(venv) $ pip install flask-login
-(venv) $ pip install flask-mail
-(venv) $ pip install flask-uploads
-(venv) $ pip install Flask-WTF
-(venv) $ pip install requests
-(venv) $ pip install Pillow
-(venv) $ pip install oauth2client
-(venv) $ pip install python-dotenv
+This installs the following into our virtual environment:
+---------------------------------------------------------
+##########################################
+## Verify we are running the proper pip ##
+##########################################
+which pip
+pip install --upgrade pip
+
+##########################################
+## Install flask and all the extensions ##
+##########################################
+pip install flask
+pip install Flask-REST-JSONAPI
+pip install flask-sqlalchemy
+pip install flask-migrate
+pip install flask-bcrypt
+pip install flask-httpauth
+pip install flask-login
+pip install flask-mail
+pip install flask-uploads
+pip install Flask-WTF
+
+############################################################
+## Install additional python packages used by application ##
+############################################################
+pip install oauth2client
+pip install python-dotenv
+
+##########################################
+## Install python packages for e2e test ##
+##########################################
+pip install requests
+pip install Pillow
+
+###########################################
+## Install Jupyter notebook for e2e test ##
+###########################################
+pip install jupyter
+pip install ipykernel
+python3 -m ipykernel install --user
+
+####################
+## Install Pylint ##
+####################
+pip install pylint
+
+################################
+## Install gunicorn webserver ##
+################################
+pip install gunicorn
+
+############################################################################
+## Install package that allows SQLAlchemy to connect to Postgres database ##
+############################################################################
+pip install psycopg2
+
 ```
 
 **Step 5. Activate the python virtual environment and start the application server**

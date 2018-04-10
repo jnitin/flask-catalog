@@ -15,11 +15,11 @@
 ## Verify we are running the proper pip ##
 ##########################################
 which pip
+pip install --upgrade pip
 
 ##########################################
 ## Install flask and all the extensions ##
 ##########################################
-pip install --upgrade pip
 pip install flask
 pip install Flask-REST-JSONAPI
 pip install flask-sqlalchemy
@@ -46,7 +46,6 @@ pip install Pillow
 ###########################################
 ## Install Jupyter notebook for e2e test ##
 ###########################################
-pip install --upgrade pip
 pip install jupyter
 pip install ipykernel
 python3 -m ipykernel install --user

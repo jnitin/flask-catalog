@@ -338,6 +338,9 @@ deployment
 
      ( ) Testing and fixes to some issues:
 
+          ( ) NOTE: Each time you push a change, you need to restart the one-of
+                    dyno!!!
+
           ( ) run the unittests in one-off dyno:
           (venv) $ heroku run bash
           ~$ cd tests
@@ -360,7 +363,7 @@ deployment
               Solution is to add 'https://flask-catalog.herokuapp.com' as an authorized JavaScript origin.
 
      (-) Remaining issues to fix:
-          (-) default users cannot login. Password hash not working??
+	  (-) remove Flask-Bcrypt from project, including readme, pip_install.sh
           (-) bcrypt does not play nice with PostgreSQL...
               Fixed by not using bcrypt
 
