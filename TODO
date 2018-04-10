@@ -321,7 +321,46 @@ deployment
           ( ) Push local repository to heroku, and it will be automatically deployed
                $ git push heroku master
 
-          NOTE:
+               --> Verify that web app is running at: https://flask-catalog.herokuapp.com/
+               --> Database is empty
+
+     ( ) Reset or Initialize the database using a one-off dyno: (https://devcenter.heroku.com/articles/one-off-dynos)
+          (venv) $ heroku run bash
+          ~$ flask initdb
+
+          --> Verify that database now has content
+
+          In a new terminal window, stop the one-off dyno:
+          (venv) $ heroku ps       (Shows the running dyno)
+
+          (venv) $ heroku ps:stop run.1      (If the name is run.1)
+
+
+     ( ) Testing and fixes to some issues:
+
+          ( ) run the unittests in one-off dyno:
+          (venv) $ heroku run bash
+          ~$ cd tests
+          ~/tests $ python tests_user_model.py
+
+          ( ) viewing logs with: (https://devcenter.heroku.com/articles/logging)
+          $ heroku logs -n 200   (Retrieves last 200 lines)
+          $ heroku logs --tail   (tailing logs)
+
+          ( ) heroku logs showed an error. The with open(GOOGLE_OAUTH2_FILE_PATH, 'w')
+              command did not work. This is because the instance folder does not
+              exist. Fixed it by changing config variable to point to main folder.
+
+          ( ) When trying out signin via Google, it gave this error:
+               The JavaScript origin in the request, https://flask-catalog.herokuapp.com,
+               does not match the ones authorized for the OAuth client.
+               Visit https://console.developers.google.com/apis/credentials/oauthclient/524473164280-d6r6vijbej0fvj6g3m3vb6hsp3nb7n4q.apps.googleusercontent.com?project=524473164280
+               to update the authorized JavaScript origins.
+
+              Solution is to add 'https://flask-catalog.herokuapp.com' as an authorized JavaScript origin.
+
+          (-) bcrypt does not play nice with PostgreSQL...
+
 
 promotion
 =========
