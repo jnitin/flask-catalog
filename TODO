@@ -359,7 +359,10 @@ deployment
 
               Solution is to add 'https://flask-catalog.herokuapp.com' as an authorized JavaScript origin.
 
+     (-) Remaining issues to fix:
+          (-) default users cannot login. Password hash not working??
           (-) bcrypt does not play nice with PostgreSQL...
+              Fixed by not using bcrypt
 
 
 promotion

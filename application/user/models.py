@@ -93,6 +93,9 @@ class User(db.Model, UserMixin):
         u2.role = Role.query.filter_by(name='Usermanager').first()
         db.session.add(u2)
 
+        print('Adding default user with:')
+        print('email={}'.format(current_app.config['USER_EMAIL']))
+        print('pw={}'.format(current_app.config['USER_PW']))
         u3 = User(email=current_app.config['USER_EMAIL'],
                   password=current_app.config['USER_PW'],
                   first_name=current_app.config['USER_FIRST_NAME'],
@@ -111,13 +114,15 @@ class User(db.Model, UserMixin):
     # Customize 'setter' of password to store password in hashed format
     @password.setter
     def password(self, password):
-        """Using bcrypt to hash the password"""
+        """Hash the password before storing"""
+        #TODO: investigate why this does not work with Postgresql
+        #See: https://stackoverflow.com/questions/34548846/flask-bcrypt-valueerror-invalid-salt?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
         #self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         self.password_hash = generate_password_hash(password)
         self.password_set = True
 
     def verify_password(self, password):
-        """Using bcrypt to check the hashed password"""
+        """Check the hashed password"""
 
         #if (self.password_set and
         #    bcrypt.check_password_hash(self.password_hash, password)):
