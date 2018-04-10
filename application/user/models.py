@@ -93,9 +93,6 @@ class User(db.Model, UserMixin):
         u2.role = Role.query.filter_by(name='Usermanager').first()
         db.session.add(u2)
 
-        print('Adding default user with:')
-        print('email={}'.format(current_app.config['USER_EMAIL']))
-        print('pw={}'.format(current_app.config['USER_PW']))
         u3 = User(email=current_app.config['USER_EMAIL'],
                   password=current_app.config['USER_PW'],
                   first_name=current_app.config['USER_FIRST_NAME'],

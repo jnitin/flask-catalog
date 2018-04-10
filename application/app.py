@@ -148,13 +148,17 @@ def configure_cli(app):
     @app.cli.command()
     def initdb():
         """This resets the database to default content"""
-        print("Dropping all tables in database...")
+        app.logger.info("Dropping all tables in database...")
         db.drop_all()
-        print("Creating tables in database...")
+
+        app.logger.info("Creating tables in database...")
         db.create_all()
-        print("Inserting roles...")
+
+        app.logger.info("Inserting roles...")
         Role.insert_roles()
-        print("Inserting default users...")
+
+        app.logger.info("Inserting default users...")
         User.insert_default_users()
-        print("Inserting default items...")
+
+        app.logger.info("Inserting default items...")
         Item.insert_default_items()

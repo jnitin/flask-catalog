@@ -81,7 +81,7 @@ class Config(object):
     GOOGLE_OAUTH2_FILE = os.path.join(
         os.path.dirname(__file__), GOOGLE_OAUTH2_FILE_PATH)
 
-    print('dumping google oauth2 json to disk')
+    #print('dumping google oauth2 json to disk')
     with open(GOOGLE_OAUTH2_FILE,'w') as f:
         json.dump(GOOGLE_OAUTH2, f, indent=4)
 
