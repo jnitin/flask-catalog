@@ -155,6 +155,7 @@ def delete_category(category_id):
     # now delete the category
     cat_name = category_active.name  # save name for flash message
     db.session.delete(category_active)
+
     db.session.commit()
 
     flash("Deleted category '<b>{}</b>' and all it's Items".format(cat_name),

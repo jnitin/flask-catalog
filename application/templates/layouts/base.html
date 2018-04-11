@@ -43,6 +43,48 @@
 			src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
 			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 			crossorigin="anonymous"></script>
+
+		<!--jQuery-ui modal confirmation dialog that asks confirmation to delete
+			see: https://jqueryui.com/dialog/#modal-confirmation
+				 http://jsfiddle.net/Raitono/jcxv8qom/1/ -->
+		<script type="text/javascript">
+			// set properties of dialog
+			$(document).ready(function() {
+				$("#div_confirm_delete").dialog({
+					autoOpen: false,
+					resizable: false,
+					height: "auto",
+					width: 400,
+					modal: true
+				});
+			});
+
+			// define function that handles the dialog
+			// - directs to target url if confirmed
+			// - does nothing if canceled or closed
+			function confirmDeleteFn( jQuery ) {
+				$('.confirm-delete').click(function(e) {
+					e.preventDefault();
+					var targetUrl = $(this).attr("href");
+					$( "#div_confirm_delete" ).dialog({
+						buttons : {
+							"Delete" : function() {
+								window.location.href = targetUrl;
+							},
+							"Cancel" : function() {
+								$(this).dialog("close");
+							}
+						  }
+					  });
+
+					$("#div_confirm_delete").dialog("open");
+				});
+			}
+
+			// define the function once document is fully loaded
+			$( document ).ready( confirmDeleteFn );
+		</script>
+
 		{% block jshead2 %}{% endblock %}
 	</head>
 	<body class="">
@@ -94,6 +136,7 @@
 										<div class="dropdown-divider"></div>
 										<a class="dropdown-item" a href="{{ url_for('auth.logout') }}">Log out</a>
 										<div class="dropdown-divider"></div>
+										<a class="dropdown-item confirm-delete" href="{{ url_for('user.delete_account') }}">Delete Account</a>
 									</div>
 								{% else %}
 									<a class="nav-link dropdown-toggle"  id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Register/Login</a>
@@ -128,6 +171,11 @@
 	                {% endif %}
 	            {% endwith %}
 	        {% endblock %}
+
+			<!--jQuery-ui script above turns this into a modal confirmation dialog-->
+			<div id="div_confirm_delete" title="Delete?">
+				<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Deletion is permanent and cannot be recovered. Are you sure?</p>
+			</div>
 
 	        {% block body %}{% endblock %}
 	    </div>

@@ -1,12 +1,13 @@
 import os
 
 from flask import Blueprint, render_template, send_from_directory, request, \
-    current_app, flash
+    current_app, flash, redirect, url_for
 from flask_login import login_required, current_user
 
 from .forms import profile_form
 
 from ..extensions import db
+from ..catalog import Category, Item
 from ..utils import get_current_time
 
 
@@ -16,6 +17,7 @@ user = Blueprint('user', __name__, url_prefix='/user')
 @user.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    """Update profile of current user"""
     form = profile_form(obj=current_user)
 
     if form.validate_on_submit():
@@ -42,3 +44,33 @@ def profile():
         flash('Profile updated.', 'success')
 
     return render_template('user/profile.html', form=form)
+
+
+@user.route('/delete', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    """Delete account of current user"""
+    #
+    # NOTES:
+    # Confirmation if user really wants to delete is done on client side
+    # so, we do not use a form asking for confirmation, just go & delete it
+    #
+    email = current_user.email
+
+    items = Item.query.filter_by(user_id=current_user.id).all()
+    categories = Category.query.filter_by(user_id=current_user.id).all()
+
+    for item in items:
+        db.session.delete(item)
+
+    for category in categories:
+        db.session.delete(category)
+
+    db.session.delete(current_user)
+
+    db.session.commit()
+
+    flash("Deleted account '<b>{}</b>' and all owned Categories and Items".format(email),
+          'success')
+
+    return redirect(url_for('auth.index'))
