@@ -14,10 +14,11 @@ import json
 import requests
 ########################################################################
 
-from ..email import send_confirmation_email
+from ..email import send_confirmation_email, send_password_reset_email
 from ..user import User
 from ..extensions import db, login_manager
-from .forms import register_form, register_invitation_form, login_form
+from .forms import register_form, register_invitation_form, login_form, \
+     reset_password_request_form, reset_password_form
 
 auth = Blueprint('auth', __name__)
 
@@ -150,6 +151,7 @@ def register():
         # send user a confirmatin link via email
         send_confirmation_email(user)
         flash('Thanks for registering! ', 'success')
+        flash('Check your email for the instructions to activate your account', 'success')
         return redirect(url_for('email.check_your_email'))
 
 
@@ -163,6 +165,9 @@ def register():
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
+    if current_user.is_authenticated:
+        logout_user()
+
     user_email = User.get_user_email_from_invitation_token(token)
 
     if user_email is False:
@@ -171,7 +176,7 @@ def register_from_invitation(token):
 
     if User.query.filter_by(email=user_email).first():
         flash('Registration was already completed before', 'success')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.login'))
 
     form = register_invitation_form(next=request.args.get('next'))
 
@@ -183,14 +188,58 @@ def register_from_invitation(token):
                                 confirmed=True  # auto-confirm invited users
                                 )
 
-        # no need to send user a confirmation link via email
-        # send_confirmation_email(user)
         flash('Thanks for registering! ', 'success')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.login'))
 
     return render_template('auth/register_from_invitation.html',
                            form=form,
                            user_email = user_email)
+
+
+@auth.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated and current_user.blocked:
+        return redirect(url_for('auth.blocked_account'))
+
+    if current_user.is_authenticated:
+        send_password_reset_email(current_user)
+        flash('Check your email for the instructions to reset your password',
+              'success')
+        return redirect(url_for('email.check_your_email'))
+
+    form = reset_password_request_form()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+        # always show this message, even if email not yet registered
+        flash('Check your email for the instructions to reset your password',
+              'success')
+        return redirect(url_for('email.check_your_email'))
+
+    return render_template('auth/reset_password_request.html', form=form)
+
+@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        logout_user()
+
+    user = User.verify_reset_password_token(token)
+    if not user:
+        flash('The reset password link is invalid or has expired.')
+        return redirect(url_for('auth.index'))
+
+    if user.blocked:
+        return redirect(url_for('auth.blocked_account'))
+
+    form = reset_password_form()
+    if form.validate_on_submit():
+        user.password=form.password.data
+        db.session.commit()
+        flash('Your password has been reset.', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html', form=form)
 
 
 @auth.route('/blocked_account')

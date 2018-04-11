@@ -81,21 +81,27 @@ class UserModelTestCase(unittest.TestCase):
         time.sleep(2)
         self.assertFalse(u.confirm(token))
 
-    def test_valid_reset_token(self):
+    def test_valid_reset_password_token(self):
         u = User(password='cat')
         db.session.add(u)
         db.session.commit()
-        token = u.generate_reset_token()
-        self.assertTrue(User.reset_password(token, 'dog'))
-        self.assertTrue(u.verify_password('dog'))
+        token = u.generate_reset_password_token()
+        self.assertEqual(User.verify_reset_password_token(token), u)
 
-    def test_invalid_reset_token(self):
+    def test_invalid_reset_password_token(self):
         u = User(password='cat')
         db.session.add(u)
         db.session.commit()
-        token = u.generate_reset_token()
-        self.assertFalse(User.reset_password(token + 'a', 'horse'))
-        self.assertTrue(u.verify_password('cat'))
+        token = u.generate_reset_password_token()
+        self.assertIsNone(User.verify_reset_password_token(token + 'a'))
+
+    def test_expired_reset_password_token(self):
+        u = User(password='cat')
+        db.session.add(u)
+        db.session.commit()
+        token = u.generate_reset_password_token(1)
+        time.sleep(2)
+        self.assertIsNone(User.verify_reset_password_token(token))
 
     def test_valid_email_change_token(self):
         u = User(email='john@example.com', password='cat')

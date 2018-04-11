@@ -88,7 +88,7 @@ Also note that the Navbar has changed. A link is added to get back to this main 
 
 ------
 
-##### User dropdown for Profile, Logout, Delete
+##### User dropdown:
 
 
 

@@ -37,6 +37,10 @@ def get_invitation_link(user_email):
     return url_for('auth.register_from_invitation', token=token,
                    _external=True)
 
+def get_reset_password_link(user):
+    token = user.generate_reset_password_token()
+    return url_for('auth.reset_password', token=token, _external=True)
+
 def send_confirmation_email(user):
     """Send confirmation email to registered user"""
     confirm_url = get_confirmation_link(user)
@@ -57,3 +61,12 @@ def send_invitation_email(user_email):
 
     send_email('You are invited to join Catalog', [user_email], email_html_body)
 
+def send_password_reset_email(user):
+    """Send password reset email to a registered user"""
+    reset_password_url = get_reset_password_link(user)
+
+    email_html_body = render_template(
+        'email/email_reset_password.html',
+        reset_password_url=reset_password_url)
+
+    send_email('Reset Your Password', [user.email], email_html_body)

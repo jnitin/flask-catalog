@@ -41,3 +41,14 @@ class register_invitation_form(FlaskForm):
     last_name = StringField('Last Name',
                        [DataRequired()])
     submit = SubmitField('Register')
+
+
+class reset_password_request_form(FlaskForm):
+    email = EmailField('Email',
+                       [DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class reset_password_form(FlaskForm):
+    password = PasswordField('Password',
+                             [DataRequired()])
+    submit = SubmitField('Reset Password')

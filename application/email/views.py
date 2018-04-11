@@ -32,5 +32,4 @@ def resend_confirmation():
 
 @email.route('/check_your_email')
 def check_your_email():
-    flash('Please check your email to activate your account.', 'success')
     return render_template('email/check_your_email.html')

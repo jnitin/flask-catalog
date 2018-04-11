@@ -156,23 +156,22 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         return True
 
-    def generate_reset_token(self, expiration=3600):
+    def generate_reset_password_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'reset': self.id}).decode('utf-8')
+        return s.dumps({'reset_password': self.id}).decode('utf-8')
 
     @staticmethod
-    def reset_password(token, new_password):
+    def verify_reset_password_token(token):
+        """Verifies that reset_password token is OK, and returns user"""
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token.encode('utf-8'))
+            id = data.get('reset_password')
+            return User.query.get(id)
         except:
-            return False
-        user = User.query.get(data.get('reset'))
-        if user is None:
-            return False
-        user.password = new_password
-        db.session.add(user)
-        return True
+            return None
+
+        return None
 
     def generate_email_change_token(self, new_email, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
