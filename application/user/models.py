@@ -75,6 +75,28 @@ class User(db.Model, UserMixin):
         return user
 
     @staticmethod
+    def delete_account(user):
+        """Deletes user and all it's owned Categories and Items"""
+
+        # first delete all owned categories and all the items in those
+        # categories, including items that other users added to the category.
+        for category in user.categories:
+            for item in category.items:
+                db.session.delete(item)
+            db.session.delete(category)
+        db.session.commit()
+
+        # then delete all remaining owned items
+        for item in user.items:
+            db.session.delete(item)
+        db.session.commit()
+
+        # finally, delete the user
+        db.session.delete(user)
+        db.session.commit()
+
+
+    @staticmethod
     def insert_default_users():
         """Inserts a default admin, usermanager and user into the database"""
         u1 = User(email=current_app.config['ADMIN_EMAIL'],

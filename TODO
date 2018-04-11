@@ -82,10 +82,6 @@ auth
                ( ) If user does not yet exist, create it.
                ( ) Register user with flask_login
                ( ) In verify password, check if password was set.
-          (-) In profile: update password
-              (-) if registered with Google, do NOT ask for previous password,
-                  because it does not exist.
-                  Ask instead to re-login with GOOGLE account before proceeding.
           (-) Write a unit test for Google signin
           (-) Write a e2e test for Google signin
 
@@ -101,6 +97,7 @@ profile pictures
 
 api
 ===
+(-) Delete user must also delete the Categories and Items.
 (-) Create application specific package, like api/catalog, with:
      (-) model_schemas.py
      (-) views.py

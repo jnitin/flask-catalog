@@ -255,9 +255,11 @@ def delete_category_item(category_id, item_id):
     if category_active is None or item_active is None:
         abort(404)
 
-    if item_active.user != current_user:
+    if (item_active.user != current_user and
+        category_active.user != current_user):
         message = 'You are not authorized to delete this item, because'+\
-            ' you are not the owner.'
+            ' you are neither the owner of the item nor the owner of'+\
+            ' the category.'
         return render_template('catalog/403.html', message=message)
 
     item_name = item_active.name  # save name for flash message

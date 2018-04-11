@@ -4,8 +4,8 @@ from flask import Blueprint, render_template, send_from_directory, request, \
     current_app, flash, redirect, url_for
 from flask_login import login_required, current_user
 
+from . import User
 from .forms import profile_form
-
 from ..extensions import db
 from ..catalog import Category, Item
 from ..utils import get_current_time
@@ -57,18 +57,7 @@ def delete_account():
     #
     email = current_user.email
 
-    items = Item.query.filter_by(user_id=current_user.id).all()
-    categories = Category.query.filter_by(user_id=current_user.id).all()
-
-    for item in items:
-        db.session.delete(item)
-
-    for category in categories:
-        db.session.delete(category)
-
-    db.session.delete(current_user)
-
-    db.session.commit()
+    User.delete_account(current_user)
 
     flash("Deleted account '<b>{}</b>' and all owned Categories and Items".format(email),
           'success')
