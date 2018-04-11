@@ -32,4 +32,5 @@ def resend_confirmation():
 
 @email.route('/check_your_email')
 def check_your_email():
+    logout_user()
     return render_template('email/check_your_email.html')
