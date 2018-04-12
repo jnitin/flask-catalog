@@ -56,7 +56,7 @@ When a user is not authenticated, the Navbar shows a dropdown on the right side 
 
 ##### Login:  [https://flask-catalog.herokuapp.com/login](https://flask-catalog.herokuapp.com/login)
 
-![login_1](./images_for_readme/login_1.gif)
+![login_1](./images_for_readme/login_1.png)
 
 The login page can be reached from the home page or from the Navbar dropdown.
 
@@ -88,56 +88,136 @@ Also note that the Navbar has changed. A link is added to get back to this main 
 
 ------
 
-##### User dropdown:
+##### Logged in user dropdown: 
+
+![logged_in_2](./images_for_readme/logged_in_2.png)
+
+Once logged in, you have access to some user options to update your profile, reset your password, log out or delete your account. Lets try them all out.
+
+------
+
+##### Profile: [https://flask-catalog.herokuapp.com/user/profile](https://flask-catalog.herokuapp.com/user/profile)
+
+![profile_1](./images_for_readme/profile_1.png)
+
+On the profile page, the logged in user can update the profile picture, email, first name and last name. Since I logged in with Google, the profile picture that I have stored with my Google account is used, but if I want I can upload another picture. 
+
+------
+
+##### Reset Password: 
+
+![logged_in_2](./images_for_readme/logged_in_2.png)
+
+![reset_password_1](./images_for_readme/reset_password_1.png)
 
 
 
-Without authentication, only the main page can be visited which displays the catalog content.
+When selecting Reset Password from the dropdown in the Navbar while logged in, the application will immediately send out an email, and display a message to check your your email, which looks like this:
 
-1. Users can create an account and login, in several ways:
 
-   1. At the home page, by providing email & password.
 
-   2. At the home page, with a Google account.
+![reset_password_2](./images_for_readme/reset_password_2.png)
 
-   3. With an API request, by providing email & password
+When you click on the link in the email, you will be redirected to a form where you can reset your password. Note that in case the registration/login was done with Google OAUTH2, this will be the first time you set your password, so it is not a reset it the literal sense. Once a password has been set, you will then be able to login without Google OAUTH2 and use the applications authentication method.
 
-      *(NOTE: The API does not yet support authentication with a Google account)*
+![reset_password_3](./images_for_readme/reset_password_3.png)
 
-   ​
 
-2. All API calls are authenticated. 
 
-3. New users need to verify their account by email. Users are not able to log in until this verification is complete.
+------
 
-4. There are three roles with different permission levels: 
+##### Delete account:
+
+![delete_account_1](./images_for_readme/delete_account_1.png)
+
+
+
+![delete_account_2](./images_for_readme/delete_account_2.png)
+
+
+
+When you select Delete Account, the application will first ask for confirmation. If you click on Delete, it will go ahead and delete the Categories you own, including all the items in it, the Items you own, and your user account. Once done, a message is flashed back.
+
+
+
+------
+
+##### Register: [https://flask-catalog.herokuapp.com/register](https://flask-catalog.herokuapp.com/register)
+
+![register_1](./images_for_readme/register_1.png)
+
+After deletion of the account, now lets explore registration without using Google OAUTH2. Click on Register>> on the home page, which will redirect you to the registration page, and provide your email and password together with First Name and Last Name, and click 'Register'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+​
+
+1. All API calls are authenticated. 
+
+2. New users need to verify their account by email. Users are not able to log in until this verification is complete.
+
+3. There are three roles with different permission levels: 
    (-) a regular user, who is only able to CRUD their own records
     (-) a user manager, who is able to CRUD only users
     (-) an admin, who is able to CRUD all records and users
 
-5. When a user fails to log in three times in a row, his or her account will be blocked automatically, and only admins and managers are able to unblock it.
+4. When a user fails to log in three times in a row, his or her account will be blocked automatically, and only admins and managers are able to unblock it.
 
-6. An admin is able to invite someone to the application by specifying an email address; the system will send an invitation message automatically, prompting the user to complete the registration by setting first name, last name, and password.
+5. An admin is able to invite someone to the application by specifying an email address; the system will send an invitation message automatically, prompting the user to complete the registration by setting first name, last name, and password.
 
-7. Users are able to upload and change their profile picture.
+6. Users are able to upload and change their profile picture.
 
-8. Users can post 'meals', and each meal has a date, time, text, and number of catalog.
+7. Users can post 'meals', and each meal has a date, time, text, and number of catalog.
 
-9. If the number of catalog is not provided, the API will connect to [Nutritionix](https://www.nutritionix.com) and try to get the number of catalog for the entered meal.
+8. If the number of catalog is not provided, the API will connect to [Nutritionix](https://www.nutritionix.com) and try to get the number of catalog for the entered meal.
 
-10. In a user setting, a target number of catalog per day is defined.
+9. In a user setting, a target number of catalog per day is defined.
 
-11. When retrieving the details for a meal an extra boolean field is set to true if the total for that day is less than expected number of catalog per day, otherwise it will be false.
+10. When retrieving the details for a meal an extra boolean field is set to true if the total for that day is less than expected number of catalog per day, otherwise it will be false.
 
-12. The API return data according to the [JSON API 1.0](http://jsonapi.org/) specification
+11. The API return data according to the [JSON API 1.0](http://jsonapi.org/) specification
 
-13. The API provides filter capabilities for all endpoints that return a list of elements, and supports pagination.
+12. The API provides filter capabilities for all endpoints that return a list of elements, and supports pagination.
 
-14. The API filtering allows definition of operations precedence and use any combination of the available fields.
+13. The API filtering allows definition of operations precedence and use any combination of the available fields.
 
-15. The application includes rigorous unit tests.
+14. The application includes rigorous unit tests.
 
-16. End 2 end scenarios are tested via a python client written in a [Jupyter notebook](http://jupyter.org/)
+15. End 2 end scenarios are tested via a python client written in a [Jupyter notebook](http://jupyter.org/)
 
 
 ### Framework & Extensions
