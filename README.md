@@ -2,9 +2,13 @@
 
 Portfolio project to demonstrate a Flask based implementation of a secure user model with registration, email confirmation, and Google oauth2 login, combined with an example catalog of items grouped in categories. Registered users can CRUD the catalog via a web front-end or via a REST API that adheres strictly to the  [JSON API 1.0](http://jsonapi.org/) specification. The REST API supports advanced searching and filtering. End 2 end scenarios are demonstrated via a python client written in a [Jupyter notebook](http://jupyter.org/).
 
-### Deployed on Heroku
+# Deployed on Heroku
 
-The application is deployed on https://flask-catalog.herokuapp.com/, so please follow along and visit the pages.
+The application is deployed on https://flask-catalog.herokuapp.com/, so please follow along and interact with the front end via a browser or interact with the back end via API calls.
+
+
+
+# Front End
 
 ------
 
@@ -16,6 +20,10 @@ The home page shows a Jumbotron with some branding, three buttons (Visit, Regist
 
 Note the favicon icon in the browser tab, which shows a beer stein, since the catalog is populated with beers.
 
+
+
+
+
 ------
 
 ##### Main page - categories: [https://flask-catalog.herokuapp.com/catalog/categories/1/items](https://flask-catalog.herokuapp.com/catalog/categories/1/items)
@@ -26,6 +34,10 @@ When you click the Visit>> button on the home page, you are directed to the main
 
 The Categories are listed on the left side of the page, while the beers (items) that belong to the selected category are listed on the right side.
 
+
+
+
+
 ------
 
 ##### Main page - items: [https://flask-catalog.herokuapp.com/catalog/categories/1/items/4/](https://flask-catalog.herokuapp.com/catalog/categories/1/items/4/)
@@ -33,6 +45,10 @@ The Categories are listed on the left side of the page, while the beers (items) 
 ![visit_2](./images_for_readme/visit_2.gif)
 
 When you click on a beer in the list on the right side, a redirection takes place to the selected item in the selected category. The example image shows how the selected beer is always shown at the top of the list, with an expanded view where the description is given.
+
+
+
+
 
 ------
 
@@ -44,6 +60,10 @@ When you change the browser window size, notice how the Navbar is nicely collaps
 
 This pretty much completes what a visitor of the catalog can do without logging in.
 
+
+
+
+
 ------
 
 ##### Register/Login dropdown
@@ -51,6 +71,10 @@ This pretty much completes what a visitor of the catalog can do without logging 
 ![visit_4](./images_for_readme/visit_4.gif)
 
 When a user is not authenticated, the Navbar shows a dropdown on the right side that provides options for Register and Log in. 
+
+
+
+
 
 ------
 
@@ -62,6 +86,10 @@ The login page can be reached from the home page or from the Navbar dropdown.
 
 As the image shows, one can login with an email & password, but that requires you to first register an account. A more convenient approach is to sign in with the service listed at the bottom, which uses Google OAUTH2 to authenticate you and log you in. Please first login with your google account.
 
+
+
+
+
 ------
 
 ##### Google Login
@@ -71,6 +99,10 @@ As the image shows, one can login with an email & password, but that requires yo
 
 
 When you click on the Google Sign in button, you will be asked to authenticate yourself with a gmail address. Upon successful authentication, the flask-catalog application will verify on the server side that all is indeed OK by making a call to the Google OAUTH2 API. If all is fine, your email will be registered as a confirmed user, and you will be logged in. 
+
+
+
+
 
 ------
 
@@ -86,13 +118,105 @@ Note that above both the categories and the items lists you can find options to 
 
 Also note that the Navbar has changed. A link is added to get back to this main page, and the dropdown  now shows your name.
 
+
+
+
+
+------
+
+##### Edit Category that you do not own: [https://flask-catalog.herokuapp.com/catalog/categories/1/edit](https://flask-catalog.herokuapp.com/catalog/categories/1/edit)
+
+![categories_1](./images_for_readme/categories_1.png)
+
+When you try to edit the first Category, you will be redirected to a custom 403.html page that looks like the image shown. This will happen for Edit & Delete actions on **categories and items** that you do not own.
+
+
+
+
+
+------
+
+##### Add Category: [https://flask-catalog.herokuapp.com/catalog/categories/add](https://flask-catalog.herokuapp.com/catalog/categories/add)
+
+![categories_2](./images_for_readme/categories_2.png)
+
+So, lets add a Category to our beer catalog. When clicking the add link, it brings up a page where you can fill out the name of the new category, and then click Create.
+
+![categories_3](./images_for_readme/categories_3.png)
+
+The new category is added to the database, and you will be redirected to a page that shows all the items in this new category, which off course is an empty list for now.
+
+Note that a message is flashed back to you to confirm that the category was added.
+
+
+
+
+
+------
+
+##### Add Item: [https://flask-catalog.herokuapp.com/catalog/categories/3/items/add](https://flask-catalog.herokuapp.com/catalog/categories/3/items/add)
+
+![items_1](./images_for_readme/items_1.png)
+
+Lets add some beers to our new category, by clicking on the Add link in the right column. This brings up a page where you can fill out the name of the new beer with a description, and then click Create. 
+
+![items_2](./images_for_readme/items_2.png)
+
+The new beer is added to the database, and you will be redirected to a page that shows all the items in the category, with the newly selected beer selected and shown at the top of the page.
+
+Note that a message is flashed back to you to confirm that the category was added.
+
+Lets try this again:
+
+![items_3](./images_for_readme/items_3.png)
+
+Note how the latest beer you add always is automatically selected and shown at the top of the list.
+
+![items_4](./images_for_readme/items_4.png)
+
+You are allowed to also add new beers to a category that you do not own. This comes with a danger though, because when the owner of the category deletes that category (see below) or decides to delete the account altogether, all the beers of that category will be deleted.
+
+
+
+
+
+------
+
+##### Edit an owned item: [https://flask-catalog.herokuapp.com/catalog/categories/3/items/42/edit](https://flask-catalog.herokuapp.com/catalog/categories/3/items/42/edit)
+
+![items_5](./images_for_readme/items_5.png)
+
+Any category or item that you own can be edited, as shown here for an item.
+
+
+
+
+
+------
+
+##### Delete an owned category or item:
+
+![delete_1](./images_for_readme/delete_1.png)
+
+![delete_2](./images_for_readme/delete_2.png)
+
+When you click on the Delete link for an owned category or item, the application will first ask for confirmation. If you click on Delete, it will go ahead and delete the selected Category or Item. When you delete a category it will also delete all the items in it. Once done, a message is flashed back.
+
+
+
+
+
 ------
 
 ##### Logged in user dropdown: 
 
 ![logged_in_2](./images_for_readme/logged_in_2.png)
 
-Once logged in, you have access to some user options to update your profile, reset your password, log out or delete your account. Lets try them all out.
+As a logged in user, you have access to some user options to update your profile, reset your password, log out or delete your account. Lets try them all out.
+
+
+
+
 
 ------
 
@@ -101,6 +225,10 @@ Once logged in, you have access to some user options to update your profile, res
 ![profile_1](./images_for_readme/profile_1.png)
 
 On the profile page, the logged in user can update the profile picture, email, first name and last name. Since I logged in with Google, the profile picture that I have stored with my Google account is used, but if I want I can upload another picture. 
+
+
+
+
 
 ------
 
@@ -112,15 +240,15 @@ On the profile page, the logged in user can update the profile picture, email, f
 
 
 
-When selecting Reset Password from the dropdown in the Navbar while logged in, the application will immediately send out an email, and display a message to check your your email, which looks like this:
-
-
+When selecting Reset Password from the dropdown in the Navbar while logged in, the application will send you an email, and display a message to check your your email, which looks like this:
 
 ![reset_password_2](./images_for_readme/reset_password_2.png)
 
+![reset_password_3](./images_for_readme/reset_password_3.png)
+
 When you click on the link in the email, you will be redirected to a form where you can reset your password. Note that in case the registration/login was done with Google OAUTH2, this will be the first time you set your password, so it is not a reset it the literal sense. Once a password has been set, you will then be able to login without Google OAUTH2 and use the applications authentication method.
 
-![reset_password_3](./images_for_readme/reset_password_3.png)
+
 
 
 
@@ -128,15 +256,17 @@ When you click on the link in the email, you will be redirected to a form where 
 
 ##### Delete account:
 
-![delete_account_1](./images_for_readme/delete_account_1.png)
+![delete_1](./images_for_readme/delete_1.png)
 
 
 
-![delete_account_2](./images_for_readme/delete_account_2.png)
+![delete_3](./images_for_readme/delete_3.png)
+
+When you select Delete Account, the application will first ask for confirmation. If you click on Delete, it will go ahead and delete the categories you own, including all the items in it (even those you do not own), the  Items you added to non-owned cateogires, and finally your user account will be deleted. 
+
+Once done, a message is flashed back.
 
 
-
-When you select Delete Account, the application will first ask for confirmation. If you click on Delete, it will go ahead and delete the Categories you own, including all the items in it, the Items you own, and your user account. Once done, a message is flashed back.
 
 
 
@@ -146,81 +276,49 @@ When you select Delete Account, the application will first ask for confirmation.
 
 ![register_1](./images_for_readme/register_1.png)
 
-After deletion of the account, now lets explore registration without using Google OAUTH2. Click on Register>> on the home page, which will redirect you to the registration page, and provide your email and password together with First Name and Last Name, and click 'Register'
+After deletion of the account, now lets explore registration without using Google OAUTH2. Click on **Register>>** on the home page, and you will be redirected you to the registration page, where you are asked to provide your email and password together with First Name and Last Name. 
+
+![register_2](./images_for_readme/register_2.png)
+
+When you click Register, your account will be created, but not yet activated. The application will send you an email, and display a message to check your your email, which looks like this:
+
+![register_3](./images_for_readme/register_3.png)
+
+![register_4](./images_for_readme/register_4.png)
+
+
+
+![register_5](./images_for_readme/register_5.png)
+
+When you click on the link in the email, you will first be asked to login, and if that is successful, your account will be activated.
 
 
 
 
 
+# Back End
+
+The API was developed using a very nice flask extension called [Flask-REST-JSONAPI](http://flask-rest-jsonapi.readthedocs.io/en/latest/). Implementing an API with this extension is a bit more involved than just providing some endpoints that return json, but it gives tremendous capability once finished. For example, it provides automatically:
+
+- JSON responses that adhere strictly to the  [JSON API 1.0](http://jsonapi.org/) specification.
+- Links in the JSON responses to related object, complying with the REST requirement of *discoverability*.
+- Pagination of JSON responses that involve lists.
+- Powerful filtering capability.
+
+The implementation of the API are best documented via example code snippets. You can try them out by downloading this Jupyter notebook to your local disk, and then do the following:
+
+```bash
+(venv) $ cd tests
+(venv) $ jupyter notebook e2e_test_REST_API.ipynb
+```
 
 
 
+This will open up the Jupyter notebook in your default browser
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-​
-
-1. All API calls are authenticated. 
-
-2. New users need to verify their account by email. Users are not able to log in until this verification is complete.
-
-3. There are three roles with different permission levels: 
-   (-) a regular user, who is only able to CRUD their own records
-    (-) a user manager, who is able to CRUD only users
-    (-) an admin, who is able to CRUD all records and users
-
-4. When a user fails to log in three times in a row, his or her account will be blocked automatically, and only admins and managers are able to unblock it.
-
-5. An admin is able to invite someone to the application by specifying an email address; the system will send an invitation message automatically, prompting the user to complete the registration by setting first name, last name, and password.
-
-6. Users are able to upload and change their profile picture.
-
-7. Users can post 'meals', and each meal has a date, time, text, and number of catalog.
-
-8. If the number of catalog is not provided, the API will connect to [Nutritionix](https://www.nutritionix.com) and try to get the number of catalog for the entered meal.
-
-9. In a user setting, a target number of catalog per day is defined.
-
-10. When retrieving the details for a meal an extra boolean field is set to true if the total for that day is less than expected number of catalog per day, otherwise it will be false.
-
-11. The API return data according to the [JSON API 1.0](http://jsonapi.org/) specification
-
-12. The API provides filter capabilities for all endpoints that return a list of elements, and supports pagination.
-
-13. The API filtering allows definition of operations precedence and use any combination of the available fields.
-
-14. The application includes rigorous unit tests.
-
-15. End 2 end scenarios are tested via a python client written in a [Jupyter notebook](http://jupyter.org/)
-
-
-### Framework & Extensions
+# Framework & Extensions
 
 The application is written in [Python 3](https://www.python.org/) using the [Flask](http://flask.pocoo.org/)  microframework, with following extensions.
 
@@ -247,26 +345,65 @@ The end-2-end test client is written in Python with following extensions:
 
 (*) We do not install Bootstrap V4.0.0, but use a CDN.
 
-### API usage
-
-The API is demonstrated in this [end-2-end test scenario](link-to-HTML).
-
-(The link is an HTML export of this [Jupyter notebook](link-to-notebook) after all cells were run.)
 
 
-### Installation
+
+# Installation
 
 Development and testing was done on Ubuntu 16.04, using Python 3.6.2, to be compatible with environment deployed on heroku.
 
-The steps described here show how to run <b>catalog</b> within a python virtual environment.
+The steps described here show how to run locally within a python virtual environment.
 
 **Step 1. Clone the project repository**
 ```bash
-$ git clone https://github.com/ArjaanBuijk/Catalog.git
+$ git clone https://github.com/ArjaanBuijk/FullstackND-Catalog.git
 ```
 
 **Step 2. Configure project**
-Install the secret configuration file into: Catalog/instance/config.py
+Define the environment variables in a **.env** file, including the following variables:
+
+```bash
+SECRET_KEY = '<create-a-secret-key>'
+BCRYPT_LOG_ROUNDS = <an integer>
+
+# Using gmail (FOR EXAMPLE. REPLACE WITH OWN SMTP SERVER)
+MAIL_SERVER = 'smtp.googlemail.com'
+MAIL_PORT = 465
+MAIL_USE_TLS = False
+MAIL_USE_SSL = True
+MAIL_USERNAME = '------@gmail.com'
+MAIL_PASSWORD = '#########'
+MAIL_DEFAULT_SENDER = '-------@gmail.com'
+
+# We initialize one ADMIN, one USERMANAGER and one USER
+ADMIN_EMAIL = '--------'
+ADMIN_PW = '------------'
+ADMIN_FIRST_NAME = 'Default'
+ADMIN_LAST_NAME = 'Admin'
+
+USERMANAGER_EMAIL = 'um@example.com'
+USERMANAGER_PW = '---------------'
+USERMANAGER_FIRST_NAME = 'Default'
+USERMANAGER_LAST_NAME = 'Usermanager'
+
+USER_EMAIL = 'us@example.com'
+USER_PW = '--------------'
+USER_FIRST_NAME = 'Default'
+USER_LAST_NAME = 'User'
+
+# Uploads
+
+IMAGE_DEST = 'application/static/uploads/img'
+DEFAULT_DEST = 'application/static/uploads'
+
+# Google OAUTH2
+# You have to register the app with Google yourself and then copy/paste the credentials
+# json into this environment variable. 
+# Make sure to use TRUE JSON, with " ", not ' '
+GOOGLE_OAUTH2_ENV = '{"web":{"client_id":"-----------","project_id":"-------------","auth_uri":"---------","token_uri":"-----------","auth_provider_x509_cert_url":"---------------","client_secret":"--------------","redirect_uris":["http://localhost:5000/categories/"]}}'
+GOOGLE_OAUTH2_FILE_PATH = '<just-a-name>.json'
+```
+
 Note that for security reasons this configuration file is not included in the github repository.
 
 **Step 3. One time: make sure python3-pip and python3-env are installed**
@@ -275,7 +412,7 @@ $ sudo apt install python3-pip
 $ sudo apt-get install python3-venv
 ```
 
-**Step 4. One time: prepare the python3 virtual environment**
+**Step 4. One time: prepare the python3 virtual environment** 
 ```bash
 $ cd Catalog
 $ python3.6 -m venv venv
@@ -285,7 +422,7 @@ $ source venv/bin/activate
 (venv) $ pip install -r requirements.txt
 ```
 
- Alternatively, instead of installing the required python packages using the file 'requirements.txt', which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package:
+Alternatively, instead of installing the required python packages using the file 'requirements.txt', which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package. Using this script has an advantage in that it also installs and configures the **Jupyter notebook**.
 ```bash
 $ cd Catalog
 $ python3.6 -m venv venv
@@ -351,30 +488,13 @@ pip install psycopg2
 ```
 
 **Step 5. Activate the python virtual environment and start the application server**
-```bash
-$ cd Catalog
-$ source venv/bin/activate
-(venv) $ export FLASK_APP=catalog.py
-(venv) $ flask run
-```
 
- You will see this output printed to the console:
- ```bash
- Connecting to existing data-base...
- * Serving Flask app "catalog"
- * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
- ```
-
-### Notes for developer
-
-**Start with a clean database**
-
-To start with a clean and fresh database, just remove the existing database before starting the application:
+This will start the application with a clean and fresh database that contains only the default content:
 
 ```bash
 $ cd Catalog
 $ source venv/bin/activate
-(venv) $ rm app.db
+(venv) $ reset_db_migrations.sh
 (venv) $ export FLASK_APP=catalog.py
 (venv) $ flask run
 ```
@@ -382,7 +502,6 @@ $ source venv/bin/activate
 You will see this output printed to the console:
 
 ```bash
- Creating & initializing a new data-base...
  * Serving Flask app "catalog"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```

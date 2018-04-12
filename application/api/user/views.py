@@ -1,11 +1,12 @@
 from . import UserSchema
 from .. import api as api_blueprint
+from ..catalog import find_user_by_category_id, find_user_by_item_id
 from ...user import User, Role, Permission
-#from ...meal import Meal, Day
 from ...decorators import admin_required, usermanager_required
 from ...email import send_confirmation_email, send_invitation_email
 from ...extensions import db, login_manager, images
 from ...extensions import api as rest_jsonapi
+
 
 from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
 from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound, \
@@ -14,43 +15,6 @@ from werkzeug.http import HTTP_STATUS_CODES
 from sqlalchemy.orm.exc import NoResultFound
 
 from flask import current_app, g, request, send_from_directory, jsonify, url_for
-
-
-#def find_user_by_meal_id(meal_id):
-    #try:
-        #meal = Meal.query.filter_by(id=meal_id).one()
-    #except NoResultFound:
-        #raise ObjectNotFound({'parameter': 'meal_id'},
-                             #"Meal: {} not found".format(meal_id))
-    #else:
-        #if meal.user is not None:
-            #if (g.current_user.is_administrator() or
-                #meal.user == g.current_user):
-                #return meal.user
-            #else:
-                ## Unauthorized
-                #raise JsonApiException(' ',
-                                       #title = HTTP_STATUS_CODES[403],
-                                       #status = '403')
-        #return None
-
-#def find_user_by_day_id(day_id):
-    #try:
-        #day = Day.query.filter_by(id=day_id).one()
-    #except NoResultFound:
-        #raise ObjectNotFound({'parameter': 'day_id'},
-                             #"Day: {} not found".format(day_id))
-    #else:
-        #if day.user is not None:
-            #if (g.current_user.is_administrator() or
-                #day.user == g.current_user):
-                #return day.user
-            #else:
-                ## Unauthorized
-                #raise JsonApiException(' ',
-                                       #title = HTTP_STATUS_CODES[403],
-                                       #status = '403')
-        #return None
 
 
 ###############################################################################
@@ -127,14 +91,14 @@ class UserDetail(ResourceDetail):
                                        title = HTTP_STATUS_CODES[403],
                                        status = '403')
 
-        # - GET /api/v1/meals/<meal_id>/user
-        if view_kwargs.get('meal_id') is not None:
-            user = find_user_by_meal_id(view_kwargs['meal_id'])
+        # - GET /api/v1/categories/<category_id>/user
+        if view_kwargs.get('category_id') is not None:
+            user = find_user_by_category_id(view_kwargs['category_id'])
             view_kwargs['id'] = user.id
 
-        # - GET /api/v1/days/<day_id>/user
-        if view_kwargs.get('day_id') is not None:
-            user = find_user_by_day_id(view_kwargs['day_id'])
+        # - GET /api/v1/items/<item_id>/user
+        if view_kwargs.get('item_id') is not None:
+            user = find_user_by_item_id(view_kwargs['item_id'])
             view_kwargs['id'] = user.id
 
     schema = UserSchema
@@ -146,13 +110,13 @@ class UserDetail(ResourceDetail):
                   }
 
 
-class UserMealRelationship(ResourceRelationship):
+class UserCategoryRelationship(ResourceRelationship):
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
                   }
 
-class UserDayRelationship(ResourceRelationship):
+class UserItemRelationship(ResourceRelationship):
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
@@ -181,11 +145,11 @@ rest_jsonapi.route(UserList, 'user_list',
 rest_jsonapi.route(UserDetail, 'user_detail',
           '/users/<int:id>')
 
-#rest_jsonapi.route(UserMealRelationship, 'user_meals',
-          #'/users/<int:id>/relationships/meals/')
+rest_jsonapi.route(UserCategoryRelationship, 'user_categories',
+          '/users/<int:id>/relationships/categories/')
 
-#rest_jsonapi.route(UserDayRelationship, 'user_days',
-          #'/users/<int:id>/relationships/days/')
+rest_jsonapi.route(UserItemRelationship, 'user_items',
+          '/users/<int:id>/relationships/items/')
 
 
 

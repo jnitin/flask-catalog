@@ -28,8 +28,6 @@ class UserSchema(Schema):
     profile_pic_filename = fields.Str(load_only=True)
     profile_pic_url = fields.Str()
 
-    daily_calories_target = fields.Float()
-
     meals = Relationship(self_view='api.user_meals',
                          self_view_kwargs={'id': '<id>'},
                          related_view='api.meal_list',
