@@ -641,7 +641,164 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(u.failed_logins, 0)
 
 
-    def test_2_0_create_user_and_add_item(self):
+    def test_2_0_get_users(self):
+        url = '/api/v1/users/'
+
+        # admin can retrieve all 3 users
+        headers = self.get_api_headers(current_app.config['ADMIN_EMAIL'],
+                                       current_app.config['ADMIN_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 3)
+
+        # manager can retrieve all 3 users
+        headers = self.get_api_headers(current_app.config['USERMANAGER_EMAIL'],
+                                       current_app.config['USERMANAGER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 3)
+
+        # user can retrieve only self
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 1)
+
+    def test_2_1_get_user_by_id(self):
+        url = '/api/v1/users/3'
+
+        # admin can retrieve details of any user
+        headers = self.get_api_headers(current_app.config['ADMIN_EMAIL'],
+                                       current_app.config['ADMIN_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+
+        # manager can retrieve details of any user
+        headers = self.get_api_headers(current_app.config['USERMANAGER_EMAIL'],
+                                       current_app.config['USERMANAGER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+
+        # user can retrieve details of self only
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+
+        url = '/api/v1/users/2'
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_403_FORBIDDEN(response)
+
+    def test_2_2_get_user_by_category_id(self):
+        url = '/api/v1/categories/1/user'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['data']['id'], '3')
+
+    def test_2_3_get_user_by_item_id(self):
+        url = '/api/v1/items/1/user'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['data']['id'], '3')
+
+
+    def test_3_0_get_categories(self):
+        url = '/api/v1/categories/'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 2)
+
+    def test_3_1_get_category_by_id(self):
+        url = '/api/v1/categories/2'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['data']['id'], '2')
+
+    def test_3_2_get_categories_of_user(self):
+        url = '/api/v1/users/3/categories/'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 2)
+
+    def test_4_0_get_items(self):
+        url = '/api/v1/items/'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 40)
+
+    def test_4_1_get_item_by_id(self):
+        url = '/api/v1/items/21'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['data']['id'], '21')
+
+    def test_4_2_get_items_of_user(self):
+        url = '/api/v1/users/3/items/'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 40)
+
+        url = '/api/v1/users/2/items/'
+
+        headers = self.get_api_headers(current_app.config['USERMANAGER_EMAIL'],
+                                       current_app.config['USERMANAGER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 0)
+
+    def test_4_3_get_items_of_category(self):
+        url = '/api/v1/categories/2/items/'
+
+        headers = self.get_api_headers(current_app.config['USER_EMAIL'],
+                                       current_app.config['USER_PW'])
+        response = self.client().get(url,headers=headers)
+        self.verify_response_is_200_OK(response)
+        json_response = json.loads(response.get_data(as_text=True))
+        self.assertEqual(json_response['meta']['count'], 20)
+
+    def test_10_0_create_user_and_add_item(self):
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {
@@ -680,7 +837,7 @@ class APITestCase(unittest.TestCase):
         self.assertIsNotNone(json_response.get('token'))
         token = json_response['token']
 
-        ## Create an item for this user
+        ## Create an item for this user in the first category
         #url = '/api/v1/itemss/'
         #headers = self.get_api_headers(token,'')
         #data = {

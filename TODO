@@ -385,4 +385,58 @@ promotion
 
 
 
+tests of API must test all routes:
+==================================
+
+
+###########
+## ADMIN ##
+###########
+
+Resource manager | end point name | urls                                | methods	         | Permission
+-----------------|----------------|-------------------------------------|--------------------|-----------
+None             | None           | /api/v1/help                        | GET                | ADMIN
+None             | None           | /api/v1/invite/<string:user_email>  | POST               | ADMIN
+None             | None           | /api/v1/users/<int:user_id>/unblock | POST               | ADMIN
+
+
+###########
+## Users ##
+###########
+
+Resource manager         | end point name  | urls                                             | methods	           | Permission
+-------------------------|-----------------|--------------------------------------------------|--------------------|-----------
+None                     | None            | /api/v1/token                                    | +POST              | USER
+None                     | None            | /api/v1/profile_pic                              | GET, POST          | USER
+UserList                 | user_list       | /api/v1/users/						              | +GET, POST          | USER
+UserDetail               | user_detail     | /api/v1/users/<int:id>                           | +GET, PATCH, DELETE | USER
+UserDetail               | user_detail     | /api/v1//categories/<int:category_id>/user       | +GET, PATCH, DELETE | USER
+UserDetail               | user_detail     | /api/v1//items/<int:item_id>/user                | +GET, PATCH, DELETE | USER
+UserCategoryRelationship | user_categories | /api/v1/users/<int:id>/relationships/categories/ | GET                | USER
+UserItemRelationship     | user_items      | /api/v1/users/<int:id>/relationships/items/      | GET                | USER
+
+################
+## Categories ##
+################
+
+Resource manager | end point name | urls                                 | methods	           | Permission
+-----------------|----------------|--------------------------------------|---------------------|-----------
+CategoryList     | category_list   | /api/v1/categories/                 | +GET, POST           | USER
+CategoryList     | category_list   | /api/v1//users/<int:id>/categories/ | +GET, POST           | USER
+CategoryDetail   | category_detail | /api/v1/categories/<int:id>         | +GET, PATCH, DELETE  | USER
+
+
+###########
+## Items ##
+###########
+
+Resource manager | end point name  | urls                                           | methods	          | Permission
+-----------------|-----------------|------------------------------------------------|---------------------|-----------
+ItemList         | item_list       | /api/v1/items/	                                | +GET, POST           | USER
+ItemList         | item_list       | /api/v1/users/<int:id>/items/	                | +GET, POST           | USER
+ItemList         | item_list       | /api/v1/categories/<int:category_id>/items/	| +GET, POST           | USER
+ItemDetail       | item_detail     | /api/v1/items/<int:id>				            | +GET, PATCH, DELETE  | USER
+
+
+Get all items of a user via relationships. Do NOT create a special route...
 

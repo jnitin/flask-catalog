@@ -24,9 +24,12 @@ from flask import current_app, g, request, send_from_directory, jsonify, url_for
 #    https://github.com/miLibris/flask-rest-jsonapi/blob/master/flask_rest_jsonapi/resource.py
 
 class UserList(ResourceList):
+    """ResourceList: provides get and post methods to retrieve a collection of
+                     objects or create one"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, view_kwargs):
         # we come here when querying:
-        # GET /api/users
+        # GET /api/v1/users
         query_ = self.session.query(User)
 
         # If  current user is not administrator or usermanager,
@@ -59,24 +62,22 @@ class UserList(ResourceList):
             # send user a confirmatin link via email
             send_confirmation_email(obj)
 
-
-    def before_get_object(self, view_kwargs):
-        ...
-        pass
-
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
                   'methods': {
                       'query': query,
                       'before_create_object': before_create_object,
-                      'after_create_object': after_create_object,
-                      'before_get_object': before_get_object
+                      'after_create_object': after_create_object
                   }
                   }
 
 
 class UserDetail(ResourceDetail):
+    """ResourceDetail: provides get, patch and delete methods to retrieve
+                       details of an object, update an object and delete an
+                       object"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def before_get_object(self, view_kwargs):
         # Find the user and check access permission if we got here through:
         # - GET /api/v1/users/<id>
@@ -111,39 +112,64 @@ class UserDetail(ResourceDetail):
 
 
 class UserCategoryRelationship(ResourceRelationship):
+    """ResourceRelationship: provides get, post, patch and delete methods to
+                             get relationships, create relationships, update
+                             relationships and delete relationships between
+                             objects."""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
+    def before_get_object(self, view_kwargs):
+        ...
+        pass
+
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
+                  'methods': {
+                      'before_get_object': before_get_object
                   }
+                  }
+    methods = ['GET']  # only implement GET. rest is done automatic.
 
 class UserItemRelationship(ResourceRelationship):
+    """ResourceRelationship: provides get, post, patch and delete methods to
+                             get relationships, create relationships, update
+                             relationships and delete relationships between
+                             objects."""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
                   }
+    methods = ['GET']  # only implement GET. rest is done automatic.
 
 ###############################################################################
 # Flask-REST-JSONAPI: Create endpoints (routes)
 #
-#http://flask-rest-jsonapi.readthedocs.io/en/latest/flask-rest-jsonapi.html
+# http://flask-rest-jsonapi.readthedocs.io/en/latest/routing.html
+# -> api.route(<Resource manager>, <endpoint name>, <url_1>, <url_2>, ...)
 #
-#Parameters given to api.route:
+# http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+# -> ResourceList:         provides get and post methods to retrieve a
+#                          collection of objects or create one.
 #
-# resource (Resource) – a resource class inherited from
-#                       flask_rest_jsonapi.resource.Resource
-#                       -> see resource_managers.py
-# view (str) – the view name
-#              -> used eg. in check_permissions
-# urls (list) – the urls of the view
-#               -> used by clients in CRUD requests
-# kwargs (dict) – additional options of the route
-
+# -> ResourceDetail:       provides get, patch and delete methods to retrieve
+#                          details of an object, update an object and delete an
+#                          object
+#
+# -> ResourceRelationship: provides get, post, patch and delete methods to get
+#                          relationships, create relationships, update
+#                          relationships and delete relationships between
+#                          objects.
 
 rest_jsonapi.route(UserList, 'user_list',
           '/users/')
 
 rest_jsonapi.route(UserDetail, 'user_detail',
-          '/users/<int:id>')
+          '/users/<int:id>',
+          '/categories/<int:category_id>/user',
+          '/items/<int:item_id>/user')
 
 rest_jsonapi.route(UserCategoryRelationship, 'user_categories',
           '/users/<int:id>/relationships/categories/')

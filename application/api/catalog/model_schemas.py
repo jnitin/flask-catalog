@@ -15,12 +15,13 @@ class CategorySchema(Schema):
     name = fields.Str()
 
     user = Relationship(attribute='user',
-                        self_view='api.category_user',
-                        self_view_kwargs={'id': '<id>'},
-                        related_view='api.user_detail',
-                        related_view_kwargs={'category_id': '<id>'},
-                        schema='UserSchema',
-                        type_='user')
+                          self_view='api.category_user',
+                          self_view_kwargs={'category_id': '<id>'},
+                          related_view='api.user_detail',
+                          related_view_kwargs={'category_id': '<id>'},
+                          schema='UserSchema',
+                          type_='user')
+
 
 
 class ItemSchema(Schema):
@@ -37,7 +38,7 @@ class ItemSchema(Schema):
 
     user = Relationship(attribute='user',
                         self_view='api.item_user',
-                        self_view_kwargs={'id': '<id>'},
+                        self_view_kwargs={'item_id': '<id>'},
                         related_view='api.user_detail',
                         related_view_kwargs={'item_id': '<id>'},
                         schema='UserSchema',

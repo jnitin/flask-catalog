@@ -28,18 +28,18 @@ class UserSchema(Schema):
     profile_pic_filename = fields.Str(load_only=True)
     profile_pic_url = fields.Str()
 
-    meals = Relationship(self_view='api.user_meals',
+    categories = Relationship(self_view='api.user_categories',
+                        self_view_kwargs={'id': '<id>'},
+                        related_view='api.category_list',
+                        related_view_kwargs={'id': '<id>'},
+                        many=True,
+                        schema='CategorySchema',
+                        type_='category')
+
+    items = Relationship(self_view='api.user_items',
                          self_view_kwargs={'id': '<id>'},
-                         related_view='api.meal_list',
+                         related_view='api.item_list',
                          related_view_kwargs={'id': '<id>'},
                          many=True,
                          schema='ItemSchema',
-                         type_='meal')
-
-    days = Relationship(self_view='api.user_days',
-                         self_view_kwargs={'id': '<id>'},
-                         related_view='api.day_list',
-                         related_view_kwargs={'id': '<id>'},
-                         many=True,
-                         schema='DaySchema',
-                         type_='day')
+                         type_='item')

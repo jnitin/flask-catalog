@@ -46,7 +46,21 @@ def query_for_user_only(query_, user_id):
 
     return query_
 
+def query_for_category_only(query_, category_id):
+    """If the category's id is given, query only for that category's data only"""
+    try:
+        Category.query.filter_by(id=category_id).one()
+    except NoResultFound:
+        raise ObjectNotFound({'parameter': 'category_id'}, "Category: {} not found".format(category_id))
+    else:
+        query_ = query_.join(Category).filter(Category.id == category_id)
+
+    return query_
+
 class CategoryList(ResourceList):
+    """ResourceList: provides get and post methods to retrieve a collection of
+                     objects or create one"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, view_kwargs):
         # we come here when querying categories:
         # GET /api/v1/categories
@@ -79,7 +93,14 @@ class CategoryList(ResourceList):
                   }
 
 
+
+
 class CategoryDetail(ResourceDetail):
+    """ResourceDetail: provides get, patch and delete methods to retrieve
+                       details of an object, update an object and delete an
+                       object"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
     schema = CategorySchema
     data_layer = {'session': db.session,
                   'model': Category
@@ -87,22 +108,34 @@ class CategoryDetail(ResourceDetail):
 
 
 class CategoryUserRelationship(ResourceRelationship):
+    """ResourceRelationship: provides get, post, patch and delete methods to
+                             get relationships, create relationships, update
+                             relationships and delete relationships between
+                             objects."""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     schema = CategorySchema
     data_layer = {'session': db.session,
                   'model': Category
                   }
-    methods = ['GET']  # only implement GET
+    methods = ['GET']  # only implement GET. rest is done automatic.
 
 
-class CategoryItemRelationship(ResourceRelationship):
-    schema = CategorySchema
-    data_layer = {'session': db.session,
-                  'model': Category
-                  }
-    methods = ['GET']  # only implement GET
+#class CategoryItemRelationship(ResourceRelationship):
+    #"""ResourceRelationship: provides get, post, patch and delete methods to
+                             #get relationships, create relationships, update
+                             #relationships and delete relationships between
+                             #objects."""
+    ## http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+    #schema = CategorySchema
+    #data_layer = {'session': db.session,
+                  #'model': Category
+                  #}
 
 
 class ItemList(ResourceList):
+    """ResourceList: provides get and post methods to retrieve a collection of
+                     objects or create one"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, view_kwargs):
         # we come here when querying items:
         # GET /api/v1/items
@@ -113,15 +146,20 @@ class ItemList(ResourceList):
         if user_id:
             query_ = query_for_user_only(query_, user_id)
 
+        category_id = view_kwargs.get('category_id')
+        if category_id:
+            query_ = query_for_category_only(query_, category_id)
+
         return query_
 
     def before_create_object(self, data, view_kwargs):
-        # POST /api/v1/items
+        # POST /api/v1/categories/<int:id>/items
 
-        if ('category_id' not in data and
-            'name' not in data and
+        category_id = view_kwargs.get('id')
+
+        if ('name' not in data and
             'description' not in data):
-            raise BadRequest('Must include category_id, name and description ',
+            raise BadRequest('Must include id (of category), name and description ',
                              'fields')
 
         try:
@@ -134,6 +172,9 @@ class ItemList(ResourceList):
         # set the foreign key to the logged in user
         data['user_id'] = g.current_user.id
 
+        # set the foreign key for category
+        data['category_id'] = category.id
+
     schema = ItemSchema
     data_layer = {'session': db.session,
                   'model': Item,
@@ -145,6 +186,11 @@ class ItemList(ResourceList):
 
 
 class ItemDetail(ResourceDetail):
+    """ResourceDetail: provides get, patch and delete methods to retrieve
+                       details of an object, update an object and delete an
+                       object"""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
     schema = ItemSchema
     data_layer = {'session': db.session,
                   'model': Item
@@ -152,66 +198,72 @@ class ItemDetail(ResourceDetail):
 
 
 class ItemUserRelationship(ResourceRelationship):
+    """ResourceRelationship: provides get, post, patch and delete methods to
+                             get relationships, create relationships, update
+                             relationships and delete relationships between
+                             objects."""
+    # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
     schema = ItemSchema
     data_layer = {'session': db.session,
                   'model': Item
                   }
-    methods = ['GET']  # only implement GET
 
 
-class ItemCategoryRelationship(ResourceRelationship):
-    schema = ItemSchema
-    data_layer = {'session': db.session,
-                  'model': Item
-                  }
-    methods = ['GET']  # only implement GET
+#class ItemCategoryRelationship(ResourceRelationship):
+    #"""ResourceRelationship: provides get, post, patch and delete methods to
+                             #get relationships, create relationships, update
+                             #relationships and delete relationships between
+                             #objects."""
+    ## http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+
+    #schema = ItemSchema
+    #data_layer = {'session': db.session,
+                  #'model': Item
+                  #}
 
 
 ###############################################################################
 # Flask-REST-JSONAPI: Create endpoints (routes)
 #
-#http://flask-rest-jsonapi.readthedocs.io/en/latest/flask-rest-jsonapi.html
+# http://flask-rest-jsonapi.readthedocs.io/en/latest/routing.html
+# -> api.route(<Resource manager>, <endpoint name>, <url_1>, <url_2>, ...)
 #
-#Parameters given to api.route:
+# http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
+# -> ResourceList:         provides get and post methods to retrieve a
+#                          collection of objects or create one.
 #
-# resource (Resource) – a resource class inherited from
-#                       flask_rest_jsonapi.resource.Resource
-#                       -> see resource_managers.py
-# view (str) – the view name
-#              -> used eg. in check_permissions
-# urls (list) – the urls of the view
-#               -> used by clients in CRUD requests
-# kwargs (dict) – additional options of the route
+# -> ResourceDetail:       provides get, patch and delete methods to retrieve
+#                          details of an object, update an object and delete an
+#                          object
+#
+# -> ResourceRelationship: provides get, post, patch and delete methods to get
+#                          relationships, create relationships, update
+#                          relationships and delete relationships between
+#                          objects.
 
 ##########################################################################
-
 rest_jsonapi.route(CategoryList, 'category_list',
                    '/categories/',
-          '/users/<int:id>/categories/',
-          '/items/<int:id>/categories/')
+                   '/users/<int:id>/categories/')
 
 rest_jsonapi.route(CategoryDetail, 'category_detail',
                    '/categories/<int:id>')
 
 rest_jsonapi.route(CategoryUserRelationship, 'category_user',
-                   '/categories/<int:id>/relationships/user')
+                   '/categories/<int:category_id>/relationships/user')
 
-rest_jsonapi.route(CategoryItemRelationship, 'category_item',
-                   '/categories/<int:id>/relationships/item')
 
 ##########################################################################
 rest_jsonapi.route(ItemList, 'item_list',
                    '/items/',
-          '/users/<int:id>/items/')
+                   '/users/<int:id>/items/',
+                   '/categories/<int:category_id>/items/')
 
 rest_jsonapi.route(ItemDetail, 'item_detail',
-                   '/items/<int:id>',
-          '/categories/<int:category_id>/item')
+                   '/items/<int:id>')
 
 rest_jsonapi.route(ItemUserRelationship, 'item_user',
-                   '/items/<int:id>/relationships/user')
-
-rest_jsonapi.route(ItemCategoryRelationship, 'item_categories',
-                   '/items/<int:id>/relationships/categories/')
+                   '/items/<int:item_id>/relationships/user')
 
 ##########################################################################
