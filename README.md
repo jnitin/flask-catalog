@@ -305,16 +305,88 @@ The API was developed using a very nice flask extension called [Flask-REST-JSONA
 - Pagination of JSON responses that involve lists.
 - Powerful filtering capability.
 
-The implementation of the API are best documented via example code snippets. You can try them out by downloading this Jupyter notebook to your local disk, and then do the following:
+The implementation of the API are best documented via examples. You can try them out by running this Jupyter notebook from your computer:
 
 ```bash
 (venv) $ cd tests
-(venv) $ jupyter notebook e2e_test_REST_API.ipynb
+(venv) $ jupyter notebook e2e_REST_API_small_demo_heroku.ipynb
 ```
 
+This will open up the Jupyter notebook in your default browser, and you can run the commands.
 
+You can view an executed notebook, exported as HTML [here](https://flask-catalog.herokuapp.com/static/docs/e2e_REST_API_all_localhost.html).
 
-This will open up the Jupyter notebook in your default browser
+In the examples it is shown that every API call is authenticated, either with user+password, or by means of a JWT token.
+
+To get all the categories you can use this request in python:
+
+```python
+url = SERVER+'/api/v1/categories/'
+headers = get_api_headers(token,'')
+r = requests.get(url, headers=headers)
+```
+
+Utilities are provided in the Jupyter notebook to print the request and response, and the output is:
+
+```json
+=================================
+===THE REQUEST WE SENT===
+=================================
+
+--------------------------------------------------------------
+REQUEST METHOD and URL:
+GET https://flask-catalog.herokuapp.com/api/v1/categories/
+
+REQUEST HEADER:
+{ 'Accept': 'application/vnd.api+json',
+  'Accept-Encoding': 'gzip, deflate',
+  'Authorization': 'Basic '
+                   'ZXlKaGJHY2lPaUpJVXpJMU5pSXNJbWxoZENJNk1UVXlNelkxTXpJMk5Td2laWGh3SWpveE5USXpOalUyT0RZMWZRLmV5SnBaQ0k2TTMwLlJaVmg5cUEtTVpFd21IZ1BwaURDMDdtU0JvYTBpNUNpUk5UdE92VWQ1OEk6',
+  'Connection': 'keep-alive',
+  'Content-Type': 'application/vnd.api+json',
+  'User-Agent': 'python-requests/2.18.4'}
+
+REQUEST BODY:
+request.body is empty
+--------------------------------------------------------------
+=================================
+===THE RESPONSE WE RECEIVED===
+=================================
+
+--------------------------------------------------------------
+RESPONSE STATUS CODE:
+200
+
+RESPONSE HEADER:
+{ 'Connection': 'keep-alive',
+  'Content-Length': '705',
+  'Content-Type': 'application/json, application/vnd.api+json',
+  'Date': 'Fri, 13 Apr 2018 21:01:23 GMT',
+  'Server': 'gunicorn/19.7.1',
+  'Via': '1.1 vegur'}
+
+RESPONSE TEXT (Body):
+{ 'data': [ { 'attributes': { 'name': 'American Amber / Red Ale',
+                              'timestamp': '2018-04-11T21:16:20.990182+00:00'},
+              'id': '1',
+              'links': {'self': '/api/v1/categories/1'},
+              'relationships': { 'user': { 'links': { 'related': '/api/v1/categories/1/user',
+                                                      'self': '/api/v1/categories/1/relationships/user'}}},
+              'type': 'category'},
+            { 'attributes': { 'name': 'American Barleywine',
+                              'timestamp': '2018-04-11T21:16:21.099433+00:00'},
+              'id': '2',
+              'links': {'self': '/api/v1/categories/2'},
+              'relationships': { 'user': { 'links': { 'related': '/api/v1/categories/2/user',
+                                                      'self': '/api/v1/categories/2/relationships/user'}}},
+              'type': 'category'}],
+  'jsonapi': {'version': '1.0'},
+  'links': {'self': 'https://flask-catalog.herokuapp.com/api/v1/categories/'},
+  'meta': {'count': 2}}
+--------------------------------------------------------------
+```
+
+Similar examples are provided to get the details of a certain category or item.
 
 
 
