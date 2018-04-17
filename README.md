@@ -564,10 +564,10 @@ pip install psycopg2
 This will start the application with a clean and fresh database that contains only the default content:
 
 ```bash
-$ cd Catalog
+$ cd FullstackND-Catalog
 $ source venv/bin/activate
-(venv) $ reset_db_migrations.sh
 (venv) $ export FLASK_APP=catalog.py
+(venv) $ ./reset_db_migrations.sh
 (venv) $ flask run
 ```
 
