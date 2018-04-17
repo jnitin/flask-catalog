@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-# to get access to application/*.py
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import os
+import sys
 import unittest
 from config import Config
 import time
@@ -12,6 +10,7 @@ from application.user import User, AnonymousUser, Role, Permission
 from application.extensions import db
 from application.extensions import api as rest_jsonapi
 
+
 class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'  # In memory database
@@ -20,12 +19,13 @@ class TestConfig(Config):
     CSRF_ENABLED = False
     WTF_CSRF_ENABLED = False
 
+
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
         # avoid error from jsonapi. See description in tests_api.py
         rest_jsonapi.resources = []
 
-        #self.app = create_app('testing') #TODO: set up like this
+#         self.app = create_app('testing') #TODO: set up like this
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -142,7 +142,7 @@ class UserModelTestCase(unittest.TestCase):
         user_email2 = 'susan@example.org'
         token = User.generate_invitation_token(user_email1)
         self.assertNotEqual(User.get_user_email_from_invitation_token(token),
-                         user_email2)
+                            user_email2)
 
     def test_expired_invitation_token(self):
         user_email = 'john@example.com'
@@ -178,7 +178,6 @@ class UserModelTestCase(unittest.TestCase):
         self.assertFalse(u.can(Permission.CRUD_OWNED))
         self.assertFalse(u.can(Permission.CRUD_USERS))
         self.assertFalse(u.can(Permission.ADMIN))
-
 
     def test_to_json(self):
         u = User(email='john@example.com', password='cat')

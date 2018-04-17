@@ -3,12 +3,13 @@
 import pprint
 import json
 
+
 def pprint_sequence(sequence):
-    if (sequence is not None and len(sequence)>0):
+    if (sequence is not None and len(sequence) > 0):
         pp = pprint.PrettyPrinter(indent=2)
         pp.pprint(sequence)
     else:
-        print ('sequence has no content')
+        print('sequence has no content')
 
 
 def pprint_response(response, print_data=True):
@@ -16,22 +17,22 @@ def pprint_response(response, print_data=True):
 
     print('\n--------------------------------------------------------------')
     print('RESPONSE STATUS CODE:')
-    print (response)
+    print(response)
 
     print('\nRESPONSE HEADER:')
     if response.headers is not None:
         pprint_sequence(response.headers.to_wsgi_list())
     else:
-        print ('response.headers has no content')
-
+        print('response.headers has no content')
 
     print('\nRESPONSE DATA:')
     if print_data and response.data is not None:
         pprint_sequence(json.loads(response.data.decode()))
     else:
-        print ('response.data has no content')
+        print('response.data has no content')
 
     print('--------------------------------------------------------------')
+
 
 def ordered(obj):
     """Sorts a json dictionary, so we can do a compare.

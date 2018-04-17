@@ -1,15 +1,18 @@
 """Contains non-sensitive configurations for application"""
 
-import os, os.path
+import os
+import os.path
 import json
 from dotenv import load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))  # path to this file
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # path to this file
 
 # load content of .env as environment variables for our application
-load_dotenv(os.path.join(basedir, '.env'))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
 
 class Config(object):
+    """Configuration of the flask application."""
     APP_NAME = "application"  # must be same as folder name
     COPYRIGHT = "Arjaan Buijk 2018"
 
@@ -34,10 +37,14 @@ class Config(object):
     ADMIN_FIRST_NAME = os.environ.get('ADMIN_FIRST_NAME') or 'Example'
     ADMIN_LAST_NAME = os.environ.get('ADMIN_LAST_NAME') or 'Admin'
 
-    USERMANAGER_EMAIL = os.environ.get('USERMANAGER_EMAIL') or 'manager@example.com'
-    USERMANAGER_PW = os.environ.get('USERMANAGER_PW') or 'not-so-good-password'
-    USERMANAGER_FIRST_NAME = os.environ.get('USERMANAGER_FIRST_NAME') or 'Example'
-    USERMANAGER_LAST_NAME = os.environ.get('USERMANAGER_LAST_NAME') or 'Manager'
+    USERMANAGER_EMAIL = os.environ.get('USERMANAGER_EMAIL') or \
+        'manager@example.com'
+    USERMANAGER_PW = os.environ.get('USERMANAGER_PW') or \
+        'not-so-good-password'
+    USERMANAGER_FIRST_NAME = os.environ.get('USERMANAGER_FIRST_NAME') or \
+        'Example'
+    USERMANAGER_LAST_NAME = os.environ.get('USERMANAGER_LAST_NAME') or \
+        'Manager'
 
     USER_EMAIL = os.environ.get('USER_EMAIL') or 'user@example.com'
     USER_PW = os.environ.get('USER_PW') or 'not-so-good-password'
@@ -46,15 +53,15 @@ class Config(object):
 
     # During development, use sqlite database on disk
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+        'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Avoid DeprecationWarning: Request.is_xhr is deprecated.
     JSONIFY_PRETTYPRINT_REGULAR = False
 
-    ####################################
-    ## Uploads (eg. profile pictures) ##
-    ####################################
+    ##################################
+    # Uploads (eg. profile pictures) #
+    ##################################
 
     IMAGE_DEST = os.environ.get('IMAGE_DEST')
     DEFAULT_DEST = os.environ.get('DEFAULT_DEST')
@@ -63,16 +70,16 @@ class Config(object):
     UPLOADED_IMAGES_DEST = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         IMAGE_DEST)
-    #UPLOADED_IMAGES_URL = TODO when uploading a lot!
+    # UPLOADED_IMAGES_URL = TODO when uploading a lot!
 
     UPLOADS_DEFAULT_DEST = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         DEFAULT_DEST)
     # UPLOADS_DEFAULT_URL = TODO!
 
-    ###################
-    ## Google OAUTH2 ##
-    ###################
+    #################
+    # Google OAUTH2 #
+    #################
     GOOGLE_OAUTH2 = json.loads(os.environ.get('GOOGLE_OAUTH2_ENV'))
     GOOGLE_OAUTH2_FILE_PATH = os.environ.get('GOOGLE_OAUTH2_FILE_PATH')
     #
@@ -81,11 +88,6 @@ class Config(object):
     GOOGLE_OAUTH2_FILE = os.path.join(
         os.path.dirname(__file__), GOOGLE_OAUTH2_FILE_PATH)
 
-    #print('dumping google oauth2 json to disk')
-    with open(GOOGLE_OAUTH2_FILE,'w') as f:
+    # print('dumping google oauth2 json to disk')
+    with open(GOOGLE_OAUTH2_FILE, 'w') as f:
         json.dump(GOOGLE_OAUTH2, f, indent=4)
-
-
-
-
-
