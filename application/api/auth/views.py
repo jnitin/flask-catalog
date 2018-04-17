@@ -8,6 +8,7 @@ from ...extensions import db
 from flask_rest_jsonapi.exceptions import ObjectNotFound, BadRequest
 from flask import jsonify, g
 
+
 @api_blueprint.route('/token', methods=['POST'])
 def get_token():
     if g.current_user.is_anonymous or g.token_used:

@@ -11,12 +11,13 @@ from ...user import User, AnonymousUser
 # - if NOT OK, it will send back a 401 UNAUTHORIZED error
 basic_auth = HTTPBasicAuth()
 
+
 @basic_auth.verify_password
 def verify_password(email_or_token, password):
     if email_or_token == '':
         # We make 1 exception:
         #  POST /api/v#/users/ to register a new user is allowed without login
-        if (request.endpoint == 'api.user_list' and request.method=='POST'):
+        if (request.endpoint == 'api.user_list' and request.method == 'POST'):
             g.current_user = AnonymousUser()
             return True
 
@@ -42,20 +43,21 @@ def verify_password(email_or_token, password):
 
 @basic_auth.error_handler
 def auth_error():
-    #return unauthorized('Invalid credentials')
+    # return unauthorized('Invalid credentials')
     # g.current_user might not be defined, so wrap it into a try block
     try:
         if g.current_user is not None and g.current_user.blocked:
-            return error_response(403,'Account has been blocked.'
+            return error_response(403, 'Account has been blocked.'
                                   'Contact the site administrator.')
 
         if g.current_user is not None and g.current_user.is_active is False:
-            return error_response(403,"Account is not yet activated."
+            return error_response(403, "Account is not yet activated."
                                   "Please check your email to activate.")
 
         return unauthorized('Invalid credentials')
     except:
         return unauthorized('Invalid credentials')
+
 
 @api_blueprint.before_request
 @basic_auth.login_required

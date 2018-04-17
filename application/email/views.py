@@ -30,6 +30,7 @@ def resend_confirmation():
     flash('A new confirmation email has been sent to you by email.')
     return redirect(url_for('email.check_your_email'))
 
+
 @email.route('/check_your_email')
 def check_your_email():
     logout_user()

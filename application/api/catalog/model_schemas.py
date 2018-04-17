@@ -2,8 +2,9 @@ from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
 from ...catalog import Category, Item
 
+
 class CategorySchema(Schema):
-    """Flask-REST-JSONAPI: Create logical data abstraction for Category model"""
+    """Flask-REST-JSONAPI: Logical data abstraction for Category model"""
     class Meta:
         type_ = 'category'
         self_view = 'api.category_detail'
@@ -15,17 +16,16 @@ class CategorySchema(Schema):
     name = fields.Str()
 
     user = Relationship(attribute='user',
-                          self_view='api.category_user',
-                          self_view_kwargs={'category_id': '<id>'},
-                          related_view='api.user_detail',
-                          related_view_kwargs={'category_id': '<id>'},
-                          schema='UserSchema',
-                          type_='user')
-
+                        self_view='api.category_user',
+                        self_view_kwargs={'category_id': '<id>'},
+                        related_view='api.user_detail',
+                        related_view_kwargs={'category_id': '<id>'},
+                        schema='UserSchema',
+                        type_='user')
 
 
 class ItemSchema(Schema):
-    """Flask-REST-JSONAPI: Create logical data abstraction for Item model"""
+    """Flask-REST-JSONAPI: Logical data abstraction for Item model"""
     class Meta:
         type_ = 'item'
         self_view = 'api.item_detail'
@@ -43,4 +43,3 @@ class ItemSchema(Schema):
                         related_view_kwargs={'item_id': '<id>'},
                         schema='UserSchema',
                         type_='user')
-

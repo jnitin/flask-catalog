@@ -12,12 +12,13 @@ from ..catalog import Category, Item
 
 catalog = Blueprint('catalog', __name__, url_prefix='/catalog')
 
+
 @catalog.route('/categories/',
                methods=['GET'])
 def categories():
     categories = Category.query.all()
     if categories:
-        #redirect it to the first existing category_id
+        # redirect it to the first existing category_id
         return redirect(url_for('catalog.category_items',
                                 category_id=categories[0].id))
     else:
@@ -25,7 +26,7 @@ def categories():
         return render_template('catalog/items.html',
                                categories=[],
                                category_id=0,
-                               category_active = None,
+                               category_active=None,
                                items=[],
                                item_id=0,
                                item_active=None)
@@ -42,11 +43,12 @@ def category_items(category_id):
         return render_template('catalog/items.html',
                                categories=categories,
                                category_id=category_id,
-                               category_active = category_active,
+                               category_active=category_active,
                                items=items,
                                item_id=0,
                                item_active=None)
     abort(404)
+
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/',
                methods=['GET'])
@@ -61,11 +63,12 @@ def category_item(category_id, item_id):
             return render_template('catalog/items.html',
                                    categories=categories,
                                    category_id=category_id,
-                                   category_active = category_active,
+                                   category_active=category_active,
                                    items=items,
                                    item_id=item_id,
                                    item_active=item_active)
     abort(404)
+
 
 @catalog.route('/categories/add',
                methods=['GET', 'POST'])
@@ -91,6 +94,7 @@ def add_category():
 
     return render_template('catalog/add_category.html', form=form)
 
+
 @catalog.route('/categories/<int:category_id>/edit',
                methods=['GET', 'POST'])
 @login_required
@@ -102,7 +106,7 @@ def edit_category(category_id):
         abort(404)
 
     if category_active.user != current_user:
-        message = 'You are not authorized to edit this category, because'+\
+        message = 'You are not authorized to edit this category, because' + \
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
@@ -114,7 +118,7 @@ def edit_category(category_id):
             flash("Category '<b>{}</b>' already exists".format(form.name.data),
                   'danger')
         else:
-            category_active.name=form.name.data
+            category_active.name = form.name.data
             db.session.commit()
 
             flash("Category renamed to '<b>{}</b>'".format(form.name.data),
@@ -124,7 +128,8 @@ def edit_category(category_id):
                                     category_id=category_id))
 
     return render_template('catalog/edit_category.html', form=form,
-                           category_active = category_active)
+                           category_active=category_active)
+
 
 @catalog.route('/categories/<int:category_id>/delete',
                methods=['GET'])
@@ -141,7 +146,7 @@ def delete_category(category_id):
         abort(404)
 
     if category_active.user != current_user:
-        message = 'You are not authorized to delete this category, because'+\
+        message = 'You are not authorized to delete this category, because' + \
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
@@ -195,7 +200,8 @@ def add_category_item(category_id):
                                     item_id=new_item.id))
 
     return render_template('catalog/add_category_item.html', form=form,
-                           category_active = category_active)
+                           category_active=category_active)
+
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/edit',
                methods=['GET', 'POST'])
@@ -208,7 +214,7 @@ def edit_category_item(category_id, item_id):
         abort(404)
 
     if (item_active.user != current_user):
-        message = 'You are not authorized to edit this item, because'+\
+        message = 'You are not authorized to edit this item, because' + \
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
@@ -217,7 +223,7 @@ def edit_category_item(category_id, item_id):
 
     if form.validate_on_submit():
         # update description
-        item_active.description=form.description.data
+        item_active.description = form.description.data
         db.session.commit()
         flash('Successfully updated Item description',
               'success')
@@ -225,10 +231,11 @@ def edit_category_item(category_id, item_id):
         # check if name of item was modified, and if so, if new name is unique
         if form.name.data != item_active.name:
             if Item.query.filter_by(name=form.name.data).first():
-                flash("Cannot rename Item to '<b>{}</b>', because that name already exists".format(form.name.data),
+                flash("Cannot rename Item to '<b>{}</b>', because that name "
+                      "already exists".format(form.name.data),
                       'danger')
             else:
-                item_active.name=form.name.data
+                item_active.name = form.name.data
                 db.session.commit()
 
                 flash('Successfully updated Item name',
@@ -238,11 +245,9 @@ def edit_category_item(category_id, item_id):
                                 category_id=category_id,
                                 item_id=item_id))
 
-
     return render_template('catalog/edit_category_item.html', form=form,
                            category_active=category_active,
                            item_active=item_active)
-
 
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/delete',
@@ -261,7 +266,7 @@ def delete_category_item(category_id, item_id):
         abort(404)
 
     if (item_active.user != current_user):
-        message = 'You are not authorized to delete this item, because'+\
+        message = 'You are not authorized to delete this item, because' + \
             ' you are not the owner'
         return render_template('catalog/403.html', message=message)
 

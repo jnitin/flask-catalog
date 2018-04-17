@@ -7,13 +7,16 @@ from ...email import send_confirmation_email, send_invitation_email
 from ...extensions import db, login_manager, images
 from ...extensions import api as rest_jsonapi
 
-from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
+from flask_rest_jsonapi import ResourceDetail, ResourceList, \
+     ResourceRelationship
 from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound, \
      BadRequest
 from werkzeug.http import HTTP_STATUS_CODES
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import current_app, g, request, send_from_directory, jsonify, url_for
+from flask import current_app, g, request, send_from_directory, jsonify, \
+     url_for
+
 
 def find_user_by_category_id(category_id):
     try:
@@ -40,22 +43,26 @@ def query_for_user_only(query_, user_id):
     try:
         User.query.filter_by(id=user_id).one()
     except NoResultFound:
-        raise ObjectNotFound({'parameter': 'id'}, "User: {} not found".format(user_id))
+        raise ObjectNotFound({'parameter': 'id'}, "User: {} not found".format(
+            user_id))
     else:
         query_ = query_.join(User).filter(User.id == user_id)
 
     return query_
 
+
 def query_for_category_only(query_, category_id):
-    """If the category's id is given, query only for that category's data only"""
+    """Query only for that category's data only"""
     try:
         Category.query.filter_by(id=category_id).one()
     except NoResultFound:
-        raise ObjectNotFound({'parameter': 'category_id'}, "Category: {} not found".format(category_id))
+        raise ObjectNotFound({'parameter': 'category_id'},
+                             "Category: {} not found".format(category_id))
     else:
         query_ = query_.join(Category).filter(Category.id == category_id)
 
     return query_
+
 
 class CategoryList(ResourceList):
     """ResourceList: provides get and post methods to retrieve a collection of
@@ -82,7 +89,6 @@ class CategoryList(ResourceList):
         # set the foreign key to the logged in user
         data['user_id'] = g.current_user.id
 
-
     schema = CategorySchema
     data_layer = {'session': db.session,
                   'model': Category,
@@ -91,8 +97,6 @@ class CategoryList(ResourceList):
                       'before_create_object': before_create_object
                   }
                   }
-
-
 
 
 class CategoryDetail(ResourceDetail):
@@ -120,16 +124,17 @@ class CategoryUserRelationship(ResourceRelationship):
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 
-#class CategoryItemRelationship(ResourceRelationship):
-    #"""ResourceRelationship: provides get, post, patch and delete methods to
-                             #get relationships, create relationships, update
-                             #relationships and delete relationships between
-                             #objects."""
-    ## http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
-    #schema = CategorySchema
-    #data_layer = {'session': db.session,
-                  #'model': Category
-                  #}
+# class CategoryItemRelationship(ResourceRelationship):
+#     """ResourceRelationship: provides get, post, patch and delete methods to
+#                              get relationships, create relationships, update
+#                              relationships and delete relationships between
+#                              objects.
+#     """
+#     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager
+#     schema = CategorySchema
+#     data_layer = {'session': db.session,
+#                   'model': Category
+#                   }
 
 
 class ItemList(ResourceList):
@@ -158,9 +163,9 @@ class ItemList(ResourceList):
         category_id = view_kwargs.get('id')
 
         if ('name' not in data and
-            'description' not in data):
-            raise BadRequest('Must include id (of category), name and description ',
-                             'fields')
+                'description' not in data):
+            raise BadRequest('Must include id (of category), name and '
+                             'description fields')
 
         try:
             category = Category.query.filter_by(id=data['category_id']).one()
@@ -210,17 +215,17 @@ class ItemUserRelationship(ResourceRelationship):
                   }
 
 
-#class ItemCategoryRelationship(ResourceRelationship):
-    #"""ResourceRelationship: provides get, post, patch and delete methods to
-                             #get relationships, create relationships, update
-                             #relationships and delete relationships between
-                             #objects."""
-    ## http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
-
-    #schema = ItemSchema
-    #data_layer = {'session': db.session,
-                  #'model': Item
-                  #}
+# class ItemCategoryRelationship(ResourceRelationship):
+#     """ResourceRelationship: provides get, post, patch and delete methods to
+#                              get relationships, create relationships, update
+#                              relationships and delete relationships between
+#                              objects."""
+#     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager
+#
+#     schema = ItemSchema
+#     data_layer = {'session': db.session,
+#                   'model': Item
+#                   }
 
 
 ###############################################################################

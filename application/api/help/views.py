@@ -19,17 +19,22 @@ def routes_info():
     for rule in current_app.url_map.iter_rules():
         try:
             if rule.endpoint != 'static':
-                if hasattr(current_app.view_functions[rule.endpoint], 'import_name'):
-                    import_name = current_app.view_functions[rule.endpoint].import_name
+                if hasattr(current_app.view_functions[rule.endpoint],
+                           'import_name'):
+                    import_name = current_app.view_functions[
+                        rule.endpoint].import_name
                     obj = import_string(import_name)
-                    routes.append({rule.rule: "%s\n%s" % (",".join(list(rule.methods)), obj.__doc__)})
+                    routes.append({rule.rule: "%s\n%s" % (",".join(
+                        list(rule.methods)), obj.__doc__)})
                 else:
-                    routes.append({rule.rule: current_app.view_functions[rule.endpoint].__doc__})
+                    routes.append({rule.rule: current_app.view_functions[
+                        rule.endpoint].__doc__})
         except Exception as exc:
             routes.append({rule.rule:
                            "(%s) INVALID ROUTE DEFINITION!!!" % rule.endpoint})
             route_info = "%s => %s" % (rule.rule, rule.endpoint)
-            current_app.logger.error("Invalid route: %s" % route_info, exc_info=True)
+            current_app.logger.error("Invalid route: %s" % route_info,
+                                     exc_info=True)
             # func_list[rule.rule] = obj.__doc__
 
     return jsonify(code=200, data=routes)

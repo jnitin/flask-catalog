@@ -51,7 +51,8 @@ class Item(db.Model):
                     {"name": "Hop Head Red Ale",
                      "description": "Made by Green Flash Brewing Co."},
                     {"name": "Amber Ale",
-                     "description": "Made by Bell's Brewery - Eccentric Café & General Store"},
+                     "description": "Made by Bell's Brewery - Eccentric Café "
+                     "& General Store"},
                     {"name": "Hopback Amber Ale",
                      "description": "Made by Tröegs Brewing Company"},
                     {"name": "Flipside Red IPA",
@@ -92,7 +93,8 @@ class Item(db.Model):
                     {"name": "Bigfoot Barleywine-Style Ale",
                      "description": "Made by Sierra Nevada Brewing Co."},
                     {"name": "Third Coast Old Ale",
-                     "description": "Made by Bell's Brewery - Eccentric Café & General Store"},
+                     "description": "Made by Bell's Brewery - Eccentric Café "
+                     "& General Store"},
                     {"name": "Olde School Barleywine",
                      "description": "Made by Dogfish Head Craft Brewery"},
                     {"name": "Old Ruffian Barley Wine",
@@ -102,7 +104,8 @@ class Item(db.Model):
                     {"name": "Old Guardian Barley Wine Style Ale",
                      "description": "Made by Stone Brewing"},
                     {"name": "Old Horizontal",
-                     "description": "Made by Victory Brewing Company - Downingtown"},
+                     "description": "Made by Victory Brewing Company - "
+                     "Downingtown"},
                     {"name": "Behemoth Blonde Barleywine",
                      "description": "Made by 3 Floyds Brewing Co."},
                     {"name": "Olde GnarlyWine",
@@ -111,12 +114,14 @@ class Item(db.Model):
                      "description": "Made by AleSmith Brewing Company"},
                     {"name": "Flying Mouflan",
                      "description": "Made by Tröegs Brewing Company"},
-                    {"name": "Sierra Nevada Bigfoot Barleywine Style Ale - Barrel-Aged",
+                    {"name": "Sierra Nevada Bigfoot Barleywine Style Ale - "
+                     "Barrel-Aged",
                      "description": "Made by Sierra Nevada Brewing Co."},
                     {"name": "XS Old Crustacean",
                      "description": "Made by Rogue Ales"},
                     {"name": "Doggie Claws",
-                     "description": "Made by Hair of the Dog Brewing Company / Brewery and Tasting Room"},
+                     "description": "Made by Hair of the Dog Brewing Company "
+                     "/ Brewery and Tasting Room"},
                     {"name": "A Deal With The Devil",
                      "description": "Made by Anchorage Brewing Company"},
                     {"name": "Cockeyed Cooper",
@@ -133,7 +138,8 @@ class Item(db.Model):
             }
         ]
 
-        usr = User.query.filter_by(email=current_app.config['USER_EMAIL']).one()
+        usr = User.query.filter_by(
+            email=current_app.config['USER_EMAIL']).one()
         for beer in beers:
             category_name = beer['category']
             new_category = Category(name=category_name,

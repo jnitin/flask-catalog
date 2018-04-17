@@ -27,7 +27,7 @@ def profile():
         last_name = form.last_name.data
 
         if client_file_storage:
-            current_user.profile_pic = client_file_storage  # Calls our "setter"
+            current_user.profile_pic = client_file_storage  # Calls "setter"
 
         if email and email != current_user.email:
             # Note: in forms we already validate if email is unique
@@ -59,7 +59,7 @@ def delete_account():
 
     User.delete_account(current_user)
 
-    flash("Deleted account '<b>{}</b>' and all owned Categories and Items".format(email),
-          'success')
+    flash("Deleted account '<b>{}</b>' and all owned Categories and "
+          "Items".format(email), 'success')
 
     return redirect(url_for('auth.index'))

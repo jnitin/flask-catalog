@@ -18,28 +18,33 @@ def send_async_email(msg):
     with current_app.app_context():
         mail.send(msg)
 
+
 def send_email(subject, recipients, html_body):
     """Sends emails to recipients"""
     msg = Message(subject, recipients=recipients)
     msg.html = html_body
 
-    #TODO: Send async
-    mail.send(msg) # outcomment this to do async
-    #thr = Thread(target=send_async_email, args=[msg])
-    #thr.start()
+    # TODO: Send async
+    mail.send(msg)  # outcomment this to do async
+    # thr = Thread(target=send_async_email, args=[msg])
+    # thr.start()
+
 
 def get_confirmation_link(user):
     token = user.generate_confirmation_token()
     return url_for('email.confirm', token=token, _external=True)
+
 
 def get_invitation_link(user_email):
     token = User.generate_invitation_token(user_email)
     return url_for('auth.register_from_invitation', token=token,
                    _external=True)
 
+
 def get_reset_password_link(user):
     token = user.generate_reset_password_token()
     return url_for('auth.reset_password', token=token, _external=True)
+
 
 def send_confirmation_email(user):
     """Send confirmation email to registered user"""
@@ -51,6 +56,7 @@ def send_confirmation_email(user):
 
     send_email('Confirm Your Email Address', [user.email], email_html_body)
 
+
 def send_invitation_email(user_email):
     """Send invitation email to a new user_email"""
     invitation_url = get_invitation_link(user_email)
@@ -59,7 +65,9 @@ def send_invitation_email(user_email):
         'email/email_invitation.html',
         invitation_url=invitation_url)
 
-    send_email('You are invited to join Catalog', [user_email], email_html_body)
+    send_email('You are invited to join Catalog',
+               [user_email], email_html_body)
+
 
 def send_password_reset_email(user):
     """Send password reset email to a registered user"""

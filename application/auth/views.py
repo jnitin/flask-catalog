@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, current_app, request, flash, \
     url_for, redirect, session, abort, make_response
-from flask_login import login_required, login_user, current_user, logout_user, \
-    confirm_login, login_fresh
+from flask_login import login_required, login_user, current_user, \
+     logout_user, confirm_login, login_fresh
 from werkzeug.urls import url_parse
-import random, string
+import random
+import string
 
 ########################################################################
 # IMPORTS FOR 3.11-9: GCONNECT
@@ -22,10 +23,11 @@ from .forms import register_form, register_invitation_form, login_form, \
 
 auth = Blueprint('auth', __name__)
 
+
 @auth.before_app_request
 def before_request():
     if current_user.is_authenticated:
-        #current_user.ping()
+        # current_user.ping()
         if not current_user.confirmed \
                 and request.endpoint \
                 and request.endpoint != 'email.confirm' \
@@ -41,6 +43,7 @@ def unconfirmed():
         return redirect(url_for('auth.index'))
     return render_template('auth/unconfirmed.html')
 
+
 @auth.route('/')
 def index():
     if current_user.is_authenticated and current_user.is_active and \
@@ -54,7 +57,6 @@ def login():
     if current_user.is_authenticated and current_user.is_active and \
        not current_user.blocked:
         return redirect(url_for('catalog.categories'))
-
 
     # Create anti-forgery state token for google oauth logic with Ajax request
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -91,7 +93,6 @@ def login():
         if user and user.blocked:
             return redirect(url_for('auth.blocked_account'))
 
-
     # Extract next URL to go to after a successfull login, and pass to
     # to template to be passed on to gconnect
     # TODO: do we really need to do this or is it already available?
@@ -125,7 +126,6 @@ def register():
                     for x in range(32))
     session['state'] = state
 
-
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
@@ -152,9 +152,9 @@ def register():
         # send user a confirmatin link via email
         send_confirmation_email(user)
         flash('Thanks for registering! ', 'success')
-        flash('Check your email for the instructions to activate your account', 'success')
+        flash('Check your email for the instructions to activate your account',
+              'success')
         return redirect(url_for('email.check_your_email'))
-
 
     # Set next page to go go after registration via google, which also logs in
     next_page = url_for('catalog.categories')
@@ -163,6 +163,7 @@ def register():
                            google_oauth2_client_id=client_id,
                            state=state,
                            nxt=next_page)
+
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
@@ -194,7 +195,7 @@ def register_from_invitation(token):
 
     return render_template('auth/register_from_invitation.html',
                            form=form,
-                           user_email = user_email)
+                           user_email=user_email)
 
 
 @auth.route('/reset_password_request', methods=['GET', 'POST'])
@@ -221,6 +222,7 @@ def reset_password_request():
 
     return render_template('auth/reset_password_request.html', form=form)
 
+
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
@@ -236,7 +238,7 @@ def reset_password(token):
 
     form = reset_password_form()
     if form.validate_on_submit():
-        user.password=form.password.data
+        user.password = form.password.data
         db.session.commit()
         flash('Your password has been reset.', 'success')
         return redirect(url_for('auth.login'))
@@ -250,13 +252,13 @@ def blocked_account():
     return render_template('auth/blocked_account.html')
 
 
-################################################################################
+###############################################################################
 # Handle the AJAX request that the client sends to the server after succesful
 # authentication with the Google+ API server.
 #
 @auth.route('/gconnect', methods=['POST'])
 def gconnect():
-    # Validate state token to protect against cross-site reference forgery attacks
+    # Validate state token protect against cross-site reference forgery attacks
     if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -286,9 +288,9 @@ def gconnect():
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
-    #python2 returns a string:
-    #result = json.loads(h.request(url, 'GET')[1])
-    #python3 returns a byte object:
+    # python2 returns a string:
+    # result = json.loads(h.request(url, 'GET')[1])
+    # python3 returns a byte object:
     result = json.loads(h.request(url, 'GET')[1].decode())
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
@@ -316,15 +318,15 @@ def gconnect():
     stored_access_token = session.get('access_token')
     stored_gplus_id = session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps(
+            'Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Store the access token in the session for later use.
     # For now, we don't stay connected to google, so not needed to store this
-    #session['access_token'] = credentials.access_token
-    #session['gplus_id'] = gplus_id
+    # session['access_token'] = credentials.access_token
+    # session['gplus_id'] = gplus_id
 
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -333,9 +335,9 @@ def gconnect():
 
     data = answer.json()
 
-    #session['username'] = data['name']
-    #session['picture'] = data['picture']
-    #session['email'] = data['email']
+    # session['username'] = data['name']
+    # session['picture'] = data['picture']
+    # session['email'] = data['email']
 
     user = User.query.filter_by(email=data['email']).first()
     if user:
@@ -362,36 +364,40 @@ def gconnect():
     return next_page
 
 
-################################################################################
+###############################################################################
 # DISCONNECT - Revoke a current user's token and reset their session
 # We did not stay connected to Google, so we do not need this function at this
 # this time...
-#@auth.route('/gdisconnect')
-#def gdisconnect():
-    #access_token = session.get('access_token')
-    #if access_token is None:
-        #print('Access Token is None')
-        #response = make_response(json.dumps('Current user not connected.'), 401)
-        #response.headers['Content-Type'] = 'application/json'
-        #return response
-    #print('In gdisconnect access token is {}'.format(access_token))
-    #print('User name is: ')
-    #print(session['username'])
-    #url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
-    #h = httplib2.Http()
-    #result = h.request(url, 'GET')[0]
-    #print('result is ')
-    #print(result)
-    #if result['status'] == '200':
-        #del session['access_token']
-        #del session['gplus_id']
-        #del session['username']
-        #del session['email']
-        #del session['picture']
-        #response = make_response(json.dumps('Successfully disconnected.'), 200)
-        #response.headers['Content-Type'] = 'application/json'
-        #return response
-    #else:
-        #response = make_response(json.dumps('Failed to revoke token for given user.', 400))
-        #response.headers['Content-Type'] = 'application/json'
-        #return response
+# @auth.route('/gdisconnect')
+# def gdisconnect():
+#     access_token = session.get('access_token')
+#     if access_token is None:
+#         print('Access Token is None')
+#         response = make_response(json.dumps(
+#             'Current user not connected.'), 401)
+#         response.headers['Content-Type'] = 'application/json'
+#         return response
+#     print('In gdisconnect access token is {}'.format(access_token))
+#     print('User name is: ')
+#     print(session['username'])
+#     url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(
+#         session['access_token'])
+#     h = httplib2.Http()
+#     result = h.request(url, 'GET')[0]
+#     print('result is ')
+#     print(result)
+#     if result['status'] == '200':
+#         del session['access_token']
+#         del session['gplus_id']
+#         del session['username']
+#         del session['email']
+#         del session['picture']
+#         response = make_response(json.dumps(
+#             'Successfully disconnected.'), 200)
+#         response.headers['Content-Type'] = 'application/json'
+#         return response
+#     else:
+#         response = make_response(json.dumps(
+#             'Failed to revoke token for given user.', 400))
+#         response.headers['Content-Type'] = 'application/json'
+#         return response

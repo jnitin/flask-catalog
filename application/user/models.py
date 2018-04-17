@@ -14,18 +14,19 @@ class User(db.Model, UserMixin):
 
     __tablename__ = 'users'
 
-    ############################################
-    ## Columns typical for every application  ##
-    ############################################
+    ##########################################
+    # Columns typical for every application  #
+    ##########################################
     id = Column(db.Integer, primary_key=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String(128))  # We store it hashed
-    #password_hash = db.Column(db.Binary(128))  # We store it hashed
+    # password_hash = db.Column(db.Binary(128))  # We store it hashed
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     confirmed = db.Column(db.Boolean, nullable=True, default=False)
     password_set = db.Column(db.Boolean, nullable=True, default=False)
-    registered_with_google = db.Column(db.Boolean, nullable=True, default=False)
+    registered_with_google = db.Column(db.Boolean, nullable=True,
+                                       default=False)
     failed_logins = db.Column(db.Integer, default=0)
     blocked = db.Column(db.Boolean, nullable=True, default=False)
     profile_pic_filename = db.Column(db.String, default=None, nullable=True)
@@ -33,14 +34,13 @@ class User(db.Model, UserMixin):
 
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
-    ##################################
-    ## Application specific columns ##
-    ##################################
+    ################################
+    # Application specific columns #
+    ################################
 
-
-    ###########################################
-    ## Methds typical for every application  ##
-    ###########################################
+    #########################################
+    # Methds typical for every application  #
+    #########################################
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
 
@@ -61,13 +61,13 @@ class User(db.Model, UserMixin):
         if password:
             user.password = password
         if confirmed:
-            user.confirmed=True
+            user.confirmed = True
         if role:
             user.role = Role.query.filter_by(name=role).first()
         if with_google:
             user.registered_with_google = True
         if profile_pic_url:
-            user.profile_pic_url=profile_pic_url
+            user.profile_pic_url = profile_pic_url
 
         db.session.add(user)
         db.session.commit()
@@ -94,7 +94,6 @@ class User(db.Model, UserMixin):
         # finally, delete the user
         db.session.delete(user)
         db.session.commit()
-
 
     @staticmethod
     def insert_default_users():
@@ -134,19 +133,13 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         """Hash the password before storing"""
-        #TODO: investigate why this does not work with Postgresql
-        #See: https://stackoverflow.com/questions/34548846/flask-bcrypt-valueerror-invalid-salt?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-        #self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         self.password_hash = generate_password_hash(password)
         self.password_set = True
 
     def verify_password(self, password):
         """Check the hashed password"""
-
-        #if (self.password_set and
-        #    bcrypt.check_password_hash(self.password_hash, password)):
         if (self.password_set and
-            check_password_hash(self.password_hash, password)):
+                check_password_hash(self.password_hash, password)):
             self.failed_logins = 0
             return True
         else:
@@ -156,11 +149,9 @@ class User(db.Model, UserMixin):
             db.session.commit()
             return False
 
-
     def unblock(self):
         self.failed_logins = 0
         self.blocked = False
-
 
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
@@ -277,7 +268,7 @@ class User(db.Model, UserMixin):
 
         # If we already have a profile picture, remove it
         if self.profile_pic_filename:
-            filepath=os.path.join(
+            filepath = os.path.join(
                 current_app.config['UPLOADED_IMAGES_DEST'],
                 self.profile_pic_filename)
             os.remove(filepath)
@@ -315,9 +306,9 @@ class User(db.Model, UserMixin):
             return None
         return User.query.get(data['id'])
 
-    ##################################
-    ## Application specific methods ##
-    ##################################
+    ################################
+    # Application specific methods #
+    ################################
 
 
 # For consistency, create a custom AnonymousUser class that implements the
@@ -339,6 +330,7 @@ class AnonymousUser(AnonymousUserMixin):
 
 login_manager.anonymous_user = AnonymousUser
 
+
 class Permission:
     """Defines the list of permissions"""
     # implementation based on "Flask Web Development - Chapter 9. User Roles"
@@ -346,22 +338,23 @@ class Permission:
     CRUD_USERS = 2
     ADMIN = 4
 
+
 class Role(db.Model):
     """Defines the list of roles with their permissions:
 
     User role      | Permission value  | Description
-    ---------------|-------------------|---------------------------------------------
+    ---------------|-------------------|--------------------------------------
     Anonymous      | 0                 | User who is not logged in.
                    |                   | Can only register or login.
                    |                   |
-    User           | 1                 | Basic permissions to CRUD owned entries.
+    User           | 1                 | Basic permissions to CRUD owned data.
                    |                   | This is the default for new users.
                    |                   |
     Usermanager    | 2                 | Adds permission to CRUD other users
                    |                   |
                    |                   |
-    Administrator  | 4                 | Full access, which includes permission to
-                   |                   | change the roles of other users.
+    Administrator  | 4                 | Full access, which includes permission
+                   |                   | to change the roles of other users.
 
     """
     # implementation based on "Flask Web Development - Chapter 9. User Roles"

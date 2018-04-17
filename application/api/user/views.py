@@ -8,13 +8,15 @@ from ...extensions import db, login_manager, images
 from ...extensions import api as rest_jsonapi
 
 
-from flask_rest_jsonapi import ResourceDetail, ResourceList, ResourceRelationship
+from flask_rest_jsonapi import ResourceDetail, ResourceList, \
+     ResourceRelationship
 from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound, \
      BadRequest
 from werkzeug.http import HTTP_STATUS_CODES
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask import current_app, g, request, send_from_directory, jsonify, url_for
+from flask import current_app, g, request, send_from_directory, jsonify, \
+     url_for
 
 
 ###############################################################################
@@ -43,18 +45,20 @@ class UserList(ResourceList):
     def before_create_object(self, data, view_kwargs):
         # POST /users
         if ('email' not in data or 'password' not in data or
-            'first_name' not in data or 'last_name' not in data):
-            raise BadRequest('Must include email, password, first_name and last_name fields')
+                'first_name' not in data or 'last_name' not in data):
+            raise BadRequest('Must include email, password, first_name and'
+                             'last_name fields')
 
         u = self.session.query(User).filter_by(email=data['email']).first()
         if u:
             if u.blocked:
                 raise JsonApiException(detail='Account has been blocked.'
-                                    'Contact the site administrator.',
+                                       'Contact the site administrator.',
                                        title='Permission denied',
                                        status='403')
             else:
-                raise BadRequest('Email {} already registered'.format(data['email']))
+                raise BadRequest('Email {} already registered'.format(
+                    data['email']))
 
     def after_create_object(self, obj, data, view_kwargs):
         if obj.is_authenticated:
@@ -83,14 +87,14 @@ class UserDetail(ResourceDetail):
         # - GET /api/v1/users/<id>
         if view_kwargs.get('id') is not None:
             if (g.current_user.is_administrator() or
-                g.current_user.is_usermanager() or
-                g.current_user.id == view_kwargs['id']):
+                    g.current_user.is_usermanager() or
+                    g.current_user.id == view_kwargs['id']):
                 pass
             else:
                 # Unauthorized
                 raise JsonApiException(' ',
-                                       title = HTTP_STATUS_CODES[403],
-                                       status = '403')
+                                       title=HTTP_STATUS_CODES[403],
+                                       status='403')
 
         # - GET /api/v1/categories/<category_id>/user
         if view_kwargs.get('category_id') is not None:
@@ -131,6 +135,7 @@ class UserCategoryRelationship(ResourceRelationship):
                   }
     methods = ['GET']  # only implement GET. rest is done automatic.
 
+
 class UserItemRelationship(ResourceRelationship):
     """ResourceRelationship: provides get, post, patch and delete methods to
                              get relationships, create relationships, update
@@ -164,30 +169,28 @@ class UserItemRelationship(ResourceRelationship):
 #                          objects.
 
 rest_jsonapi.route(UserList, 'user_list',
-          '/users/')
+                   '/users/')
 
 rest_jsonapi.route(UserDetail, 'user_detail',
-          '/users/<int:id>',
-          '/categories/<int:category_id>/user',
-          '/items/<int:item_id>/user')
+                   '/users/<int:id>',
+                   '/categories/<int:category_id>/user',
+                   '/items/<int:item_id>/user')
 
 rest_jsonapi.route(UserCategoryRelationship, 'user_categories',
-          '/users/<int:id>/relationships/categories/')
+                   '/users/<int:id>/relationships/categories/')
 
 rest_jsonapi.route(UserItemRelationship, 'user_items',
-          '/users/<int:id>/relationships/items/')
-
+                   '/users/<int:id>/relationships/items/')
 
 
 #############################################################################
 # Custom routes, not going over Flask-REST-JSONAPI
-
 @api_blueprint.route('/profile_pic', methods=['GET', 'POST'])
 def upload_profile_pic():
     if request.method == 'POST':
         if 'profile_pic' in request.files:
             client_file_storage = request.files['profile_pic']
-            g.current_user.profile_pic = client_file_storage  # Calls our "setter"
+            g.current_user.profile_pic = client_file_storage  # Calls "setter"
 
             db.session.commit()
 
@@ -201,8 +204,9 @@ def upload_profile_pic():
                 message='profile_pic not in request files'), 400
     else:
         if g.current_user.profile_pic_filename:
-            return send_from_directory(current_app.config['UPLOADED_IMAGES_DEST'],
-                                       g.current_user.profile_pic_filename)
+            return send_from_directory(
+                current_app.config['UPLOADED_IMAGES_DEST'],
+                g.current_user.profile_pic_filename)
         else:
             return jsonify(message="Profile picture for user not found"), 404
 

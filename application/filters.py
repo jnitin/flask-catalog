@@ -40,9 +40,10 @@ def pretty_date(value, default="just now"):
 
 _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
+
 def nl2br(value):
     if not value:
         return ""
     result = '\n\n'.join('<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
-                for p in _paragraph_re.split(escape(value.strip())))
+                         for p in _paragraph_re.split(escape(value.strip())))
     return Markup(result)

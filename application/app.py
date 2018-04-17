@@ -41,7 +41,7 @@ def configure_app(app, config):
     # We now use environment variables, for heroku deployment
     # Load the configuration from ./instance/config.py (secret information)
     # http://flask.pocoo.org/docs/config/#instance-folders
-    #app.config.from_pyfile('config.py')
+    # app.config.from_pyfile('config.py')
 
 
 def configure_extensions(app):
@@ -75,7 +75,6 @@ def configure_extensions(app):
 
     # flask-mail
     mail.init_app(app)
-
 
 
 def configure_blueprints(app):
@@ -120,9 +119,8 @@ def configure_logging(app):
         if not os.path.exists('logs'):
             os.mkdir('logs')
 
-        info_file_handler = logging.handlers.RotatingFileHandler('logs/info.log',
-                                                                 maxBytes=10240,
-                                                                 backupCount=10)
+        info_file_handler = logging.handlers.RotatingFileHandler(
+            'logs/info.log', maxBytes=10240, backupCount=10)
         info_file_handler.setLevel(logging.INFO)
         info_file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s '

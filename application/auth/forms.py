@@ -23,9 +23,9 @@ class register_form(FlaskForm):
     password = PasswordField('Password',
                              [DataRequired()])
     first_name = StringField('First Name',
-                       [DataRequired()])
+                             [DataRequired()])
     last_name = StringField('Last Name',
-                       [DataRequired()])
+                            [DataRequired()])
     submit = SubmitField('Register')
 
     def validate_email(self, field):
@@ -37,9 +37,9 @@ class register_invitation_form(FlaskForm):
     password = PasswordField('Password',
                              [DataRequired()])
     first_name = StringField('First Name',
-                       [DataRequired()])
+                             [DataRequired()])
     last_name = StringField('Last Name',
-                       [DataRequired()])
+                            [DataRequired()])
     submit = SubmitField('Register')
 
 
@@ -47,6 +47,7 @@ class reset_password_request_form(FlaskForm):
     email = EmailField('Email',
                        [DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
+
 
 class reset_password_form(FlaskForm):
     password = PasswordField('Password',

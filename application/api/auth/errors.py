@@ -14,6 +14,7 @@ def error_response(status_code, message=None):
 def bad_request(message):
     return error_response(400, message)
 
+
 def unauthorized(message):
     response = jsonify({'error': 'unauthorized', 'message': message})
     response.status_code = 401
@@ -26,6 +27,6 @@ def forbidden(message):
     return response
 
 
-#@api_blueprint.errorhandler(ValidationError)
-#def validation_error(e):
-    #return bad_request(e.args[0])
+# @api_blueprint.errorhandler(ValidationError)
+# def validation_error(e):
+#     return bad_request(e.args[0])
