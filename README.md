@@ -308,7 +308,7 @@ The API was developed using a very nice flask extension called [Flask-REST-JSONA
 The implementation of the API are best documented via examples. You can try them out by running this Jupyter notebook from your computer:
 
 ```bash
-(venv) $ cd tests
+(venv) $ cd test
 (venv) $ jupyter notebook e2e_REST_API_small_demo_heroku.ipynb
 ```
 
