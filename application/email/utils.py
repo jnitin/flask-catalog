@@ -1,7 +1,6 @@
 from flask import current_app, url_for, render_template
 from flask_mail import Message
-from threading import Thread
-from itsdangerous import URLSafeTimedSerializer
+# from threading import Thread
 from ..extensions import mail
 from ..user import User
 
@@ -9,7 +8,8 @@ from ..user import User
 ##############################################################################
 # mail helper functions
 # See: http://flask.pocoo.org/snippets/50/
-#      https://gitlab.com/patkennedy79/flask_recipe_app/blob/master/web/project/users/views.py
+#      https://gitlab.com/patkennedy79/flask_recipe_app/blob/master/web/
+# #            project/users/views.py
 #
 ##############################################################################
 
@@ -24,8 +24,8 @@ def send_email(subject, recipients, html_body):
     msg = Message(subject, recipients=recipients)
     msg.html = html_body
 
-    # TODO: Send async
     mail.send(msg)  # outcomment this to do async
+    # To send async
     # thr = Thread(target=send_async_email, args=[msg])
     # thr.start()
 

@@ -1,20 +1,14 @@
 from flask_wtf import FlaskForm
-
-from wtforms.fields.html5 import URLField, EmailField, TelField
-
-from wtforms import ValidationError, StringField, PasswordField, SubmitField, \
-    TextAreaField, FileField, DateField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, URL, \
-    AnyOf, Optional
+from flask_wtf.file import FileAllowed
+from wtforms import ValidationError, StringField, SubmitField, FileField
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired, Email
 from flask_login import current_user
-
-from flask_wtf.file import FileAllowed, FileRequired
 from ..extensions import images
-
 from . import User
 
 
-class profile_form(FlaskForm):
+class ProfileForm(FlaskForm):
     profile_pic = FileField('Profile Picture',
                             validators=[FileAllowed(images, 'Images only!')])
     email = EmailField('Email',

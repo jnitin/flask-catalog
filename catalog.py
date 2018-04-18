@@ -4,25 +4,25 @@ import os
 import os.path
 from application import create_app
 
-app = create_app()
+APP = create_app()
 
 if __name__ == '__main__':
     ###########################################################################
     # USE THIS WHEN RUNNING IN THE UDACITY VAGRANT ENVIRONMENT
     #
-    # - app.debug = True
+    # - APP.debug = True
     #   -> tells server to restart itself when it finds code changes
     #   -> provides a debugger in the browser
-    ##
+    #
     # - host='0.0.0.0' tells the server to listen on ALL public IP addresses
     ###########################################################################
-    # app.debug = True
-    # app.run(host='0.0.0.0', port=5000)
+    # APP.debug = True
+    # APP.run(host='0.0.0.0', port=5000)
 
     ###########################################################################
     # USE THIS WHEN RUNNING LOCAL, WITH debug
     ###########################################################################
-    # app.run(debug=True)
+    # APP.run(debug=True)
 
     ###########################################################################
     # USE THIS WHEN RUNNING LOCAL & DEBUGGING INSIDE WING IDE
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # from the IDE, and load pages from a browser to reach breakpoints or
     # exceptions.
     #
-    # If you did not set the use_reloader argument to app.run() to True then
+    # If you did not set the use_reloader argument to APP.run() to True then
     # you will need to use Restart Debugging in the Debug menu or the restart
     # @icon in the toolbar to load changed code into Flask.
     #
@@ -50,6 +50,6 @@ if __name__ == '__main__':
     ###########################################################################
 
     if 'WINGDB_ACTIVE' in os.environ:
-        app.debug = False
+        APP.debug = False
 
-    app.run(port=5000, use_reloader=False)
+    APP.run(port=5000, use_reloader=False)

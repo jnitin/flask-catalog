@@ -1,11 +1,9 @@
-import os
-
-from flask import Blueprint, render_template, current_app, request, flash, \
-    url_for, redirect, session, abort
+from flask import Blueprint, render_template, flash, \
+    url_for, redirect, abort
 from flask_login import login_required, current_user
 
-from .forms import add_category_form, edit_category_form, \
-     add_item_form, edit_item_form
+from .forms import AddCategoryForm, EditCategoryForm, \
+     AddItemForm, EditItemForm
 from ..extensions import db
 from ..catalog import Category, Item
 
@@ -16,32 +14,32 @@ catalog = Blueprint('catalog', __name__, url_prefix='/catalog')
 @catalog.route('/categories/',
                methods=['GET'])
 def categories():
-    categories = Category.query.all()
-    if categories:
+    all_categories = Category.query.all()
+    if all_categories:
         # redirect it to the first existing category_id
         return redirect(url_for('catalog.category_items',
-                                category_id=categories[0].id))
-    else:
-        # database is empty
-        return render_template('catalog/items.html',
-                               categories=[],
-                               category_id=0,
-                               category_active=None,
-                               items=[],
-                               item_id=0,
-                               item_active=None)
+                                category_id=all_categories[0].id))
+
+    # database is empty
+    return render_template('catalog/items.html',
+                           categories=[],
+                           category_id=0,
+                           category_active=None,
+                           items=[],
+                           item_id=0,
+                           item_active=None)
 
 
 @catalog.route('/categories/<int:category_id>/items',
                methods=['GET'])
 def category_items(category_id):
     # All the items of category_id
-    categories = Category.query.all()
+    all_categories = Category.query.all()
     category_active = Category.query.filter_by(id=category_id).first()
     if category_active:
         items = Item.query.filter_by(category_id=category_id).all()
         return render_template('catalog/items.html',
-                               categories=categories,
+                               categories=all_categories,
                                category_id=category_id,
                                category_active=category_active,
                                items=items,
@@ -54,14 +52,14 @@ def category_items(category_id):
                methods=['GET'])
 def category_item(category_id, item_id):
     # Details of an item
-    categories = Category.query.all()
+    all_categories = Category.query.all()
     category_active = Category.query.filter_by(id=category_id).first()
     if category_active:
         items = Item.query.filter_by(category_id=category_id).all()
         item_active = Item.query.filter_by(id=item_id).first()
         if item_active:
             return render_template('catalog/items.html',
-                                   categories=categories,
+                                   categories=all_categories,
                                    category_id=category_id,
                                    category_active=category_active,
                                    items=items,
@@ -74,7 +72,7 @@ def category_item(category_id, item_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category():
-    form = add_category_form()
+    form = AddCategoryForm()
 
     if form.validate_on_submit():
         if Category.query.filter_by(name=form.name.data).first():
@@ -111,7 +109,7 @@ def edit_category(category_id):
         return render_template('catalog/403.html', message=message)
 
     # pass category_active to initialize the values of the fields
-    form = edit_category_form(obj=category_active)
+    form = EditCategoryForm(obj=category_active)
 
     if form.validate_on_submit():
         if Category.query.filter_by(name=form.name.data).first():
@@ -178,7 +176,7 @@ def add_category_item(category_id):
     if category_active is None:
         abort(404)
 
-    form = add_item_form()
+    form = AddItemForm()
 
     if form.validate_on_submit():
         if Item.query.filter_by(name=form.name.data).first():
@@ -213,13 +211,13 @@ def edit_category_item(category_id, item_id):
     if category_active is None or item_active is None:
         abort(404)
 
-    if (item_active.user != current_user):
+    if item_active.user != current_user:
         message = 'You are not authorized to edit this item, because' + \
             ' you are not the owner.'
         return render_template('catalog/403.html', message=message)
 
     # pass item_active to initialize the values of the fields
-    form = edit_item_form(obj=item_active)
+    form = EditItemForm(obj=item_active)
 
     if form.validate_on_submit():
         # update description
@@ -265,7 +263,7 @@ def delete_category_item(category_id, item_id):
     if category_active is None or item_active is None:
         abort(404)
 
-    if (item_active.user != current_user):
+    if item_active.user != current_user:
         message = 'You are not authorized to delete this item, because' + \
             ' you are not the owner'
         return render_template('catalog/403.html', message=message)

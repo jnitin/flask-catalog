@@ -1,14 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import ValidationError, HiddenField, BooleanField, StringField, \
+from wtforms import ValidationError, BooleanField, StringField, \
                 PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo, Email
+from wtforms.validators import DataRequired, Email
 from wtforms.fields.html5 import EmailField
-from flask_login import current_user
 
 from ..user import User
 
 
-class login_form(FlaskForm):
+class LoginForm(FlaskForm):
     email = EmailField('Email',
                        [DataRequired(), Email()])
     password = PasswordField('Password',
@@ -17,7 +16,7 @@ class login_form(FlaskForm):
     submit = SubmitField('Log in')
 
 
-class register_form(FlaskForm):
+class RegisterForm(FlaskForm):
     email = EmailField('Email',
                        [DataRequired(), Email()])
     password = PasswordField('Password',
@@ -33,7 +32,7 @@ class register_form(FlaskForm):
             raise ValidationError('This email is already registered')
 
 
-class register_invitation_form(FlaskForm):
+class RegisterInvitationForm(FlaskForm):
     password = PasswordField('Password',
                              [DataRequired()])
     first_name = StringField('First Name',
@@ -43,13 +42,13 @@ class register_invitation_form(FlaskForm):
     submit = SubmitField('Register')
 
 
-class reset_password_request_form(FlaskForm):
+class ResetPasswordRequestForm(FlaskForm):
     email = EmailField('Email',
                        [DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
 
 
-class reset_password_form(FlaskForm):
+class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password',
                              [DataRequired()])
     submit = SubmitField('Reset Password')

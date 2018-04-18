@@ -17,9 +17,7 @@ class Category(db.Model):
     user = db.relationship('User', backref=db.backref('categories'))
 
     def to_json(self):
-        json_category = {
-                'url': url_for('api.category_detail', id=self.id)
-            }
+        json_category = {'url': url_for('api.category_detail', id=self.id)}
         return json_category
 
 
@@ -52,7 +50,7 @@ class Item(db.Model):
                      "description": "Made by Green Flash Brewing Co."},
                     {"name": "Amber Ale",
                      "description": "Made by Bell's Brewery - Eccentric Café "
-                     "& General Store"},
+                                    "& General Store"},
                     {"name": "Hopback Amber Ale",
                      "description": "Made by Tröegs Brewing Company"},
                     {"name": "Flipside Red IPA",
@@ -94,7 +92,7 @@ class Item(db.Model):
                      "description": "Made by Sierra Nevada Brewing Co."},
                     {"name": "Third Coast Old Ale",
                      "description": "Made by Bell's Brewery - Eccentric Café "
-                     "& General Store"},
+                                    "& General Store"},
                     {"name": "Olde School Barleywine",
                      "description": "Made by Dogfish Head Craft Brewery"},
                     {"name": "Old Ruffian Barley Wine",
@@ -105,7 +103,7 @@ class Item(db.Model):
                      "description": "Made by Stone Brewing"},
                     {"name": "Old Horizontal",
                      "description": "Made by Victory Brewing Company - "
-                     "Downingtown"},
+                                    "Downingtown"},
                     {"name": "Behemoth Blonde Barleywine",
                      "description": "Made by 3 Floyds Brewing Co."},
                     {"name": "Olde GnarlyWine",
@@ -115,13 +113,13 @@ class Item(db.Model):
                     {"name": "Flying Mouflan",
                      "description": "Made by Tröegs Brewing Company"},
                     {"name": "Sierra Nevada Bigfoot Barleywine Style Ale - "
-                     "Barrel-Aged",
+                             "Barrel-Aged",
                      "description": "Made by Sierra Nevada Brewing Co."},
                     {"name": "XS Old Crustacean",
                      "description": "Made by Rogue Ales"},
                     {"name": "Doggie Claws",
                      "description": "Made by Hair of the Dog Brewing Company "
-                     "/ Brewery and Tasting Room"},
+                                    "/ Brewery and Tasting Room"},
                     {"name": "A Deal With The Devil",
                      "description": "Made by Anchorage Brewing Company"},
                     {"name": "Cockeyed Cooper",
@@ -155,7 +153,5 @@ class Item(db.Model):
             db.session.commit()
 
     def to_json(self):
-        json_item = {
-                'url': url_for('api.item_detail', id=self.id)
-            }
+        json_item = {'url': url_for('api.item_detail', id=self.id)}
         return json_item

@@ -11,7 +11,6 @@ click==6.7
 decorator==4.2.1
 entrypoints==0.2.3
 Flask==0.12.2
-Flask-Bcrypt==0.7.1
 Flask-HTTPAuth==3.2.3
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
@@ -58,6 +57,7 @@ psycopg2==2.7.4
 ptyprocess==0.5.2
 pyasn1==0.4.2
 pyasn1-modules==0.2.1
+pycodestyle==2.4.0
 pycparser==2.18
 Pygments==2.2.0
 pylint==1.8.4

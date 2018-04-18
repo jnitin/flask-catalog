@@ -1,31 +1,25 @@
 from flask_wtf import FlaskForm
-
-from wtforms.fields.html5 import URLField, EmailField, TelField
-
-from wtforms import ValidationError, StringField, PasswordField, SubmitField, \
-    TextAreaField, FileField, DateField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, URL, \
-    AnyOf, Optional
-from flask_login import current_user
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired
 
 
-class add_category_form(FlaskForm):
+class AddCategoryForm(FlaskForm):
     name = StringField('Name', [DataRequired()])
     submit = SubmitField('Create')
 
 
-class edit_category_form(FlaskForm):
+class EditCategoryForm(FlaskForm):
     name = StringField('Name', [DataRequired()])
     submit = SubmitField('Update')
 
 
-class add_item_form(FlaskForm):
+class AddItemForm(FlaskForm):
     name = StringField('Name', [DataRequired()])
     description = TextAreaField('Description', [DataRequired()])
     submit = SubmitField('Create')
 
 
-class edit_item_form(FlaskForm):
+class EditItemForm(FlaskForm):
     name = StringField('Name', [DataRequired()])
     description = TextAreaField('Description', [DataRequired()])
     submit = SubmitField('Update')

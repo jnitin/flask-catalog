@@ -1,25 +1,19 @@
-from flask import Blueprint, render_template, current_app, request, flash, \
-    url_for, redirect, session, abort, make_response
-from flask_login import login_required, login_user, current_user, \
-     logout_user, confirm_login, login_fresh
-from werkzeug.urls import url_parse
 import random
 import string
-
-########################################################################
-# IMPORTS FOR 3.11-9: GCONNECT
+import json
+import httplib2
+import requests
+from flask import Blueprint, render_template, current_app, request, flash, \
+    url_for, redirect, session, make_response
+from flask_login import login_user, current_user, logout_user
+from werkzeug.urls import url_parse
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-import requests
-########################################################################
-
 from ..email import send_confirmation_email, send_password_reset_email
 from ..user import User
-from ..extensions import db, login_manager
-from .forms import register_form, register_invitation_form, login_form, \
-     reset_password_request_form, reset_password_form
+from ..extensions import db
+from .forms import RegisterForm, RegisterInvitationForm, LoginForm, \
+     ResetPasswordRequestForm, ResetPasswordForm
 
 auth = Blueprint('auth', __name__)
 
@@ -66,7 +60,7 @@ def login():
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
-    form = login_form()
+    form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
@@ -95,7 +89,6 @@ def login():
 
     # Extract next URL to go to after a successfull login, and pass to
     # to template to be passed on to gconnect
-    # TODO: do we really need to do this or is it already available?
     next_page = request.args.get('next')
     if not next_page or url_parse(next_page).netloc != '':
         next_page = url_for('catalog.categories')
@@ -129,12 +122,12 @@ def register():
     # Pass client_id of google oauth2 to template
     client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
 
-    form = register_form()
+    form = RegisterForm()
 
     # check if user is blocked
     if form.is_submitted():
-        u = User.query.filter_by(email=form.email.data).first()
-        if u and u.blocked:
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.blocked:
             return redirect(url_for('auth.blocked_account'))
 
     if form.validate_on_submit():
@@ -146,8 +139,7 @@ def register():
                                 password=form.password.data,
                                 first_name=form.first_name.data,
                                 last_name=form.last_name.data,
-                                confirmed=False
-                                )
+                                confirmed=False)
 
         # send user a confirmatin link via email
         send_confirmation_email(user)
@@ -170,7 +162,7 @@ def register_from_invitation(token):
     if current_user.is_authenticated:
         logout_user()
 
-    user_email = User.get_user_email_from_invitation_token(token)
+    user_email = User.email_from_invitation_token(token)
 
     if user_email is False:
         flash('The invitation link is invalid or has expired.')
@@ -180,15 +172,14 @@ def register_from_invitation(token):
         flash('Registration was already completed before', 'success')
         return redirect(url_for('auth.login'))
 
-    form = register_invitation_form(next=request.args.get('next'))
+    form = RegisterInvitationForm(next=request.args.get('next'))
 
     if form.validate_on_submit():
-        user = User.create_user(email=user_email,
-                                password=form.password.data,
-                                first_name=form.first_name.data,
-                                last_name=form.last_name.data,
-                                confirmed=True  # auto-confirm invited users
-                                )
+        User.create_user(email=user_email,
+                         password=form.password.data,
+                         first_name=form.first_name.data,
+                         last_name=form.last_name.data,
+                         confirmed=True)  # auto-confirm invited users
 
         flash('Thanks for registering! ', 'success')
         return redirect(url_for('auth.login'))
@@ -209,7 +200,7 @@ def reset_password_request():
               'success')
         return redirect(url_for('email.check_your_email'))
 
-    form = reset_password_request_form()
+    form = ResetPasswordRequestForm()
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -236,7 +227,7 @@ def reset_password(token):
     if user.blocked:
         return redirect(url_for('auth.blocked_account'))
 
-    form = reset_password_form()
+    form = ResetPasswordForm()
     if form.validate_on_submit():
         user.password = form.password.data
         db.session.commit()
@@ -287,11 +278,11 @@ def gconnect():
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
-    h = httplib2.Http()
+    http = httplib2.Http()
     # python2 returns a string:
-    # result = json.loads(h.request(url, 'GET')[1])
+    # result = json.loads(http.request(url, 'GET')[1])
     # python3 returns a byte object:
-    result = json.loads(h.request(url, 'GET')[1].decode())
+    result = json.loads(http.request(url, 'GET')[1].decode())
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -351,8 +342,7 @@ def gconnect():
                                 last_name=data['family_name'],
                                 confirmed=True,  # email is confirmed
                                 with_google=True,
-                                profile_pic_url=data['picture']
-                                )
+                                profile_pic_url=data['picture'])
 
     # when we get here, all is kosher with google login
     # login with Flask_Login
@@ -383,7 +373,7 @@ def gconnect():
 #     url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(
 #         session['access_token'])
 #     h = httplib2.Http()
-#     result = h.request(url, 'GET')[0]
+#     result = http.request(url, 'GET')[0]
 #     print('result is ')
 #     print(result)
 #     if result['status'] == '200':

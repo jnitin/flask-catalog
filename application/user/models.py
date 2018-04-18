@@ -1,13 +1,12 @@
-from sqlalchemy import Column, desc
-from sqlalchemy.orm import backref
-from flask import current_app, g, url_for, render_template
+import os
+from sqlalchemy import Column
+# from sqlalchemy.orm import backref
+from flask import current_app, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
-from ..extensions import db, login_manager, bcrypt, images
-import os
-import base64
-from datetime import datetime, date, timedelta
+from ..extensions import db, login_manager, images
 
 
 class User(db.Model, UserMixin):
@@ -57,7 +56,7 @@ class User(db.Model, UserMixin):
         user = User(email=email,
                     first_name=first_name,
                     last_name=last_name
-                    )
+                   )
         if password:
             user.password = password
         if confirmed:
@@ -98,29 +97,29 @@ class User(db.Model, UserMixin):
     @staticmethod
     def insert_default_users():
         """Inserts a default admin, usermanager and user into the database"""
-        u1 = User(email=current_app.config['ADMIN_EMAIL'],
-                  password=current_app.config['ADMIN_PW'],
-                  first_name=current_app.config['ADMIN_FIRST_NAME'],
-                  last_name=current_app.config['ADMIN_LAST_NAME'],
-                  confirmed=True)
-        u1.role = Role.query.filter_by(name='Administrator').first()
-        db.session.add(u1)
+        user1 = User(email=current_app.config['ADMIN_EMAIL'],
+                     password=current_app.config['ADMIN_PW'],
+                     first_name=current_app.config['ADMIN_FIRST_NAME'],
+                     last_name=current_app.config['ADMIN_LAST_NAME'],
+                     confirmed=True)
+        user1.role = Role.query.filter_by(name='Administrator').first()
+        db.session.add(user1)
 
-        u2 = User(email=current_app.config['USERMANAGER_EMAIL'],
-                  password=current_app.config['USERMANAGER_PW'],
-                  first_name=current_app.config['USERMANAGER_FIRST_NAME'],
-                  last_name=current_app.config['USERMANAGER_LAST_NAME'],
-                  confirmed=True)
-        u2.role = Role.query.filter_by(name='Usermanager').first()
-        db.session.add(u2)
+        user2 = User(email=current_app.config['USERMANAGER_EMAIL'],
+                     password=current_app.config['USERMANAGER_PW'],
+                     first_name=current_app.config['USERMANAGER_FIRST_NAME'],
+                     last_name=current_app.config['USERMANAGER_LAST_NAME'],
+                     confirmed=True)
+        user2.role = Role.query.filter_by(name='Usermanager').first()
+        db.session.add(user2)
 
-        u3 = User(email=current_app.config['USER_EMAIL'],
-                  password=current_app.config['USER_PW'],
-                  first_name=current_app.config['USER_FIRST_NAME'],
-                  last_name=current_app.config['USER_LAST_NAME'],
-                  confirmed=True)
-        u3.role = Role.query.filter_by(name='User').first()
-        db.session.add(u3)
+        user3 = User(email=current_app.config['USER_EMAIL'],
+                     password=current_app.config['USER_PW'],
+                     first_name=current_app.config['USER_FIRST_NAME'],
+                     last_name=current_app.config['USER_LAST_NAME'],
+                     confirmed=True)
+        user3.role = Role.query.filter_by(name='User').first()
+        db.session.add(user3)
 
         db.session.commit()
 
@@ -154,14 +153,14 @@ class User(db.Model, UserMixin):
         self.blocked = False
 
     def generate_confirmation_token(self, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.id}).decode('utf-8')
+        ser = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return ser.dumps({'confirm': self.id}).decode('utf-8')
 
     def confirm(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        ser = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token.encode('utf-8'))
-        except:
+            data = ser.loads(token.encode('utf-8'))
+        except (BadSignature, SignatureExpired):
             return False
         if data.get('confirm') != self.id:
             return False
@@ -170,32 +169,32 @@ class User(db.Model, UserMixin):
         return True
 
     def generate_reset_password_token(self, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'reset_password': self.id}).decode('utf-8')
+        ser = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return ser.dumps({'reset_password': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         """Verifies that reset_password token is OK, and returns user"""
-        s = Serializer(current_app.config['SECRET_KEY'])
+        ser = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token.encode('utf-8'))
-            id = data.get('reset_password')
-            return User.query.get(id)
-        except:
+            data = ser.loads(token.encode('utf-8'))
+            user_id = data.get('reset_password')
+            return User.query.get(user_id)
+        except (BadSignature, SignatureExpired):
             return None
 
         return None
 
     def generate_email_change_token(self, new_email, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps(
+        ser = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return ser.dumps(
             {'change_email': self.id, 'new_email': new_email}).decode('utf-8')
 
     def change_email(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        ser = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token.encode('utf-8'))
-        except:
+            data = ser.loads(token.encode('utf-8'))
+        except (BadSignature, SignatureExpired):
             return False
         if data.get('change_email') != self.id:
             return False
@@ -210,16 +209,16 @@ class User(db.Model, UserMixin):
 
     @staticmethod
     def generate_invitation_token(user_email, expiration=7*3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps(
+        ser = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return ser.dumps(
             {'user_email': user_email}).decode('utf-8')
 
     @staticmethod
-    def get_user_email_from_invitation_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+    def email_from_invitation_token(token):
+        ser = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token.encode('utf-8'))
-        except:
+            data = ser.loads(token.encode('utf-8'))
+        except (BadSignature, SignatureExpired):
             return False
         user_email = data.get('user_email')
         if user_email is None:
@@ -242,19 +241,6 @@ class User(db.Model, UserMixin):
 
     def is_usermanager(self):
         return self.can(Permission.CRUD_USERS)
-
-    def revoke_token(self):
-        """Revokes the authorization token"""
-        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
-
-    @staticmethod
-    def check_token(token):
-        """Verifies that there is a user with this token, and that the
-        the token has not yet expired"""
-        user = User.query.filter_by(token=token).first()
-        if user is None or user.token_expiration < datetime.utcnow():
-            return None
-        return user
 
     # Use descriptor to deactivate 'getter' of profile_pic
     @property
@@ -287,22 +273,20 @@ class User(db.Model, UserMixin):
         self.profile_pic_url = url
 
     def to_json(self):
-        json_user = {
-                'url': url_for('api.user_detail', id=self.id)
-            }
+        json_user = {'url': url_for('api.user_detail', id=self.id)}
         return json_user
 
     def generate_auth_token(self, expiration):
-        s = Serializer(current_app.config['SECRET_KEY'],
-                       expires_in=expiration)
-        return s.dumps({'id': self.id}).decode('utf-8')
+        ser = Serializer(current_app.config['SECRET_KEY'],
+                         expires_in=expiration)
+        return ser.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        ser = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
-        except:
+            data = ser.loads(token)
+        except (BadSignature, SignatureExpired):
             return None
         return User.query.get(data['id'])
 
@@ -327,6 +311,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_usermanager(self):
         return False
+
 
 login_manager.anonymous_user = AnonymousUser
 
@@ -382,12 +367,12 @@ class Role(db.Model):
                               Permission.ADMIN],
         }
         default_role = 'User'
-        for r in roles:
-            role = Role.query.filter_by(name=r).first()
+        for rol in roles:
+            role = Role.query.filter_by(name=rol).first()
             if role is None:
-                role = Role(name=r)
+                role = Role(name=rol)
             role.reset_permissions()
-            for perm in roles[r]:
+            for perm in roles[rol]:
                 role.add_permission(perm)
             role.default = (role.name == default_role)
             db.session.add(role)

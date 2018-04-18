@@ -134,21 +134,21 @@ class UserModelTestCase(unittest.TestCase):
     def test_valid_invitation_token(self):
         user_email = 'john@example.com'
         token = User.generate_invitation_token(user_email)
-        self.assertEqual(User.get_user_email_from_invitation_token(token),
+        self.assertEqual(User.email_from_invitation_token(token),
                          user_email)
 
     def test_invalid_invitation_token(self):
         user_email1 = 'john@example.com'
         user_email2 = 'susan@example.org'
         token = User.generate_invitation_token(user_email1)
-        self.assertNotEqual(User.get_user_email_from_invitation_token(token),
+        self.assertNotEqual(User.email_from_invitation_token(token),
                             user_email2)
 
     def test_expired_invitation_token(self):
         user_email = 'john@example.com'
         token = User.generate_invitation_token(user_email, 1)
         time.sleep(2)
-        self.assertFalse(User.get_user_email_from_invitation_token(token),
+        self.assertFalse(User.email_from_invitation_token(token),
                          user_email)
 
     def test_user_role(self):

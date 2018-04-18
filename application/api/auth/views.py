@@ -1,12 +1,9 @@
-from . import basic_auth
-from .errors import error_response, bad_request, unauthorized, forbidden
+from flask_rest_jsonapi.exceptions import ObjectNotFound
+from flask import jsonify, g
+from .errors import unauthorized
 from .. import api as api_blueprint
 from ...user import User
-from ...decorators import admin_required, usermanager_required
-from ...extensions import db
-
-from flask_rest_jsonapi.exceptions import ObjectNotFound, BadRequest
-from flask import jsonify, g
+from ...decorators import usermanager_required
 
 
 @api_blueprint.route('/token', methods=['POST'])

@@ -1,8 +1,7 @@
 from flask import g, request
-from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
-from werkzeug.http import HTTP_STATUS_CODES
-from flask_login import login_user, login_manager
-from .errors import error_response, bad_request, unauthorized, forbidden
+from flask_login import login_user
+from flask_httpauth import HTTPBasicAuth
+from .errors import error_response, unauthorized, forbidden
 from .. import api as api_blueprint
 from ...user import User, AnonymousUser
 
@@ -55,7 +54,7 @@ def auth_error():
                                   "Please check your email to activate.")
 
         return unauthorized('Invalid credentials')
-    except:
+    except AttributeError:
         return unauthorized('Invalid credentials')
 
 

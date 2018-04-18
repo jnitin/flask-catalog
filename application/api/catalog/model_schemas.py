@@ -1,6 +1,5 @@
 from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
-from ...catalog import Category, Item
 
 
 class CategorySchema(Schema):

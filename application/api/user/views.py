@@ -1,29 +1,26 @@
+from flask_rest_jsonapi import ResourceDetail, ResourceList, \
+     ResourceRelationship
+from flask_rest_jsonapi.exceptions import JsonApiException, BadRequest
+from werkzeug.http import HTTP_STATUS_CODES
+from flask import current_app, g, request, send_from_directory, jsonify, \
+     url_for
 from . import UserSchema
 from .. import api as api_blueprint
 from ..catalog import find_user_by_category_id, find_user_by_item_id
-from ...user import User, Role, Permission
-from ...decorators import admin_required, usermanager_required
+from ...user import User
+from ...decorators import admin_required
 from ...email import send_confirmation_email, send_invitation_email
-from ...extensions import db, login_manager, images
+from ...extensions import db
 from ...extensions import api as rest_jsonapi
-
-
-from flask_rest_jsonapi import ResourceDetail, ResourceList, \
-     ResourceRelationship
-from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound, \
-     BadRequest
-from werkzeug.http import HTTP_STATUS_CODES
-from sqlalchemy.orm.exc import NoResultFound
-
-from flask import current_app, g, request, send_from_directory, jsonify, \
-     url_for
 
 
 ###############################################################################
 # Flask-REST-JSONAPI: Create resource managers
 # - For data layer methods and their parameters, see:
-#    https://github.com/miLibris/flask-rest-jsonapi/blob/master/flask_rest_jsonapi/data_layers/base.py
-#    https://github.com/miLibris/flask-rest-jsonapi/blob/master/flask_rest_jsonapi/resource.py
+#    https://github.com/miLibris/flask-rest-jsonapi/blob/master/
+#          flask_rest_jsonapi/data_layers/base.py
+#    https://github.com/miLibris/flask-rest-jsonapi/blob/master/
+#          flask_rest_jsonapi/resource.py
 
 class UserList(ResourceList):
     """ResourceList: provides get and post methods to retrieve a collection of
@@ -49,9 +46,9 @@ class UserList(ResourceList):
             raise BadRequest('Must include email, password, first_name and'
                              'last_name fields')
 
-        u = self.session.query(User).filter_by(email=data['email']).first()
-        if u:
-            if u.blocked:
+        user = self.session.query(User).filter_by(email=data['email']).first()
+        if user:
+            if user.blocked:
                 raise JsonApiException(detail='Account has been blocked.'
                                        'Contact the site administrator.',
                                        title='Permission denied',
@@ -72,9 +69,7 @@ class UserList(ResourceList):
                   'methods': {
                       'query': query,
                       'before_create_object': before_create_object,
-                      'after_create_object': after_create_object
-                  }
-                  }
+                      'after_create_object': after_create_object}}
 
 
 class UserDetail(ResourceDetail):
@@ -110,9 +105,7 @@ class UserDetail(ResourceDetail):
     data_layer = {'session': db.session,
                   'model': User,
                   'methods': {
-                      'before_get_object': before_get_object
-                  }
-                  }
+                      'before_get_object': before_get_object}}
 
 
 class UserCategoryRelationship(ResourceRelationship):
@@ -122,17 +115,10 @@ class UserCategoryRelationship(ResourceRelationship):
                              objects."""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
 
-    def before_get_object(self, view_kwargs):
-        ...
-        pass
-
     schema = UserSchema
     data_layer = {'session': db.session,
-                  'model': User,
-                  'methods': {
-                      'before_get_object': before_get_object
-                  }
-                  }
+                  'model': User
+                 }
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 
@@ -146,7 +132,7 @@ class UserItemRelationship(ResourceRelationship):
     schema = UserSchema
     data_layer = {'session': db.session,
                   'model': User,
-                  }
+                 }
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 ###############################################################################
@@ -167,6 +153,7 @@ class UserItemRelationship(ResourceRelationship):
 #                          relationships, create relationships, update
 #                          relationships and delete relationships between
 #                          objects.
+
 
 rest_jsonapi.route(UserList, 'user_list',
                    '/users/')
@@ -199,23 +186,23 @@ def upload_profile_pic():
             response.headers['Location'] = url_for('api.upload_profile_pic',
                                                    _external=True)
             return response
-        else:
-            return jsonify(
-                message='profile_pic not in request files'), 400
-    else:
-        if g.current_user.profile_pic_filename:
-            return send_from_directory(
-                current_app.config['UPLOADED_IMAGES_DEST'],
-                g.current_user.profile_pic_filename)
-        else:
-            return jsonify(message="Profile picture for user not found"), 404
+
+        return jsonify(
+            message='profile_pic not in request files'), 400
+
+    if g.current_user.profile_pic_filename:
+        return send_from_directory(
+            current_app.config['UPLOADED_IMAGES_DEST'],
+            g.current_user.profile_pic_filename)
+
+    return jsonify(message="Profile picture for user not found"), 404
 
 
 @api_blueprint.route('/invite/<string:user_email>', methods=['POST'])
 @admin_required
 def invite(user_email):
-    u = User.query.filter_by(email=user_email).first()
-    if u:
+    user = User.query.filter_by(email=user_email).first()
+    if user:
         return jsonify(message='Email {} already registered'.format(
             user_email)), 401
 

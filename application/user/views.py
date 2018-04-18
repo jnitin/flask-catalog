@@ -1,15 +1,9 @@
-import os
-
-from flask import Blueprint, render_template, send_from_directory, request, \
-    current_app, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 
 from . import User
-from .forms import profile_form
+from .forms import ProfileForm
 from ..extensions import db
-from ..catalog import Category, Item
-from ..utils import get_current_time
-
 
 user = Blueprint('user', __name__, url_prefix='/user')
 
@@ -18,7 +12,7 @@ user = Blueprint('user', __name__, url_prefix='/user')
 @login_required
 def profile():
     """Update profile of current user"""
-    form = profile_form(obj=current_user)
+    form = ProfileForm(obj=current_user)
 
     if form.validate_on_submit():
         client_file_storage = form.profile_pic.data

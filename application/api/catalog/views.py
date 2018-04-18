@@ -1,21 +1,14 @@
-from . import CategorySchema, ItemSchema
-from .. import api as api_blueprint
-from ...user import User, Role, Permission
-from ...catalog import Category, Item
-from ...decorators import admin_required, usermanager_required
-from ...email import send_confirmation_email, send_invitation_email
-from ...extensions import db, login_manager, images
-from ...extensions import api as rest_jsonapi
-
 from flask_rest_jsonapi import ResourceDetail, ResourceList, \
      ResourceRelationship
-from flask_rest_jsonapi.exceptions import JsonApiException, ObjectNotFound, \
+from flask_rest_jsonapi.exceptions import ObjectNotFound, \
      BadRequest
-from werkzeug.http import HTTP_STATUS_CODES
 from sqlalchemy.orm.exc import NoResultFound
-
-from flask import current_app, g, request, send_from_directory, jsonify, \
-     url_for
+from flask import g
+from . import CategorySchema, ItemSchema
+from ...user import User
+from ...catalog import Category, Item
+from ...extensions import db
+from ...extensions import api as rest_jsonapi
 
 
 def find_user_by_category_id(category_id):
@@ -96,7 +89,7 @@ class CategoryList(ResourceList):
                       'query': query,
                       'before_create_object': before_create_object
                   }
-                  }
+                 }
 
 
 class CategoryDetail(ResourceDetail):
@@ -108,7 +101,7 @@ class CategoryDetail(ResourceDetail):
     schema = CategorySchema
     data_layer = {'session': db.session,
                   'model': Category
-                  }
+                 }
 
 
 class CategoryUserRelationship(ResourceRelationship):
@@ -120,7 +113,7 @@ class CategoryUserRelationship(ResourceRelationship):
     schema = CategorySchema
     data_layer = {'session': db.session,
                   'model': Category
-                  }
+                 }
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 
@@ -158,9 +151,9 @@ class ItemList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
-        # POST /api/v1/categories/<int:id>/items
+        # POST /api/v1/categories/<int:category_id>/items
 
-        category_id = view_kwargs.get('id')
+        category_id = view_kwargs.get('category_id')
 
         if ('name' not in data and
                 'description' not in data):
@@ -168,7 +161,7 @@ class ItemList(ResourceList):
                              'description fields')
 
         try:
-            category = Category.query.filter_by(id=data['category_id']).one()
+            category = Category.query.filter_by(id=category_id).one()
         except NoResultFound:
             raise ObjectNotFound({'parameter': 'category_id'},
                                  "Category with id: {} not found".format(
@@ -187,7 +180,7 @@ class ItemList(ResourceList):
                       'query': query,
                       'before_create_object': before_create_object
                   }
-                  }
+                 }
 
 
 class ItemDetail(ResourceDetail):
@@ -199,7 +192,7 @@ class ItemDetail(ResourceDetail):
     schema = ItemSchema
     data_layer = {'session': db.session,
                   'model': Item
-                  }
+                 }
 
 
 class ItemUserRelationship(ResourceRelationship):
@@ -212,7 +205,7 @@ class ItemUserRelationship(ResourceRelationship):
     schema = ItemSchema
     data_layer = {'session': db.session,
                   'model': Item
-                  }
+                 }
 
 
 # class ItemCategoryRelationship(ResourceRelationship):

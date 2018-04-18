@@ -24,7 +24,6 @@ pip install flask
 pip install Flask-REST-JSONAPI
 pip install flask-sqlalchemy
 pip install flask-migrate
-pip install flask-bcrypt
 pip install flask-httpauth
 pip install flask-login
 pip install flask-mail
@@ -50,10 +49,15 @@ pip install jupyter
 pip install ipykernel
 python3 -m ipykernel install --user
 
-####################
-## Install Pylint ##
-####################
+###########################
+## Install PEP8 checkers ##
+## - Pylint              ##
+## - pycodestyle         ##
+## - pep8                ##
+###########################
 pip install pylint
+pip install pep8
+pip install pycodestyle
 
 ################################
 ## Install gunicorn webserver ##

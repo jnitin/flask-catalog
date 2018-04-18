@@ -3,7 +3,7 @@ from datetime import datetime
 from jinja2 import Markup, escape
 
 
-def format_date(value, format='%Y-%m-%d'):
+def format_date(value):
     # http://blog.sneawo.com/blog/2015/04/08/strftime-for-datetime-before-1900-year/
     if value:
         return '{0.year:4d}-{0.month:02d}-{0.day:02d}'.format(value)
@@ -32,18 +32,18 @@ def pretty_date(value, default="just now"):
 
         if period == 1:
             return '%d %s ago' % (period, singular)
-        else:
-            return '%d %s ago' % (period, plural)
+
+        return '%d %s ago' % (period, plural)
 
     return default
 
 
-_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+PARAGRAPH_RE = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
 def nl2br(value):
     if not value:
         return ""
     result = '\n\n'.join('<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
-                         for p in _paragraph_re.split(escape(value.strip())))
+                         for p in PARAGRAPH_RE.split(escape(value.strip())))
     return Markup(result)

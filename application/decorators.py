@@ -5,19 +5,19 @@ from .user import Permission
 
 
 def permission_required(permission):
-    def decorator(f):
-        @wraps(f)
+    def decorator(func):
+        @wraps(func)
         def decorated_function(*args, **kwargs):
             if not current_user.can(permission):
                 abort(403)
-            return f(*args, **kwargs)
+            return func(*args, **kwargs)
         return decorated_function
     return decorator
 
 
-def admin_required(f):
-    return permission_required(Permission.ADMIN)(f)
+def admin_required(func):
+    return permission_required(Permission.ADMIN)(func)
 
 
-def usermanager_required(f):
-    return permission_required(Permission.CRUD_USERS)(f)
+def usermanager_required(func):
+    return permission_required(Permission.CRUD_USERS)(func)

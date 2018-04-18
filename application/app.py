@@ -2,7 +2,7 @@ from flask import Flask
 
 from config import Config
 from .user import User, Role
-from .catalog import Category, Item
+from .catalog import Item
 
 from .extensions import db, migrate, login_manager, api, images, mail
 from .filters import format_date, pretty_date, nl2br
@@ -37,11 +37,6 @@ def configure_app(app, config):
     # http://flask.pocoo.org/docs/api/#configuration
     # Note: Potentially overwritten by TestConfig class during unit testing
     app.config.from_object(config)
-
-    # We now use environment variables, for heroku deployment
-    # Load the configuration from ./instance/config.py (secret information)
-    # http://flask.pocoo.org/docs/config/#instance-folders
-    # app.config.from_pyfile('config.py')
 
 
 def configure_extensions(app):
@@ -109,7 +104,7 @@ def configure_logging(app):
 
     import logging
     import os
-    from logging.handlers import SMTPHandler
+    # from logging.handlers import SMTPHandler
 
     if app.config['LOG_TO_STDOUT']:
         stream_handler = logging.StreamHandler()
