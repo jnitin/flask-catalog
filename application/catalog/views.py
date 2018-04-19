@@ -8,7 +8,7 @@ from ..extensions import db
 from ..catalog import Category, Item
 
 
-catalog = Blueprint('catalog', __name__, url_prefix='/catalog')
+catalog = Blueprint('catalog', __name__, url_prefix='/catalog')  # pylint: disable=invalid-name
 
 
 @catalog.route('/categories/',

@@ -5,7 +5,7 @@ from flask_login import logout_user, login_required, \
 from .utils import send_confirmation_email
 from ..extensions import db
 
-email = Blueprint('email', __name__)
+email = Blueprint('email', __name__)  # pylint: disable=invalid-name
 
 
 @email.route('/confirm/<token>')

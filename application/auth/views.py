@@ -15,7 +15,7 @@ from ..extensions import db
 from .forms import RegisterForm, RegisterInvitationForm, LoginForm, \
      ResetPasswordRequestForm, ResetPasswordForm
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__)  # pylint: disable=invalid-name
 
 
 @auth.before_app_request

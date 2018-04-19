@@ -8,7 +8,7 @@ from ...user import User, AnonymousUser
 # basic_auth is for checking the password during log in
 # - if OK, it will create and return a token to the requester
 # - if NOT OK, it will send back a 401 UNAUTHORIZED error
-basic_auth = HTTPBasicAuth()
+basic_auth = HTTPBasicAuth()  # pylint: disable=invalid-name
 
 
 @basic_auth.verify_password

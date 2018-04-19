@@ -5,6 +5,18 @@ from flask_rest_jsonapi import Api
 from flask_uploads import UploadSet, IMAGES
 from flask_mail import Mail
 
+##############################################################################
+# Flask coding convention is to use lowercase for exensions and store them as
+# module level variables. Pylint interprets module level variables as
+# constants, which according to the PEP 8 Style Guide must use UPPER_CASE
+# naming style.
+#
+# Avoid errors from pylint like this one:
+# C0103: Constant name "db" doesn't conform to UPPER_CASE naming style
+#
+# pylint: disable=invalid-name
+##############################################################################
+
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 
