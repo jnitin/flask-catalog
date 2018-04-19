@@ -87,9 +87,7 @@ class CategoryList(ResourceList):
                   'model': Category,
                   'methods': {
                       'query': query,
-                      'before_create_object': before_create_object
-                  }
-                 }
+                      'before_create_object': before_create_object}}
 
 
 class CategoryDetail(ResourceDetail):
@@ -100,8 +98,7 @@ class CategoryDetail(ResourceDetail):
 
     schema = CategorySchema
     data_layer = {'session': db.session,
-                  'model': Category
-                 }
+                  'model': Category}
 
 
 class CategoryUserRelationship(ResourceRelationship):
@@ -112,8 +109,7 @@ class CategoryUserRelationship(ResourceRelationship):
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     schema = CategorySchema
     data_layer = {'session': db.session,
-                  'model': Category
-                 }
+                  'model': Category}
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 
@@ -178,9 +174,7 @@ class ItemList(ResourceList):
                   'model': Item,
                   'methods': {
                       'query': query,
-                      'before_create_object': before_create_object
-                  }
-                 }
+                      'before_create_object': before_create_object}}
 
 
 class ItemDetail(ResourceDetail):
@@ -191,8 +185,7 @@ class ItemDetail(ResourceDetail):
 
     schema = ItemSchema
     data_layer = {'session': db.session,
-                  'model': Item
-                 }
+                  'model': Item}
 
 
 class ItemUserRelationship(ResourceRelationship):
@@ -204,8 +197,7 @@ class ItemUserRelationship(ResourceRelationship):
 
     schema = ItemSchema
     data_layer = {'session': db.session,
-                  'model': Item
-                 }
+                  'model': Item}
 
 
 # class ItemCategoryRelationship(ResourceRelationship):

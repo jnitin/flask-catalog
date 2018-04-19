@@ -117,8 +117,7 @@ class UserCategoryRelationship(ResourceRelationship):
 
     schema = UserSchema
     data_layer = {'session': db.session,
-                  'model': User
-                 }
+                  'model': User}
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 
@@ -131,8 +130,7 @@ class UserItemRelationship(ResourceRelationship):
 
     schema = UserSchema
     data_layer = {'session': db.session,
-                  'model': User,
-                 }
+                  'model': User}
     methods = ['GET']  # only implement GET. rest is done automatic.
 
 ###############################################################################

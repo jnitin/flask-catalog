@@ -189,5 +189,6 @@ class UserModelTestCase(unittest.TestCase):
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
         self.assertEqual('/api/v1/users/' + str(u.id), json_user['url'])
 
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
