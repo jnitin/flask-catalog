@@ -20,7 +20,6 @@ def create_app(config=Config, app_name=None):
 
     app = Flask(app_name, instance_relative_config=True)
     configure_app(app, config)
-    configure_hook(app)
     configure_blueprints(app)
     configure_extensions(app)
     configure_logging(app)
@@ -48,10 +47,6 @@ def configure_extensions(app):
 
     # flask-login
     login_manager.login_view = 'auth.login'
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(user_id)
 
     login_manager.init_app(app)
 
@@ -129,14 +124,16 @@ def configure_logging(app):
     app.logger.info('Application startup')
 
 
-def configure_hook(app):
-
-    @app.before_request
-    def before_request():
-        pass
-
-
 def configure_cli(app):
+    """Add custom commands to the flask command line interface.
+
+    To reset the database to default content:
+        $ flask initdb
+
+    See: http://flask.pocoo.org/docs/0.12/cli/
+    """
+    # Disable check because it is correct that callbacks are never used here.
+    # pylint: disable=unused-variable
 
     @app.cli.command()
     def initdb():

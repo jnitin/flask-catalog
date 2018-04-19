@@ -26,7 +26,7 @@ class UserList(ResourceList):
     """ResourceList: provides get and post methods to retrieve a collection of
                      objects or create one"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
-    def query(self, view_kwargs):
+    def query(self, unused_view_kwargs):
         # we come here when querying:
         # GET /api/v1/users
         query_ = self.session.query(User)
@@ -39,7 +39,7 @@ class UserList(ResourceList):
 
         return query_
 
-    def before_create_object(self, data, view_kwargs):
+    def before_create_object(self, data, unused_view_kwargs):
         # POST /users
         if ('email' not in data or 'password' not in data or
                 'first_name' not in data or 'last_name' not in data):
@@ -57,7 +57,7 @@ class UserList(ResourceList):
                 raise BadRequest('Email {} already registered'.format(
                     data['email']))
 
-    def after_create_object(self, obj, data, view_kwargs):
+    def after_create_object(self, obj, unused_data, unused_view_kwargs):
         if obj.is_authenticated:
             # User was succesfully registered
             # send user a confirmatin link via email

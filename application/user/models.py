@@ -302,7 +302,7 @@ class User(db.Model, UserMixin):
 # current_user.is_administrator() without having to check whether the user is
 # logged in first.
 class AnonymousUser(AnonymousUserMixin):
-    def can(self, permissions):
+    def can(self, unused_perm):
         return False
 
     def is_administrator(self):
@@ -313,6 +313,11 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class Permission:

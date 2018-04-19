@@ -73,7 +73,7 @@ class CategoryList(ResourceList):
 
         return query_
 
-    def before_create_object(self, data, view_kwargs):
+    def before_create_object(self, data, unused_view_kwargs):
         # POST /api/v1/categories
 
         if 'name' not in data:
