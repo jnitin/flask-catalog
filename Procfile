@@ -1,1 +1,1 @@
-web: gunicorn catalog:app
+web: flask db upgrade; gunicorn catalog:app
