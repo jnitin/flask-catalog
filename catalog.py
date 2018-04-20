@@ -4,25 +4,37 @@ import os
 import os.path
 from application import create_app
 
+##############################################################################
+# Flask coding convention is to use lowercase for exensions and store them as
+# module level variables. Pylint interprets module level variables as
+# constants, which according to the PEP 8 Style Guide must use UPPER_CASE
+# naming style.
+#
+# Avoid rhis error from pylint:
+# C0103: Constant name "pp" doesn't conform to UPPER_CASE naming style
+#
+# pylint: disable=invalid-name
+##############################################################################
+
 app = create_app()
 
 if __name__ == '__main__':
     ###########################################################################
     # USE THIS WHEN RUNNING IN THE UDACITY VAGRANT ENVIRONMENT
     #
-    # - APP.debug = True
+    # - app.debug = True
     #   -> tells server to restart itself when it finds code changes
     #   -> provides a debugger in the browser
     #
     # - host='0.0.0.0' tells the server to listen on ALL public IP addresses
     ###########################################################################
-    # APP.debug = True
-    # APP.run(host='0.0.0.0', port=5000)
+    # app.debug = True
+    # app.run(host='0.0.0.0', port=5000)
 
     ###########################################################################
     # USE THIS WHEN RUNNING LOCAL, WITH debug
     ###########################################################################
-    # APP.run(debug=True)
+    # app.run(debug=True)
 
     ###########################################################################
     # USE THIS WHEN RUNNING LOCAL & DEBUGGING INSIDE WING IDE
@@ -39,7 +51,7 @@ if __name__ == '__main__':
     # from the IDE, and load pages from a browser to reach breakpoints or
     # exceptions.
     #
-    # If you did not set the use_reloader argument to APP.run() to True then
+    # If you did not set the use_reloader argument to app.run() to True then
     # you will need to use Restart Debugging in the Debug menu or the restart
     # @icon in the toolbar to load changed code into Flask.
     #
