@@ -1,3 +1,4 @@
+"""Define logical data abstraction for REST API of User model"""
 from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
 
@@ -5,6 +6,7 @@ from marshmallow_jsonapi import fields
 class UserSchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for User model"""
     class Meta:  # pylint: disable=too-few-public-methods
+        """Define the details that come with HTTP Request"""
         type_ = 'user'
         # Note: For usage of api.user_details see this discussion:
         # https://github.com/miLibris/flask-rest-jsonapi/issues/35

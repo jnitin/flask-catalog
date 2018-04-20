@@ -1,3 +1,6 @@
+"""Define the URL routes (views) for the views blueprint and handle all the
+HTTP requests into those routes. (front-end)
+"""
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 

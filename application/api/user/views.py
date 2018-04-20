@@ -1,3 +1,6 @@
+"""Define the URL routes (views) for the user package of the REST api
+blueprint and handle all the HTTP requests into those api routes
+"""
 from flask_rest_jsonapi import ResourceDetail, ResourceList, \
      ResourceRelationship
 from flask_rest_jsonapi.exceptions import JsonApiException, BadRequest
@@ -27,6 +30,10 @@ class UserList(ResourceList):
                      objects or create one"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, unused_view_kwargs):
+        """Adjust query to retrieve only data for users that the current user
+        has access too. Regular user can only get own user data, while manager
+        and admin can get complete list of all users
+        """
         # we come here when querying:
         # GET /api/v1/users
         query_ = self.session.query(User)
@@ -40,6 +47,7 @@ class UserList(ResourceList):
         return query_
 
     def before_create_object(self, data, unused_view_kwargs):
+        """Prior to creating a new user, check all is OK"""
         # POST /users
         if ('email' not in data or 'password' not in data or
                 'first_name' not in data or 'last_name' not in data):
@@ -58,6 +66,8 @@ class UserList(ResourceList):
                     data['email']))
 
     def after_create_object(self, obj, unused_data, unused_view_kwargs):
+        """After a new user is successfully created, send a confirmation email
+        """
         # pylint: disable=no-self-use
 
         if obj.is_authenticated:
@@ -80,6 +90,7 @@ class UserDetail(ResourceDetail):
                        object"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def before_get_object(self, view_kwargs):
+        """Before retrieving requested details of a user, check all is OK"""
         # pylint: disable=no-self-use
 
         # Find the user and check access permission if we got here through:
@@ -176,6 +187,7 @@ rest_jsonapi.route(UserItemRelationship, 'user_items',
 # Custom routes, not going over Flask-REST-JSONAPI
 @api_blueprint.route('/profile_pic', methods=['GET', 'POST'])
 def upload_profile_pic():
+    """Upload or download of a profile picture via HTTP request to the API """
     if request.method == 'POST':
         if 'profile_pic' in request.files:
             client_file_storage = request.files['profile_pic']
@@ -203,6 +215,7 @@ def upload_profile_pic():
 @api_blueprint.route('/invite/<string:user_email>', methods=['POST'])
 @admin_required
 def invite(user_email):
+    """Handle HTTP request to API to send invitation email"""
     user = User.query.filter_by(email=user_email).first()
     if user:
         return jsonify(message='Email {} already registered'.format(

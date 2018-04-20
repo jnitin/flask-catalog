@@ -1,4 +1,9 @@
-"""Helper function to allow admin to retrieve a list of all application URLs"""
+"""Define the URL routes (views) for the help package of the REST api
+blueprint and handle all the HTTP requests into those api routes.
+
+This package provides a helper function to allow an admin to retrieve a list
+of all application URLs
+"""
 from werkzeug.utils import import_string
 from flask import jsonify, current_app
 from .. import api as api_blueprint

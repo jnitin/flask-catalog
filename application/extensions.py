@@ -1,3 +1,8 @@
+"""Add the flask extensions used by the application
+
+Note that all the extensions are initialized in the configure_extensions method
+of app.py
+"""
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -17,7 +22,7 @@ from flask_mail import Mail
 # pylint: disable=invalid-name
 ##############################################################################
 
-# Initialize SQLAlchemy
+# Add SQLAlchemy
 db = SQLAlchemy()
 
 # Add Flask-Migrate extension, for migrating databases

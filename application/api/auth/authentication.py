@@ -1,3 +1,4 @@
+"""Methods to authenticate API requests"""
 from flask import g, request
 from flask_login import login_user
 from flask_httpauth import HTTPBasicAuth
@@ -13,6 +14,10 @@ basic_auth = HTTPBasicAuth()  # pylint: disable=invalid-name
 
 @basic_auth.verify_password
 def verify_password(email_or_token, password):
+    """Checks that provided password or token is correct.
+    If authentication successful, the user will be logged in to allow request
+    to be processed as a logged in user, and the method will return True
+    """
     if email_or_token == '':
         # We make 1 exception:
         #  POST /api/v#/users/ to register a new user is allowed without login
@@ -62,6 +67,9 @@ def auth_error():
 @api_blueprint.before_request
 @basic_auth.login_required
 def before_request():
+    """Before each API request, enforce that a user is authenticated (done via
+    decorator) and then check that user's email has been confirmed
+    """
     if not g.current_user.is_anonymous and \
             not g.current_user.confirmed:
         return forbidden('Unconfirmed account')

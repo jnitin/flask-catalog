@@ -1,3 +1,6 @@
+"""Define the URL routes (views) for the catalog package of the REST api
+blueprint and handle all the HTTP requests into those api routes
+"""
 from flask_rest_jsonapi import ResourceDetail, ResourceList, \
      ResourceRelationship
 from flask_rest_jsonapi.exceptions import ObjectNotFound, \
@@ -12,6 +15,7 @@ from ...extensions import api as rest_jsonapi
 
 
 def find_user_by_category_id(category_id):
+    """Helper function to find user that owns the category with category_id"""
     try:
         category = Category.query.filter_by(id=category_id).one()
     except NoResultFound:
@@ -22,6 +26,7 @@ def find_user_by_category_id(category_id):
 
 
 def find_user_by_item_id(item_id):
+    """Helper function to find user that owns the item with item_id"""
     try:
         item = Item.query.filter_by(id=item_id).one()
     except NoResultFound:
@@ -62,6 +67,9 @@ class CategoryList(ResourceList):
                      objects or create one"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, view_kwargs):
+        """Adjust query to search for categories owned by current user only if
+        the user_id is provided in the request
+        """
         # we come here when querying categories:
         # GET /api/v1/categories
         # GET /api/v1/users/<id>/categories
@@ -74,6 +82,10 @@ class CategoryList(ResourceList):
         return query_
 
     def before_create_object(self, data, unused_view_kwargs):
+        """Prior to creating a new category, check all is OK and insert the
+        user_id of the current user into the request, so that the foreign
+        key for user_id is correctly stored with created category
+        """
         # pylint: disable=no-self-use
 
         # POST /api/v1/categories
@@ -133,6 +145,9 @@ class ItemList(ResourceList):
                      objects or create one"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def query(self, view_kwargs):
+        """Adjust query to search for items owned by current user only if
+        the user_id is provided in the request
+        """
         # we come here when querying items:
         # GET /api/v1/items
         # GET /api/v1/users/<id>/items
@@ -149,6 +164,13 @@ class ItemList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
+        """Prior to creating a new item, check all is OK and insert the
+        user_id of the current user into the request, so that the foreign
+        key for user_id is correctly s0tored with created item.
+
+        Also stores the category_id of the request URL into the data storage
+        used to set the foreign key of the item pointing to the category.
+        """
         # pylint: disable=no-self-use
 
         # POST /api/v1/categories/<int:category_id>/items

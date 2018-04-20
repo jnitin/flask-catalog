@@ -4,9 +4,7 @@ from flask import Flask
 from config import Config
 from .user import User, Role
 from .catalog import Item
-
 from .extensions import db, migrate, login_manager, api, images, mail
-from .filters import format_date, pretty_date, nl2br
 
 
 # For import *
@@ -24,22 +22,40 @@ def create_app(config=Config, app_name=None):
     configure_blueprints(app)
     configure_extensions(app)
     configure_logging(app)
-    configure_template_filters(app)
     configure_cli(app)
 
     return app
 
 
 def configure_app(app, config):
-    """Different ways of configurations."""
+    """Set configuration values of the application.
 
-    # Load the configuration from ./config.py
-    # http://flask.pocoo.org/docs/api/#configuration
-    # Note: Potentially overwritten by TestConfig class during unit testing
+    The approach we use is to set the configuration parameters from an object
+    that is instantiated from a selected class in config.py
+
+    A different configuration class is used during unit-testing versus
+    deployment.
+
+    In addition, the actual configuration parameters can be set via environment
+    variables. For details on that, see the Config class in config.py
+
+    This method is described in:
+        http://flask.pocoo.org/docs/api/#configuration
+    """
+
     app.config.from_object(config)
 
 
 def configure_extensions(app):
+    """Initialize all the Flask extensions used by the application:
+
+    - flask-sqlalchemy
+    - flask-migrate
+    - flask-login
+    - flask-rest-jsonapi
+    - flask-uploads
+    - flask-mail
+    """
     # flask-sqlalchemy
     db.init_app(app)
 
@@ -81,14 +97,6 @@ def configure_blueprints(app):
     # Register all blueprints with the application
     for blueprint in [user, auth, email, catalog]:
         app.register_blueprint(blueprint)
-
-
-def configure_template_filters(app):
-    """Configure filters."""
-
-    app.jinja_env.filters["pretty_date"] = pretty_date
-    app.jinja_env.filters["format_date"] = format_date
-    app.jinja_env.filters["nl2br"] = nl2br
 
 
 def configure_logging(app):

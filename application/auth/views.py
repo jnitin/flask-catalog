@@ -1,3 +1,6 @@
+"""Define the URL routes (views) for the auth blueprint and handle all the
+HTTP requests into those routes. (front-end)
+"""
 import random
 import string
 import json
@@ -33,6 +36,7 @@ def before_request():
 
 @auth.route('/unconfirmed')
 def unconfirmed():
+    """Display message to user that email is not yet confirmed"""
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('auth.index'))
     return render_template('auth/unconfirmed.html')
@@ -40,7 +44,10 @@ def unconfirmed():
 
 @auth.route('/')
 def index():
-    if current_user.is_authenticated and current_user.is_active and \
+    """Display main landing page, which is different for a visitor versus a
+    logged in user.
+    """
+    if current_user.is_authenticated and current_user.confirmed and \
        not current_user.blocked:
         return redirect(url_for('catalog.categories'))
     return render_template('index.html')
@@ -48,7 +55,8 @@ def index():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated and current_user.is_active and \
+    """Allow user to login."""
+    if current_user.is_authenticated and current_user.confirmed and \
        not current_user.blocked:
         return redirect(url_for('catalog.categories'))
 
@@ -101,6 +109,7 @@ def login():
 
 @auth.route('/logout')
 def logout():
+    """Allow user to logout."""
     logout_user()
     flash('Succesfully logged out', 'success')
     return redirect(url_for('auth.index'))
@@ -108,10 +117,11 @@ def logout():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    """Allow user to register."""
     if current_user.is_authenticated and current_user.blocked:
         return redirect(url_for('auth.blocked_account'))
 
-    if current_user.is_authenticated and current_user.is_active:
+    if current_user.is_authenticated and current_user.confirmed:
         return redirect(url_for('catalog.categories'))
 
     # Create anti-forgery state token for google oauth logic with Ajax request
@@ -159,6 +169,7 @@ def register():
 
 @auth.route('/register/<token>', methods=['GET', 'POST'])
 def register_from_invitation(token):
+    """Allow user to register from a link in an invitation email."""
     if current_user.is_authenticated:
         logout_user()
 
@@ -191,6 +202,7 @@ def register_from_invitation(token):
 
 @auth.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
+    """Allow user to request reset password email."""
     if current_user.is_authenticated and current_user.blocked:
         return redirect(url_for('auth.blocked_account'))
 
@@ -216,6 +228,7 @@ def reset_password_request():
 
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    """Allow user to reset password from a link in a reset password email."""
     if current_user.is_authenticated:
         logout_user()
 
@@ -238,6 +251,7 @@ def reset_password(token):
 
 @auth.route('/blocked_account')
 def blocked_account():
+    """Display message that account has been blocked"""
     flash('Your account has been blocked.', 'danger')
     flash('Contact the site administrator.', 'danger')
     return render_template('auth/blocked_account.html')
@@ -249,6 +263,7 @@ def blocked_account():
 #
 @auth.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Login (and register on the fly) via Google OAUTH2 authentication"""
     # Validate state token protect against cross-site reference forgery attacks
     if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)

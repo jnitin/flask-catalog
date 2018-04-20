@@ -1,3 +1,4 @@
+"""Define the forms of the user blueprint. (front-end)"""
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import ValidationError, StringField, SubmitField, FileField
@@ -9,6 +10,7 @@ from . import User
 
 
 class ProfileForm(FlaskForm):
+    """Form to update a user profile"""
     profile_pic = FileField('Profile Picture',
                             validators=[FileAllowed(images, 'Images only!')])
     email = EmailField('Email',
@@ -20,6 +22,7 @@ class ProfileForm(FlaskForm):
     submit = SubmitField('Update profile')
 
     def validate_email(self, field):
+        """Check if email provided is already registered"""
         # pylint: disable=no-self-use
 
         email_current = current_user.email

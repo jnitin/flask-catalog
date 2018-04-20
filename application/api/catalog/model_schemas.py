@@ -1,3 +1,6 @@
+"""Define logical data abstraction for REST API of catalog, including a
+Category model and an Item model
+"""
 from marshmallow_jsonapi.flask import Schema, Relationship
 from marshmallow_jsonapi import fields
 
@@ -5,6 +8,7 @@ from marshmallow_jsonapi import fields
 class CategorySchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for Category model"""
     class Meta:  # pylint: disable=too-few-public-methods
+        """Define the details that come with HTTP Request"""
         type_ = 'category'
         self_view = 'api.category_detail'
         self_view_kwargs = {'id': '<id>'}
@@ -26,6 +30,7 @@ class CategorySchema(Schema):
 class ItemSchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for Item model"""
     class Meta:  # pylint: disable=too-few-public-methods
+        """Define the details that come with HTTP Request"""
         type_ = 'item'
         self_view = 'api.item_detail'
         self_view_kwargs = {'id': '<id>'}

@@ -1,3 +1,6 @@
+"""Define the URL routes (views) for the catalog blueprint and handle all the
+HTTP requests into those routes. (front-end)
+"""
 from flask import Blueprint, render_template, flash, \
     url_for, redirect, abort
 from flask_login import login_required, current_user
@@ -15,6 +18,7 @@ catalog = Blueprint('catalog',  # pylint: disable=invalid-name
 @catalog.route('/categories/',
                methods=['GET'])
 def categories():
+    """Handle HTTP requests for categories"""
     all_categories = Category.query.all()
     if all_categories:
         # redirect it to the first existing category_id
@@ -34,6 +38,7 @@ def categories():
 @catalog.route('/categories/<int:category_id>/items',
                methods=['GET'])
 def category_items(category_id):
+    """Handle HTTP requests for all items in a category"""
     category_active = Category.query.filter_by(id=category_id).first()
     if category_active is None:
         abort(404)
@@ -52,8 +57,7 @@ def category_items(category_id):
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/',
                methods=['GET'])
 def category_item(category_id, item_id):
-    # Details of an item
-
+    """Handle HTTP requests for a specific item in a category"""
     category_active = Category.query.filter_by(id=category_id).first()
     item_active = Item.query.filter_by(id=item_id).first()
 
@@ -76,6 +80,7 @@ def category_item(category_id, item_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category():
+    """Handle HTTP requests to add a category"""
     form = AddCategoryForm()
 
     if form.validate_on_submit():
@@ -101,7 +106,7 @@ def add_category():
                methods=['GET', 'POST'])
 @login_required
 def edit_category(category_id):
-
+    """Handle HTTP requests to edit a category"""
     category_active = Category.query.filter_by(id=category_id).first()
 
     if category_active is None:
@@ -137,6 +142,7 @@ def edit_category(category_id):
                methods=['GET'])
 @login_required
 def delete_category(category_id):
+    """Handle HTTP requests to delete a category"""
     #
     # NOTES:
     # Confirmation if user really wants to delete is done on client side
@@ -175,6 +181,7 @@ def delete_category(category_id):
                methods=['GET', 'POST'])
 @login_required
 def add_category_item(category_id):
+    """Handle HTTP requests to add an item to a category"""
     category_active = Category.query.filter_by(id=category_id).first()
 
     if category_active is None:
@@ -209,6 +216,7 @@ def add_category_item(category_id):
                methods=['GET', 'POST'])
 @login_required
 def edit_category_item(category_id, item_id):
+    """Handle HTTP requests to edit an item of a category"""
     category_active = Category.query.filter_by(id=category_id).first()
     item_active = Item.query.filter_by(id=item_id).first()
 
@@ -256,6 +264,7 @@ def edit_category_item(category_id, item_id):
                methods=['GET', 'POST'])
 @login_required
 def delete_category_item(category_id, item_id):
+    """Handle HTTP requests to delete an item of a category"""
     #
     # NOTES:
     # Confirmation if user really wants to delete is done on client side

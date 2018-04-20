@@ -1,3 +1,4 @@
+"""Utilities used by the email blueprint"""
 from flask import current_app, url_for, render_template
 from flask_mail import Message
 # from threading import Thread
@@ -31,17 +32,20 @@ def send_email(subject, recipients, html_body):
 
 
 def get_confirmation_link(user):
+    """Generates a token and returns a URL for email confirmation"""
     token = user.generate_confirmation_token()
     return url_for('email.confirm', token=token, _external=True)
 
 
 def get_invitation_link(user_email):
+    """Generates a token and returns a URL for invitation to register"""
     token = User.generate_invitation_token(user_email)
     return url_for('auth.register_from_invitation', token=token,
                    _external=True)
 
 
 def get_reset_password_link(user):
+    """Generates a token and returns a URL for a password reset"""
     token = user.generate_reset_password_token()
     return url_for('auth.reset_password', token=token, _external=True)
 
