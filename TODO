@@ -311,6 +311,10 @@ deployment
 
      ( ) Deploy
 
+		  ( ) First clean out the migrations in local repository.
+		      (This needs to be done differently once going for a real application)
+		       $ ./reset_db_migrations.sh
+
           ( ) Commit everything
                $ git add .
                $ git commit -m "Ready for heroku deployment"
