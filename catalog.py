@@ -4,7 +4,7 @@ import os
 import os.path
 from application import create_app
 
-APP = create_app()
+app = create_app()
 
 if __name__ == '__main__':
     ###########################################################################
@@ -50,6 +50,6 @@ if __name__ == '__main__':
     ###########################################################################
 
     if 'WINGDB_ACTIVE' in os.environ:
-        APP.debug = False
+        app.debug = False
 
-    APP.run(port=5000, use_reloader=False)
+    app.run(port=5000, use_reloader=False)
