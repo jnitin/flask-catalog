@@ -311,7 +311,7 @@ deployment
 
      ( ) Deploy
 
-		  ( ) First clean out the migrations in local repository.
+		  ( ) First clean out the migrations in local repository and do first migration
 		      (This needs to be done differently once going for a real application)
 		       $ ./reset_db_migrations.sh
 
