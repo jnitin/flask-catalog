@@ -42,20 +42,21 @@ def verify_password(email_or_token, password):
 
 @basic_auth.error_handler
 def auth_error():
-    # return unauthorized('Invalid credentials')
+    """Provide error message explaining authentication error"""
     # g.current_user might not be defined, so wrap it into a try block
     try:
         if g.current_user is not None and g.current_user.blocked:
             return error_response(403, 'Account has been blocked.'
                                   'Contact the site administrator.')
 
-        if g.current_user is not None and g.current_user.is_active is False:
-            return error_response(403, "Account is not yet activated."
-                                  "Please check your email to activate.")
+        if g.current_user is not None and not g.current_user.confirmed:
+            return error_response(403, "Email is not yet confirmed."
+                                  "Please check your email to corfirm.")
 
-        return unauthorized('Invalid credentials')
     except AttributeError:
-        return unauthorized('Invalid credentials')
+        pass
+
+    return unauthorized('Invalid credentials')
 
 
 @api_blueprint.before_request
@@ -64,3 +65,5 @@ def before_request():
     if not g.current_user.is_anonymous and \
             not g.current_user.confirmed:
         return forbidden('Unconfirmed account')
+
+    return None

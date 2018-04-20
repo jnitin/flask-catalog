@@ -20,6 +20,8 @@ class ProfileForm(FlaskForm):
     submit = SubmitField('Update profile')
 
     def validate_email(self, field):
+        # pylint: disable=no-self-use
+
         email_current = current_user.email
         email_new = field.data
         if email_new != email_current:

@@ -8,7 +8,8 @@ from ..extensions import db
 from ..catalog import Category, Item
 
 
-catalog = Blueprint('catalog', __name__, url_prefix='/catalog')  # pylint: disable=invalid-name
+catalog = Blueprint('catalog',  # pylint: disable=invalid-name
+                    __name__, url_prefix='/catalog')
 
 
 @catalog.route('/categories/',
@@ -33,39 +34,42 @@ def categories():
 @catalog.route('/categories/<int:category_id>/items',
                methods=['GET'])
 def category_items(category_id):
-    # All the items of category_id
-    all_categories = Category.query.all()
     category_active = Category.query.filter_by(id=category_id).first()
-    if category_active:
-        items = Item.query.filter_by(category_id=category_id).all()
-        return render_template('catalog/items.html',
-                               categories=all_categories,
-                               category_id=category_id,
-                               category_active=category_active,
-                               items=items,
-                               item_id=0,
-                               item_active=None)
-    abort(404)
+    if category_active is None:
+        abort(404)
+
+    all_categories = Category.query.all()
+    items = Item.query.filter_by(category_id=category_id).all()
+    return render_template('catalog/items.html',
+                           categories=all_categories,
+                           category_id=category_id,
+                           category_active=category_active,
+                           items=items,
+                           item_id=0,
+                           item_active=None)
 
 
 @catalog.route('/categories/<int:category_id>/items/<int:item_id>/',
                methods=['GET'])
 def category_item(category_id, item_id):
     # Details of an item
-    all_categories = Category.query.all()
+
     category_active = Category.query.filter_by(id=category_id).first()
-    if category_active:
-        items = Item.query.filter_by(category_id=category_id).all()
-        item_active = Item.query.filter_by(id=item_id).first()
-        if item_active:
-            return render_template('catalog/items.html',
-                                   categories=all_categories,
-                                   category_id=category_id,
-                                   category_active=category_active,
-                                   items=items,
-                                   item_id=item_id,
-                                   item_active=item_active)
-    abort(404)
+    item_active = Item.query.filter_by(id=item_id).first()
+
+    if category_active is None or item_active is None:
+        abort(404)
+
+    all_categories = Category.query.all()
+    items = Item.query.filter_by(category_id=category_id).all()
+
+    return render_template('catalog/items.html',
+                           categories=all_categories,
+                           category_id=category_id,
+                           category_active=category_active,
+                           items=items,
+                           item_id=item_id,
+                           item_active=item_active)
 
 
 @catalog.route('/categories/add',

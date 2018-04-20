@@ -5,9 +5,9 @@ import json
 
 
 def pprint_sequence(sequence):
-    if (sequence is not None and len(sequence) > 0):
-        pp = pprint.PrettyPrinter(indent=2)
-        pp.pprint(sequence)
+    if not sequence:
+        ppr = pprint.PrettyPrinter(indent=2)
+        ppr.pprint(sequence)
     else:
         print('sequence has no content')
 
@@ -44,11 +44,12 @@ def ordered(obj):
     IMPORTANT: It returns a sorted list, not a json dict !
 
     Taken from:
-    https://stackoverflow.com/questions/25851183/how-to-compare-two-json-objects-with-the-same-elements-in-a-different-order-equa  # NOQA
+    https://stackoverflow.com/questions/25851183/how-to-compare-two-json-objects-with-the-same-elements-in-a-different-order-equa  # pylint: disable=line-to-long
     """
     if isinstance(obj, dict):
         return sorted((k, ordered(v)) for k, v in obj.items())
+
     if isinstance(obj, list):
         return sorted(ordered(x) for x in obj)
-    else:
-        return obj
+
+    return obj

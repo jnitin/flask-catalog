@@ -99,7 +99,7 @@ def configure_logging(app):
 
     import logging
     import os
-    # from logging.handlers import SMTPHandler
+    from logging.handlers import RotatingFileHandler
 
     if app.config['LOG_TO_STDOUT']:
         stream_handler = logging.StreamHandler()
@@ -109,7 +109,7 @@ def configure_logging(app):
         if not os.path.exists('logs'):
             os.mkdir('logs')
 
-        info_file_handler = logging.handlers.RotatingFileHandler(
+        info_file_handler = RotatingFileHandler(
             'logs/info.log', maxBytes=10240, backupCount=10)
         info_file_handler.setLevel(logging.INFO)
         info_file_handler.setFormatter(logging.Formatter(

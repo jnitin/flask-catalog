@@ -20,15 +20,15 @@ auth = Blueprint('auth', __name__)  # pylint: disable=invalid-name
 
 @auth.before_app_request
 def before_request():
-    if current_user.is_authenticated:
-        # current_user.ping()
-        if not current_user.confirmed \
-                and request.endpoint \
-                and request.endpoint != 'email.confirm' \
-                and request.endpoint != 'email.check_your_email' \
-                and request.blueprint != 'auth' \
-                and request.endpoint != 'static':
+    """Redirect unconfirmed users to the proper landing page"""
+    if current_user.is_authenticated and not current_user.confirmed:
+        if request.blueprint != 'auth' and \
+           request.endpoint != 'email.confirm' and \
+           request.endpoint != 'email.check_your_email' and \
+           request.endpoint != 'static':
             return redirect(url_for('auth.unconfirmed'))
+
+    return None
 
 
 @auth.route('/unconfirmed')
@@ -254,6 +254,7 @@ def gconnect():
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+
     # Obtain authorization code
     # This is the one-time code that Google+ API had sent to the client
     code = request.data
@@ -274,44 +275,9 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # Check that the access token is valid.
-    access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
-    http = httplib2.Http()
-    # python2 returns a string:
-    # result = json.loads(http.request(url, 'GET')[1])
-    # python3 returns a byte object:
-    result = json.loads(http.request(url, 'GET')[1].decode())
-    # If there was an error in the access token info, abort.
-    if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Verify that the access token is used for the intended user.
-    gplus_id = credentials.id_token['sub']
-    if result['user_id'] != gplus_id:
-        response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    # Verify that the access token is valid for this current_app
-    client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
-    if result['issued_to'] != client_id:
-        response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
-        print("Token's client ID does not match app's.")
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
-    stored_access_token = session.get('access_token')
-    stored_gplus_id = session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps(
-            'Current user is already connected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
+    # check that all is OK with credentials, and if not, return message
+    response = check_google_credentials(credentials)
+    if response is not None:
         return response
 
     # Store the access token in the session for later use.
@@ -353,6 +319,48 @@ def gconnect():
 
     return next_page
 
+
+def check_google_credentials(credentials):
+    """Check validity of google credentials"""
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    http = httplib2.Http()
+    result = json.loads(http.request(url, 'GET')[1].decode())
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is used for the intended user.
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this current_app
+    client_id = current_app.config['GOOGLE_OAUTH2']['web']['client_id']
+    if result['issued_to'] != client_id:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        print("Token's client ID does not match app's.")
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    stored_access_token = session.get('access_token')
+    stored_gplus_id = session.get('gplus_id')
+    if stored_access_token is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps(
+            'Current user is already connected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    return None
 
 ###############################################################################
 # DISCONNECT - Revoke a current user's token and reset their session

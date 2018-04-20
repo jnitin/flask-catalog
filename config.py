@@ -13,6 +13,10 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 class Config(object):
     """Configuration of the flask application."""
+    # Accepted pattern in Flask to use a class for configuration
+    # See: http://flask.pocoo.org/docs/0.12/config/
+    # pylint: disable=too-few-public-methods
+
     APP_NAME = "application"  # must be same as folder name
     COPYRIGHT = "Arjaan Buijk 2018"
 
@@ -91,3 +95,16 @@ class Config(object):
     # print('dumping google oauth2 json to disk')
     with open(GOOGLE_OAUTH2_FILE, 'w') as f:
         json.dump(GOOGLE_OAUTH2, f, indent=4)
+
+
+class TestConfig(Config):
+    # Accepted pattern in Flask to use a class for configuration
+    # See: http://flask.pocoo.org/docs/0.12/config/
+    # pylint: disable=too-few-public-methods
+
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'  # In memory database
+
+    # turn CSRF off to enable unittesting of frontend without CSRF tokens
+    CSRF_ENABLED = False
+    WTF_CSRF_ENABLED = False

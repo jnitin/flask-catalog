@@ -58,6 +58,8 @@ class UserList(ResourceList):
                     data['email']))
 
     def after_create_object(self, obj, unused_data, unused_view_kwargs):
+        # pylint: disable=no-self-use
+
         if obj.is_authenticated:
             # User was succesfully registered
             # send user a confirmatin link via email
@@ -78,6 +80,8 @@ class UserDetail(ResourceDetail):
                        object"""
     # http://flask-rest-jsonapi.readthedocs.io/en/latest/resource_manager.html
     def before_get_object(self, view_kwargs):
+        # pylint: disable=no-self-use
+
         # Find the user and check access permission if we got here through:
         # - GET /api/v1/users/<id>
         if view_kwargs.get('id') is not None:

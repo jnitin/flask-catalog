@@ -4,7 +4,7 @@ from ..extensions import db
 from ..user import User
 
 
-class Category(db.Model):
+class Category(db.Model):  # pylint: disable=too-few-public-methods
 
     __tablename__ = 'categories'
 

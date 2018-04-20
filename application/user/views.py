@@ -5,7 +5,8 @@ from . import User
 from .forms import ProfileForm
 from ..extensions import db
 
-user = Blueprint('user', __name__, url_prefix='/user')  # pylint: disable=invalid-name
+user = Blueprint('user',  # pylint: disable=invalid-name
+                 __name__, url_prefix='/user')
 
 
 @user.route('/profile', methods=['GET', 'POST'])

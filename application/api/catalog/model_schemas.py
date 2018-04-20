@@ -4,7 +4,7 @@ from marshmallow_jsonapi import fields
 
 class CategorySchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for Category model"""
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         type_ = 'category'
         self_view = 'api.category_detail'
         self_view_kwargs = {'id': '<id>'}
@@ -25,7 +25,7 @@ class CategorySchema(Schema):
 
 class ItemSchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for Item model"""
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         type_ = 'item'
         self_view = 'api.item_detail'
         self_view_kwargs = {'id': '<id>'}

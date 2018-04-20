@@ -4,7 +4,7 @@ from marshmallow_jsonapi import fields
 
 class UserSchema(Schema):
     """Flask-REST-JSONAPI: Logical data abstraction for User model"""
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
         type_ = 'user'
         # Note: For usage of api.user_details see this discussion:
         # https://github.com/miLibris/flask-rest-jsonapi/issues/35

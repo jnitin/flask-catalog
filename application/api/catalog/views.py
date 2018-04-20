@@ -74,6 +74,8 @@ class CategoryList(ResourceList):
         return query_
 
     def before_create_object(self, data, unused_view_kwargs):
+        # pylint: disable=no-self-use
+
         # POST /api/v1/categories
 
         if 'name' not in data:
@@ -147,6 +149,8 @@ class ItemList(ResourceList):
         return query_
 
     def before_create_object(self, data, view_kwargs):
+        # pylint: disable=no-self-use
+
         # POST /api/v1/categories/<int:category_id>/items
 
         category_id = view_kwargs.get('category_id')

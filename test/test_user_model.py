@@ -1,135 +1,111 @@
 #!/usr/bin/env python3
-import os
-import sys
 import unittest
-from config import Config
 import time
-from datetime import datetime
-from application import create_app
+from test.setup_and_teardown import my_setup, my_teardown
 from application.user import User, AnonymousUser, Role, Permission
 from application.extensions import db
-from application.extensions import api as rest_jsonapi
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite://'  # In memory database
-
-    # turn CSRF off to enable unittesting of frontend without CSRF tokens
-    CSRF_ENABLED = False
-    WTF_CSRF_ENABLED = False
 
 
 class UserModelTestCase(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
     def setUp(self):
-        # avoid error from jsonapi. See description in tests_api.py
-        rest_jsonapi.resources = []
-
-#         self.app = create_app('testing') #TODO: set up like this
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-        Role.insert_roles()
-        User.insert_default_users()
+        my_setup(self)
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        my_teardown(self)
 
     def test_password_setter(self):
-        u = User(password='cat')
-        self.assertTrue(u.password_hash is not None)
+        usr = User(password='cat')
+        self.assertTrue(usr.password_hash is not None)
 
     def test_no_password_getter(self):
-        u = User(password='cat')
+        usr = User(password='cat')
         with self.assertRaises(AttributeError):
-            u.password
+            usr.password  # pylint: disable=W0104
 
     def test_password_verification(self):
-        u = User(password='cat')
-        self.assertTrue(u.verify_password('cat'))
-        self.assertFalse(u.verify_password('dog'))
+        usr = User(password='cat')
+        self.assertTrue(usr.verify_password('cat'))
+        self.assertFalse(usr.verify_password('dog'))
 
     def test_password_salts_are_random(self):
-        u = User(password='cat')
-        u2 = User(password='cat')
-        self.assertTrue(u.password_hash != u2.password_hash)
+        usr = User(password='cat')
+        usr2 = User(password='cat')
+        self.assertTrue(usr.password_hash != usr2.password_hash)
 
     def test_valid_confirmation_token(self):
-        u = User(password='cat')
-        db.session.add(u)
+        usr = User(password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_confirmation_token()
-        self.assertTrue(u.confirm(token))
+        token = usr.generate_confirmation_token()
+        self.assertTrue(usr.confirm(token))
 
     def test_invalid_confirmation_token(self):
-        u1 = User(password='cat')
-        u2 = User(password='dog')
-        db.session.add(u1)
-        db.session.add(u2)
+        usr1 = User(password='cat')
+        usr2 = User(password='dog')
+        db.session.add(usr1)
+        db.session.add(usr2)
         db.session.commit()
-        token = u1.generate_confirmation_token()
-        self.assertFalse(u2.confirm(token))
+        token = usr1.generate_confirmation_token()
+        self.assertFalse(usr2.confirm(token))
 
     def test_expired_confirmation_token(self):
-        u = User(password='cat')
-        db.session.add(u)
+        usr = User(password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_confirmation_token(1)
+        token = usr.generate_confirmation_token(1)
         time.sleep(2)
-        self.assertFalse(u.confirm(token))
+        self.assertFalse(usr.confirm(token))
 
-    def test_valid_reset_password_token(self):
-        u = User(password='cat')
-        db.session.add(u)
+    def test_valid_reset_pw_token(self):
+        usr = User(password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_reset_password_token()
-        self.assertEqual(User.verify_reset_password_token(token), u)
+        token = usr.generate_reset_password_token()
+        self.assertEqual(User.verify_reset_password_token(token), usr)
 
-    def test_invalid_reset_password_token(self):
-        u = User(password='cat')
-        db.session.add(u)
+    def test_invalid_reset_pw_token(self):
+        usr = User(password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_reset_password_token()
+        token = usr.generate_reset_password_token()
         self.assertIsNone(User.verify_reset_password_token(token + 'a'))
 
-    def test_expired_reset_password_token(self):
-        u = User(password='cat')
-        db.session.add(u)
+    def test_expired_reset_pw_token(self):
+        usr = User(password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_reset_password_token(1)
+        token = usr.generate_reset_password_token(1)
         time.sleep(2)
         self.assertIsNone(User.verify_reset_password_token(token))
 
     def test_valid_email_change_token(self):
-        u = User(email='john@example.com', password='cat')
-        db.session.add(u)
+        usr = User(email='john@example.com', password='cat')
+        db.session.add(usr)
         db.session.commit()
-        token = u.generate_email_change_token('susan@example.org')
-        self.assertTrue(u.change_email(token))
-        self.assertTrue(u.email == 'susan@example.org')
+        token = usr.generate_email_change_token('susan@example.org')
+        self.assertTrue(usr.change_email(token))
+        self.assertTrue(usr.email == 'susan@example.org')
 
     def test_invalid_email_change_token(self):
-        u1 = User(email='john@example.com', password='cat')
-        u2 = User(email='susan@example.org', password='dog')
-        db.session.add(u1)
-        db.session.add(u2)
+        usr1 = User(email='john@example.com', password='cat')
+        usr2 = User(email='susan@example.org', password='dog')
+        db.session.add(usr1)
+        db.session.add(usr2)
         db.session.commit()
-        token = u1.generate_email_change_token('david@example.net')
-        self.assertFalse(u2.change_email(token))
-        self.assertTrue(u2.email == 'susan@example.org')
+        token = usr1.generate_email_change_token('david@example.net')
+        self.assertFalse(usr2.change_email(token))
+        self.assertTrue(usr2.email == 'susan@example.org')
 
-    def test_duplicate_email_change_token(self):
-        u1 = User(email='john@example.com', password='cat')
-        u2 = User(email='susan@example.org', password='dog')
-        db.session.add(u1)
-        db.session.add(u2)
+    def test_wrong_email_change_token(self):
+        usr1 = User(email='john@example.com', password='cat')
+        usr2 = User(email='susan@example.org', password='dog')
+        db.session.add(usr1)
+        db.session.add(usr2)
         db.session.commit()
-        token = u2.generate_email_change_token('john@example.com')
-        self.assertFalse(u2.change_email(token))
-        self.assertTrue(u2.email == 'susan@example.org')
+        token = usr2.generate_email_change_token('john@example.com')
+        self.assertFalse(usr2.change_email(token))
+        self.assertTrue(usr2.email == 'susan@example.org')
 
     def test_valid_invitation_token(self):
         user_email = 'john@example.com'
@@ -152,42 +128,32 @@ class UserModelTestCase(unittest.TestCase):
                          user_email)
 
     def test_user_role(self):
-        u = User(email='john@example.com', password='cat')
-        self.assertTrue(u.can(Permission.CRUD_OWNED))
-        self.assertFalse(u.can(Permission.CRUD_USERS))
-        self.assertFalse(u.can(Permission.ADMIN))
+        usr = User(email='john@example.com', password='cat')
+        self.assertTrue(usr.can(Permission.CRUD_OWNED))
+        self.assertFalse(usr.can(Permission.CRUD_USERS))
+        self.assertFalse(usr.can(Permission.ADMIN))
 
     def test_usermanager_role(self):
-        r = Role.query.filter_by(name='Usermanager').first()
-        u = User(email='john@example.com', password='cat')
-        u.role = r
-        self.assertTrue(u.can(Permission.CRUD_OWNED))
-        self.assertTrue(u.can(Permission.CRUD_USERS))
-        self.assertFalse(u.can(Permission.ADMIN))
+        role = Role.query.filter_by(name='Usermanager').first()
+        usr = User(email='john@example.com', password='cat')
+        usr.role = role
+        self.assertTrue(usr.can(Permission.CRUD_OWNED))
+        self.assertTrue(usr.can(Permission.CRUD_USERS))
+        self.assertFalse(usr.can(Permission.ADMIN))
 
     def test_administrator_role(self):
-        r = Role.query.filter_by(name='Administrator').first()
-        u = User(email='john@example.com', password='cat')
-        u.role = r
-        self.assertTrue(u.can(Permission.CRUD_OWNED))
-        self.assertTrue(u.can(Permission.CRUD_USERS))
-        self.assertTrue(u.can(Permission.ADMIN))
+        role = Role.query.filter_by(name='Administrator').first()
+        usr = User(email='john@example.com', password='cat')
+        usr.role = role
+        self.assertTrue(usr.can(Permission.CRUD_OWNED))
+        self.assertTrue(usr.can(Permission.CRUD_USERS))
+        self.assertTrue(usr.can(Permission.ADMIN))
 
     def test_anonymous_user(self):
-        u = AnonymousUser()
-        self.assertFalse(u.can(Permission.CRUD_OWNED))
-        self.assertFalse(u.can(Permission.CRUD_USERS))
-        self.assertFalse(u.can(Permission.ADMIN))
-
-    def test_to_json(self):
-        u = User(email='john@example.com', password='cat')
-        db.session.add(u)
-        db.session.commit()
-        with self.app.test_request_context('/'):
-            json_user = u.to_json()
-        expected_keys = ['url']
-        self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
-        self.assertEqual('/api/v1/users/' + str(u.id), json_user['url'])
+        usr = AnonymousUser()
+        self.assertFalse(usr.can(Permission.CRUD_OWNED))
+        self.assertFalse(usr.can(Permission.CRUD_USERS))
+        self.assertFalse(usr.can(Permission.ADMIN))
 
 
 if __name__ == '__main__':

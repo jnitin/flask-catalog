@@ -10,6 +10,7 @@ from ..extensions import db, login_manager, images
 
 
 class User(db.Model, UserMixin):
+    # pylint: disable=too-many-instance-attributes, too-many-public-methods
 
     __tablename__ = 'users'
 
@@ -19,7 +20,6 @@ class User(db.Model, UserMixin):
     id = Column(db.Integer, primary_key=True)
     email = db.Column(db.String, index=True, unique=True)
     password_hash = db.Column(db.String(128))  # We store it hashed
-    # password_hash = db.Column(db.Binary(128))  # We store it hashed
     first_name = db.Column(db.String)
     last_name = db.Column(db.String)
     confirmed = db.Column(db.Boolean, nullable=True, default=False)
@@ -52,6 +52,8 @@ class User(db.Model, UserMixin):
                     role=None,
                     with_google=False,
                     profile_pic_url=None):
+
+        # pylint: disable=too-many-arguments
 
         user = User(email=email,
                     first_name=first_name,
@@ -302,7 +304,11 @@ class User(db.Model, UserMixin):
 # current_user.is_administrator() without having to check whether the user is
 # logged in first.
 class AnonymousUser(AnonymousUserMixin):
+    # We want identical, but dummy, functionality as for regular user.
+    # So, just disable the error R0201: Method could be a function
+    # pylint: disable=no-self-use
     def can(self, unused_perm):
+
         return False
 
     def is_administrator(self):
@@ -320,7 +326,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class Permission:
+class Permission:  # pylint: disable=too-few-public-methods
     """Defines the list of permissions"""
     # implementation based on "Flask Web Development - Chapter 9. User Roles"
     CRUD_OWNED = 1

@@ -1,9 +1,8 @@
 """Utility functions to support end-2-end testing with python-requests module,
 as used by our jupyter notebook."""
 
-import pprint
 import json
-from utils import pprint_sequence, ordered
+from test.utils import pprint_sequence
 
 
 def pprint_request(request, print_body=True):
@@ -31,13 +30,10 @@ def pprint_request(request, print_body=True):
         else:
             print('request.body is empty')
 
-    # you can break here in the debugger to further explore the body
-    ...
-
     print('--------------------------------------------------------------')
 
 
-def pprint_response(r, print_text=True, print_content=False):
+def pprint_response(response, print_text=True, print_content=False):
     """Pretty print the response received by python-requests module"""
     # See:
     # http://docs.python-requests.org/en/master/user/quickstart/#make-a-request
@@ -45,28 +41,28 @@ def pprint_response(r, print_text=True, print_content=False):
 
     print('\n--------------------------------------------------------------')
     print('RESPONSE STATUS CODE:')
-    print(r.status_code)
+    print(response.status_code)
 
     print('\nRESPONSE HEADER:')
-    if r.headers is not None:
+    if response.headers is not None:
         # convert CaseInsensitiveDict into dict before pretty printing
         # https://stackoverflow.com/questions/4301069/any-way-to-properly-pretty-print-ordered-dictionaries
-        pprint_sequence(dict(r.headers))
+        pprint_sequence(dict(response.headers))
     else:
-        print('r.headers is empty')
+        print('response.headers is empty')
 
     if print_text:
         print('\nRESPONSE TEXT (Body):')
-        if r.text is not None:
-            pprint_sequence(json.loads(r.text))
+        if response.text is not None:
+            pprint_sequence(json.loads(response.text))
         else:
-            print('r.text is empty')
+            print('response.text is empty')
 
     if print_content:
         print('\nRESPONSE CONTENT (Body):')
-        if r.content is not None:
-            pprint_sequence(json.loads(r.content.decode()))
+        if response.content is not None:
+            pprint_sequence(json.loads(response.content.decode()))
         else:
-            print('r.content is empty')
+            print('response.content is empty')
 
     print('--------------------------------------------------------------')

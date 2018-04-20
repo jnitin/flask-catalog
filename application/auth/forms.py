@@ -28,6 +28,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_email(self, field):
+        # pylint: disable=no-self-use
         if User.query.filter_by(email=field.data).first() is not None:
             raise ValidationError('This email is already registered')
 
