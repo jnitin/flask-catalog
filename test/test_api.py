@@ -12,6 +12,11 @@ from application.extensions import db
 
 
 def get_api_headers(email, password):
+    """Creates the headers for an HTTP request using email & password, with:
+
+    'Content-Type': 'application/vnd.api+json',
+    'Accept': 'application/vnd.api+json'
+    """
     return {
         'Authorization': 'Basic ' + b64encode(
             (email + ':' + password).encode('utf-8')).decode('utf-8'),
@@ -21,6 +26,13 @@ def get_api_headers(email, password):
 
 
 def get_api_headers_multiform(email, password):
+    """Creates the headers for an HTTP request using email & password, with:
+
+    'Content-Type': 'multipart/form-data',
+    'Accept': 'application/vnd.api+json'
+
+    This type of header is used when uploading images.
+    """
     return {
         'Authorization': 'Basic ' + b64encode(
             (email + ':' + password).encode('utf-8')).decode('utf-8'),
@@ -30,6 +42,7 @@ def get_api_headers_multiform(email, password):
 
 
 class APITestCase(unittest.TestCase):
+    """Unit tests for the REST API"""
     # pylint: disable=too-many-public-methods
     def setUp(self):
         my_setup(self)
@@ -40,32 +53,41 @@ class APITestCase(unittest.TestCase):
         my_teardown(self)
 
     def is_200_ok(self, response):
+        """Verifies that the response status code=200"""
         self.assertEqual(response.status_code, 200)
 
     def is_201_created(self, response):
+        """Verifies that the response status code=201"""
         self.assertEqual(response.status_code, 201)
 
     def is_400_bad_request(self, response):
+        """Verifies that the response status code=400"""
         self.assertEqual(response.status_code, 400)
 
     def is_401_unauthorized(self, response):
+        """Verifies that the response status code=401"""
         self.assertEqual(response.status_code, 401)
 
     def is_403_forbidden(self, response):
+        """Verifies that the response status code=403"""
         self.assertEqual(response.status_code, 403)
 
     def is_404_not_found(self, response):
+        """Verifies that the response status code=404"""
         self.assertEqual(response.status_code, 404)
 
     def is_405_method_not_allowed(self, response):
+        """Verifies that the response status code=405"""
         self.assertEqual(response.status_code, 405)
 
     def verify_response_is_401_or_405(self, response):
+        """Verifies that the response status code=401 or 405"""
         self.assertTrue(response.status_code == 401 or
                         response.status_code == 405)
 
     ##########################################################################
     def test_0_0_404(self):
+        """Test that requesting a non-existing url returns status code 404"""
         url = '/api/v1/wrong/url'
         headers = get_api_headers('email', 'password')
         response = self.client().get(url, headers=headers)
@@ -77,6 +99,7 @@ class APITestCase(unittest.TestCase):
         # self.assertEqual(json_response['error'], 'not found')
 
     def test_0_1_no_auth(self):
+        """Test that requests without authentication return code 401"""
         url = '/api/v1/users/'
         response = self.client().get(url,
                                      content_type='application/json')
@@ -86,6 +109,7 @@ class APITestCase(unittest.TestCase):
         # but that is tested below
 
     def test_0_2_bad_auth(self):
+        """Test that requests without wrong authentication return code 401"""
         # add a user
         role = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(role)
@@ -101,6 +125,7 @@ class APITestCase(unittest.TestCase):
         self.is_401_unauthorized(response)
 
     def test_0_3_token_auth(self):
+        """Test that a token is only provided after correct authentication"""
         # add a confirmed
         role = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(role)
@@ -131,12 +156,18 @@ class APITestCase(unittest.TestCase):
         self.is_200_ok(response)
 
     def test_0_4_anonymous(self):
+        """Test that requests without authentication header of anonymous user
+        return code 401
+        """
         url = '/api/v1/users/'
         headers = get_api_headers('', '')
         response = self.client().get(url, headers=headers)
         self.assertEqual(response.status_code, 401)
 
     def test_0_5_unconfirmed_account(self):
+        """Test that a token is only provided for accounts with confirmed
+        email.
+        """
         # add an unconfirmed user
         role = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(role)
@@ -174,6 +205,7 @@ class APITestCase(unittest.TestCase):
 
 
     def test_1_3_invite(self):
+        """Test that an admin and only an admin can invite users to join"""
         # An admin can invite a new user to join
         url = '/api/v1/invite/arjaan.buijk@gmail.com'
         headers = get_api_headers(current_app.config['ADMIN_EMAIL'],
@@ -196,6 +228,9 @@ class APITestCase(unittest.TestCase):
         self.is_403_forbidden(response)
 
     def test_1_4_register(self):
+        """Test typical scenario of user registration, confirmation and
+        token retrieval.
+        """
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {
@@ -248,6 +283,7 @@ class APITestCase(unittest.TestCase):
         self.is_200_ok(response)
 
     def test_1_5_upload_profile_pic(self):
+        """Test that a user can upload and retrieve a profile picture."""
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {
@@ -306,6 +342,10 @@ class APITestCase(unittest.TestCase):
         self.is_200_ok(response)
 
     def test_1_6_block_account(self):
+        """Test that user account is blocked after 3 consecutive failed login
+        attempts. Furthermore test that user cannot re-register, and that only
+        an admin or usermanager can unblock the account.
+        """
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {
@@ -396,6 +436,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(usr.failed_logins, 0)
 
     def test_2_0_get_users(self):
+        """Test retrieval of all users, and verify permissions of admin,
+        usermanager and user.
+        """
         url = '/api/v1/users/'
 
         # admin can retrieve all 3 users
@@ -423,6 +466,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['meta']['count'], 1)
 
     def test_2_1_get_user_by_id(self):
+        """Test retrieval of a user by it's ID, and verify permissions of
+        admin, usermanager and user.
+        """
         url = '/api/v1/users/3'
 
         # admin can retrieve details of any user
@@ -453,6 +499,7 @@ class APITestCase(unittest.TestCase):
         self.is_403_forbidden(response)
 
     def test_2_2_get_user_by_cat_id(self):
+        """Test retrieval of the user who owns a category"""
         url = '/api/v1/categories/1/user'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -463,6 +510,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['data']['id'], '3')
 
     def test_2_3_get_user_by_item_id(self):
+        """Test retrieval of the user who owns an item"""
         url = '/api/v1/items/1/user'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -473,6 +521,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['data']['id'], '3')
 
     def test_3_0_get_categories(self):
+        """Test retrieval of all categories. No permission control is
+        applied to this.
+        """
         url = '/api/v1/categories/'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -483,6 +534,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['meta']['count'], 2)
 
     def test_3_1_get_category_by_id(self):
+        """Test retrieval of a category by ID. No permission control is
+        applied to this.
+        """
         url = '/api/v1/categories/2'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -493,6 +547,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['data']['id'], '2')
 
     def test_3_2_get_categories_of_user(self):
+        """Test retrieval of all categories that belong to a certain user"""
         url = '/api/v1/users/3/categories/'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -503,6 +558,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['meta']['count'], 2)
 
     def test_4_0_get_items(self):
+        """Test retrieval of all items. No permission control is
+        applied to this.
+        """
         url = '/api/v1/items/'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -513,6 +571,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['meta']['count'], 40)
 
     def test_4_1_get_item_by_id(self):
+        """Test retrieval of an item by ID. No permission control is
+        applied to this.
+        """
         url = '/api/v1/items/21'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -523,6 +584,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['data']['id'], '21')
 
     def test_4_2_get_items_of_user(self):
+        """Test retrieval of all items that belong to a certain user"""
         url = '/api/v1/users/3/items/'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -542,6 +604,9 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(json_response['meta']['count'], 0)
 
     def test_4_3_get_items_of_category(self):
+        """Test retrieval of all categories that belong to a certain
+        category
+        """
         url = '/api/v1/categories/2/items/'
 
         headers = get_api_headers(current_app.config['USER_EMAIL'],
@@ -551,7 +616,8 @@ class APITestCase(unittest.TestCase):
         json_response = json.loads(response.get_data(as_text=True))
         self.assertEqual(json_response['meta']['count'], 20)
 
-    def test_10_0_add_item(self):
+    def test_10_0_post_user(self):
+        """Test registration of a new user via a POST request."""
         # Register a new user via POST command
         url = '/api/v1/users/'
         headers = {

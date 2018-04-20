@@ -1,3 +1,4 @@
+"""package catalog in api blueprint"""
 from .model_schemas import CategorySchema, ItemSchema
 from .views import CategoryList, CategoryDetail, CategoryUserRelationship, \
                    ItemList, ItemDetail, ItemUserRelationship, \

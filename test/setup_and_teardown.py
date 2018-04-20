@@ -1,3 +1,4 @@
+"""Define the setUp and tearDown actions for our unit tests"""
 from config import TestConfig
 from application import create_app
 from application.user import User, Role
@@ -6,6 +7,12 @@ from application.extensions import db
 from application.extensions import api as rest_jsonapi
 
 def my_setup(obj):
+    """Call this function from setUp as:
+
+    def setUp(self):
+        my_setup(self)
+
+    """
     # This seems a bug in Flask_REST_JSONAPI
     #
     # The Flask_REST_JSONAPI does not remove the Blue Blueprint objects
@@ -35,6 +42,12 @@ def my_setup(obj):
     Item.insert_default_items()
 
 def my_teardown(obj):
+    """Call this function from tearDown as:
+
+    def tearDown(self):
+        my_teardown(self)
+
+    """
     db.session.remove()
     db.drop_all()
     obj.app_context.pop()

@@ -1,3 +1,4 @@
+"""Module with functions for application creation and configuration"""
 from flask import Flask
 
 from config import Config

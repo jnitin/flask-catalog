@@ -3,14 +3,7 @@
 import pprint
 import json
 
-
-def pprint_sequence(sequence):
-    if not sequence:
-        ppr = pprint.PrettyPrinter(indent=2)
-        ppr.pprint(sequence)
-    else:
-        print('sequence has no content')
-
+PPR = pprint.PrettyPrinter(indent=2)
 
 def pprint_response(response, print_data=True):
     """Pretty print the response received by the flask test client"""
@@ -21,13 +14,13 @@ def pprint_response(response, print_data=True):
 
     print('\nRESPONSE HEADER:')
     if response.headers is not None:
-        pprint_sequence(response.headers.to_wsgi_list())
+        PPR.pprint(response.headers.to_wsgi_list())
     else:
         print('response.headers has no content')
 
     print('\nRESPONSE DATA:')
     if print_data and response.data is not None:
-        pprint_sequence(json.loads(response.data.decode()))
+        PPR.pprint(json.loads(response.data.decode()))
     else:
         print('response.data has no content')
 

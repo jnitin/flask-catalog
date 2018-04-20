@@ -1,9 +1,8 @@
+"""Helper function to allow admin to retrieve a list of all application URLs"""
 from werkzeug.utils import import_string
+from flask import jsonify, current_app
 from .. import api as api_blueprint
-from ...decorators import admin_required, permission_required
-from ...extensions import db, login_manager
-
-from flask import jsonify, g, current_app
+from ...decorators import admin_required
 
 
 @api_blueprint.route('/help', methods=['GET'])
@@ -29,7 +28,7 @@ def routes_info():
                 else:
                     routes.append({rule.rule: current_app.view_functions[
                         rule.endpoint].__doc__})
-        except Exception as exc:
+        except AttributeError:
             routes.append({rule.rule:
                            "(%s) INVALID ROUTE DEFINITION!!!" % rule.endpoint})
             route_info = "%s => %s" % (rule.rule, rule.endpoint)

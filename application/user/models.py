@@ -1,3 +1,4 @@
+"""Definition of database tables using ORM of user"""
 import os
 from sqlalchemy import Column
 # from sqlalchemy.orm import backref
@@ -10,6 +11,7 @@ from ..extensions import db, login_manager, images
 
 
 class User(db.Model, UserMixin):
+    """ORM for User"""
     # pylint: disable=too-many-instance-attributes, too-many-public-methods
 
     __tablename__ = 'users'
@@ -41,6 +43,7 @@ class User(db.Model, UserMixin):
     # Methds typical for every application  #
     #########################################
     def __init__(self, **kwargs):
+        """Initialize a user and set its default Role"""
         super(User, self).__init__(**kwargs)
 
         # Set default role for a regular new User
@@ -52,6 +55,7 @@ class User(db.Model, UserMixin):
                     role=None,
                     with_google=False,
                     profile_pic_url=None):
+        """Creates a user from provided arguments"""
 
         # pylint: disable=too-many-arguments
 
@@ -124,9 +128,11 @@ class User(db.Model, UserMixin):
 
         db.session.commit()
 
-    # Use descriptors to deactivate 'getter' of password
     @property
     def password(self):
+        """By using a descriptor the 'getter' of password is deactivated
+        and will now raise an AttributeError.
+        """
         raise AttributeError('password is not a readable attribute')
 
     # Customize 'setter' of password to store password in hashed format
@@ -150,14 +156,17 @@ class User(db.Model, UserMixin):
             return False
 
     def unblock(self):
+        """Unblock the account by resetting the values"""
         self.failed_logins = 0
         self.blocked = False
 
     def generate_confirmation_token(self, expiration=3600):
+        """Returns an email confirmation token"""
         ser = Serializer(current_app.config['SECRET_KEY'], expiration)
         return ser.dumps({'confirm': self.id}).decode('utf-8')
 
     def confirm(self, token):
+        """Corfirm user and return True if email confirmation token is OK"""
         ser = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = ser.loads(token.encode('utf-8'))
@@ -170,6 +179,7 @@ class User(db.Model, UserMixin):
         return True
 
     def generate_reset_password_token(self, expiration=3600):
+        """Returns a reset password token"""
         ser = Serializer(current_app.config['SECRET_KEY'], expiration)
         return ser.dumps({'reset_password': self.id}).decode('utf-8')
 
@@ -187,11 +197,13 @@ class User(db.Model, UserMixin):
         return None
 
     def generate_email_change_token(self, new_email, expiration=3600):
+        """Returns an email change token"""
         ser = Serializer(current_app.config['SECRET_KEY'], expiration)
         return ser.dumps(
             {'change_email': self.id, 'new_email': new_email}).decode('utf-8')
 
     def change_email(self, token):
+        """Change email and return True if email change token is OK"""
         ser = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = ser.loads(token.encode('utf-8'))
@@ -210,12 +222,14 @@ class User(db.Model, UserMixin):
 
     @staticmethod
     def generate_invitation_token(user_email, expiration=7*3600):
+        """Returns an invitation token"""
         ser = Serializer(current_app.config['SECRET_KEY'], expiration)
         return ser.dumps(
             {'user_email': user_email}).decode('utf-8')
 
     @staticmethod
     def email_from_invitation_token(token):
+        """Return user email if invitation token is OK"""
         ser = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = ser.loads(token.encode('utf-8'))
@@ -238,14 +252,17 @@ class User(db.Model, UserMixin):
         return self.role is not None and self.role.has_permission(perm)
 
     def is_administrator(self):
+        """Returns True if user has admin privileges"""
         return self.can(Permission.ADMIN)
 
     def is_usermanager(self):
+        """Returns True if user has usermanager privileges"""
         return self.can(Permission.CRUD_USERS)
 
-    # Use descriptor to deactivate 'getter' of profile_pic
     @property
     def profile_pic(self):
+        """By using a descriptor 'getter' of profile_pic is deactivated and
+        attempt to retrieve it will raise AttributeError"""
         raise AttributeError('profile_pic is not a readable attribute')
 
     # Customize 'setter' of profile_pic
@@ -274,16 +291,19 @@ class User(db.Model, UserMixin):
         self.profile_pic_url = url
 
     def to_json(self):
+        """Serialize user object to json format"""
         json_user = {'url': url_for('api.user_detail', id=self.id)}
         return json_user
 
     def generate_auth_token(self, expiration):
+        """Returns an authentication token"""
         ser = Serializer(current_app.config['SECRET_KEY'],
                          expires_in=expiration)
         return ser.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_auth_token(token):
+        """Return user id if authentication token is OK"""
         ser = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = ser.loads(token)
@@ -304,17 +324,21 @@ class User(db.Model, UserMixin):
 # current_user.is_administrator() without having to check whether the user is
 # logged in first.
 class AnonymousUser(AnonymousUserMixin):
-    # We want identical, but dummy, functionality as for regular user.
+    """Dummy functionality for Anonymous user so calls to same methods can
+    be made without additional checks.
+    """
     # So, just disable the error R0201: Method could be a function
     # pylint: disable=no-self-use
     def can(self, unused_perm):
-
+        """Anonymous user has no CUD permissions, so always return False"""
         return False
 
     def is_administrator(self):
+        """Anonymous user is not admin, so return False"""
         return False
 
     def is_usermanager(self):
+        """Anonymous user is not usermanager, so return False"""
         return False
 
 
@@ -323,6 +347,7 @@ login_manager.anonymous_user = AnonymousUser
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Callback for flask_login to return user id"""
     return User.query.get(int(user_id))
 
 
@@ -370,6 +395,7 @@ class Role(db.Model):
 
     @staticmethod
     def insert_roles():
+        """Populate the roles & permissions tables in the database."""
         roles = {
             'User': [Permission.CRUD_OWNED],
             'Usermanager': [Permission.CRUD_OWNED, Permission.CRUD_USERS],
@@ -389,18 +415,23 @@ class Role(db.Model):
         db.session.commit()
 
     def add_permission(self, perm):
+        """Helper function to add a permission"""
         if not self.has_permission(perm):
             self.permissions += perm
 
     def remove_permission(self, perm):
+        """Helper function to remove a permission"""
         if self.has_permission(perm):
             self.permissions -= perm
 
     def reset_permissions(self):
+        """Helper function to delete all permissions"""
         self.permissions = 0
 
     def has_permission(self, perm):
+        """Helper function to check on a permission"""
         return self.permissions & perm == perm
 
     def __repr__(self):
+        """Returns output of print"""
         return '<Role %r>' % self.name

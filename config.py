@@ -98,6 +98,7 @@ class Config(object):
 
 
 class TestConfig(Config):
+    """Configuration for unit tests"""
     # Accepted pattern in Flask to use a class for configuration
     # See: http://flask.pocoo.org/docs/0.12/config/
     # pylint: disable=too-few-public-methods

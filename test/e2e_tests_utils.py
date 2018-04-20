@@ -1,9 +1,16 @@
 """Utility functions to support end-2-end testing with python-requests module,
 as used by our jupyter notebook."""
 
+import pprint
 import json
-from test.utils import pprint_sequence
 
+def pprint_sequence(sequence):
+    """Pretty print a sequence"""
+    if not sequence:
+        ppr = pprint.PrettyPrinter(indent=2)
+        ppr.pprint(sequence)
+    else:
+        print('sequence has no content')
 
 def pprint_request(request, print_body=True):
     """Pretty print a request send by python-requests module"""

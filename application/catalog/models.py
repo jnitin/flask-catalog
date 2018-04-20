@@ -1,3 +1,4 @@
+"""Definition of database tables using ORM of catalog"""
 from datetime import datetime
 from flask import current_app, url_for
 from ..extensions import db
@@ -5,7 +6,7 @@ from ..user import User
 
 
 class Category(db.Model):  # pylint: disable=too-few-public-methods
-
+    """ORM for Category"""
     __tablename__ = 'categories'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,12 +18,13 @@ class Category(db.Model):  # pylint: disable=too-few-public-methods
     user = db.relationship('User', backref=db.backref('categories'))
 
     def to_json(self):
+        """Serialize category object to json format"""
         json_category = {'url': url_for('api.category_detail', id=self.id)}
         return json_category
 
 
 class Item(db.Model):
-
+    """ORM for Item"""
     __tablename__ = 'items'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +40,7 @@ class Item(db.Model):
 
     @staticmethod
     def insert_default_items():
+        """Populate database with some default categories & items"""
         beers = [
             {
                 "category": "American Amber / Red Ale",
@@ -153,5 +156,6 @@ class Item(db.Model):
             db.session.commit()
 
     def to_json(self):
+        """Serialize item object to json format"""
         json_item = {'url': url_for('api.item_detail', id=self.id)}
         return json_item
