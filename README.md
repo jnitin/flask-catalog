@@ -570,7 +570,7 @@ $ sudo apt-get install python3-venv
 
 **Step 4. One time: prepare the python3 virtual environment** 
 ```bash
-$ cd Catalog
+$ cd FullstackND-Catalog
 $ python3.6 -m venv venv
 $ source venv/bin/activate
 (venv)
@@ -580,7 +580,7 @@ $ source venv/bin/activate
 
 Alternatively, instead of installing the required python packages using the file 'requirements.txt', which installs the specific versions that were used during development and testing, you can also enter these commands, to install the latest version of each package. Using this script has an advantage in that it also installs and configures the **Jupyter notebook**.
 ```bash
-$ cd Catalog
+$ cd FullstackND-Catalog
 $ python3.6 -m venv venv
 $ source venv/bin/activate
 (venv) $ ./pip_all.sh
