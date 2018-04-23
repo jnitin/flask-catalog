@@ -67,4 +67,4 @@ pip install gunicorn
 ############################################################################
 ## Install package that allows SQLAlchemy to connect to Postgres database ##
 ############################################################################
-pip install psycopg2
+pip install psycopg2-binary
