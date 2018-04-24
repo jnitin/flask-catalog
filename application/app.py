@@ -115,11 +115,12 @@ def configure_logging(app):
         stream_handler.setLevel(logging.INFO)
         app.logger.addHandler(stream_handler)
     else:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
+
+        if not os.path.exists(app.config['INFO_LOG_DIR']):
+            os.mkdir(app.config['INFO_LOG_DIR'])
 
         info_file_handler = RotatingFileHandler(
-            'logs/info.log', maxBytes=10240, backupCount=10)
+            app.config['INFO_LOG_FILE'], maxBytes=10240, backupCount=10)
         info_file_handler.setLevel(logging.INFO)
         info_file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s '

@@ -26,6 +26,10 @@ class Config(object):
     # Option to log directly to stdout
     LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
 
+    # info logging file
+    INFO_LOG_DIR = os.environ.get('INFO_LOG_DIR')
+    INFO_LOG_FILE = os.environ.get('INFO_LOG_FILE')
+
     # We use gmail as our mail server
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
