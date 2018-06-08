@@ -647,6 +647,54 @@ pip install psycopg2
 
 ```
 
+
+
+**Step 4b. One time: Install, secure and start a Redis server** 
+
+The API offloads long running tasks to a worker process, using [rq](http://python-rq.org/), which requires [Redis](https://redis.io/). You can install, secure and start a local Redis server as explained [here](https://redis.io/topics/quickstart), using the following steps:
+
+```bash
+# Download source
+$ cd ~/Downloads
+$ wget http://download.redis.io/redis-stable.tar.gz
+$ tar xvzf redis-stable.tar.gz
+$ cd redis-stable
+$ make
+
+# Optionally, run a test
+$ make test
+
+# Install things in /usr/local/bin
+$ sudo make install
+
+# Move default configuration file to /etc
+$ sudo cp redis.conf /etc
+
+# Protect against outside intrusions over port 6379 by firewalling it
+# See: https://help.ubuntu.com/lts/serverguide/firewall.html
+$ sudo ufw status
+$ sudo ufw enable	# only needed if ufw is not yet active
+$ sudo ufw deny 6379
+```
+
+NOTEs: 
+
+- Make sure to firewall port 6379 to ensure that the Redis server is not accessible from the outside. Read [here](http://antirez.com/news/96) why.
+
+- Also, when starting the Redis server, use a configuration file (/etc/redis.conf) that runs it in protected mode. The default configuration file we copied to /etc/redis.conf does this, so don't turn it off. 
+
+- The command to start and stop the server:
+
+  ```bash
+  # Start the server
+  $ redis-server /etc/redis.conf
+  
+  # Stop the server from the redis-cli 
+  $ redis-cli shutdown
+  ```
+
+
+
 **Step 5. Activate the python virtual environment and start the application server**
 
 This will start the application with a clean and fresh database that contains only the default content:
